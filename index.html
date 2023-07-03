@@ -5,20 +5,42 @@
     <title>OOTP World Editor</title>
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 	<script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="./scripts/jstree.min.js"></script>
+    <link href="./scripts/default/style.min.css" rel="stylesheet">
     <script>
         const { ipcRenderer } = require('electron');
     </script>
 </head>
 <body>
     <input type="button" id="loadXML" value="Load XML file">
+    <div id="xmlOutput">I'M WAITING</div>
 </body>
 <script>
     $("#loadXML").on("click",function(e) {
         ipcRenderer.send('open-xml', null)
     })
 
-    ipcRenderer.on('mainprocess-response', (event, arg) => {
-        alert(arg);
+    ipcRenderer.on('xml-opened', (event, result) => {
+        if (result != 'cancelled') {
+            var json = JSON.parse(result)
+            for (continent of json.WORLD.CONTINENTS[0].CONTINENT) {
+                console.log(continent.$.name)
+                for (nation of continent.NATIONS[0].NATION) {
+                    console.log("  "+nation.$.name)
+                    for (state of nation.STATES[0].STATE) {
+                        console.log("    "+state.$.name)
+                        if (state.CITIES[0].CITY != undefined) {
+                            for (city of state.CITIES[0].CITY) {
+                                console.log("      "+city.$.name)
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        } else {
+            alert("cancelled!")
+        }
     });
 </script>
 </html>

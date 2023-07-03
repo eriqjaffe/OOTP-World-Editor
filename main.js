@@ -1,4 +1,8 @@
 const { app, BrowserWindow, dialog, Menu, shell, ipcMain  } = require('electron')
+const xml2js = require("xml2js");
+const fs = require('fs')
+
+const parser = new xml2js.Parser()
 
 const isMac = process.platform === 'darwin'
 
@@ -11,9 +15,18 @@ ipcMain.on('open-xml', (event, arg) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            event.sender.send('mainprocess-response', result.filePaths[0])
+            try {
+                fs.readFile(result.filePaths[0], 'utf8', function(err, data) {
+                    parser.parseString(data, function (err, result) {
+                        event.sender.send('xml-opened', JSON.stringify(result))
+                    })
+                })
+            } catch (err) {
+                console.log(err)
+                event.sender.send('xml-opened', err)
+            }
         } else {
-            event.sender.send('mainprocess-response', 'cancelled')
+            event.sender.send('xml-opened', 'cancelled')
         }
     })
     

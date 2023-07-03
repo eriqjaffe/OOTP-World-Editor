@@ -7,6 +7,9 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "electron": "^25.2.0"
+    "electron": "^25.2.0",
+    "xml2js": "^0.6.0",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.32"
   }
 }
