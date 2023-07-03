@@ -1,0 +1,12 @@
+{
+  "name": "OOTP-World-Editor",
+  "version": "0.1.0",
+  "description": "A world_default.xml editor for OOTP Baseball",
+  "main": "main.js",
+  "author": "Eriq P Jaffe",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "electron": "^25.2.0"
+  }
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>OOTP World Editor</title>
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+	<script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
+    <script>
+        const { ipcRenderer } = require('electron');
+    </script>
+</head>
+<body>
+    <input type="button" id="loadXML" value="Load XML file">
+</body>
+<script>
+    $("#loadXML").on("click",function(e) {
+        ipcRenderer.send('open-xml', null)
+    })
+
+    ipcRenderer.on('mainprocess-response', (event, arg) => {
+        alert(arg);
+    });
+</script>
+</html>
