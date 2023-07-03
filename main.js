@@ -209,6 +209,8 @@ function createWindow () {
       shell.openExternal(url);
       return { action: 'deny' };
     });
+
+    mainWindow.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
