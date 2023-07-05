@@ -64,7 +64,7 @@ function createWindow () {
           {
               click: () => mainWindow.webContents.send('load-uniform','click'),
               accelerator: isMac ? 'Cmd+L' : 'Control+L',
-              label: 'Load Uniform',
+              label: 'Load XML',
           },
 		  { type: 'separator' },
           {
