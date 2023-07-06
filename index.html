@@ -77,11 +77,14 @@
             max_nation_id = 0
             max_state_id = 0
             max_city_id = 0
+            max_ethnicity_id = 0
             world_count = 0
             continent_count = 0
             nation_count = 0
             state_count = 0
             city_count = 0
+            ethnicity_count = 0
+
             $("#continent_count").text(continent_count)
             $("#nation_count").text(nation_count)
             $("#state_count").text(state_count)
@@ -94,6 +97,28 @@
             // start parsing the new data
             var json = JSON.parse(result)
             var tree_json = [];
+            var ethnicities_arr = {}
+            var ethnicities = []
+            ethnicities_arr.title = "ETHNICITIES";
+            ethnicities_arr.folder = true
+            for (ethnicity of json.WORLD.ETHNICITIES[0].ETHNICITY) {
+                ethnicity_count++;
+                var ethnicity_obj = {}
+                ethnicity_obj.type = 'ethnicity'
+                ethnicity_obj.folder = false
+                ethnicity_obj.title = ethnicity.$.name
+                ethnicity_obj.name_korean = ethnicity.$.name_korean
+                ethnicity_obj.id = ethnicity.$.id
+                ethnicity_obj.african = ethnicity.$.african
+                ethnicity_obj.asian = ethnicity.$.asian
+                ethnicity_obj.east_indian = ethnicity.$.east_indian
+                ethnicity_obj.caucasian = ethnicity.$.caucasian
+                ethnicity_obj.hispanic = ethnicity.$.hispanic
+                console.log(ethnicity_obj)
+                ethnicities.push(ethnicity_obj)
+            }
+            ethnicities_arr.children = ethnicities
+            tree_json.push(ethnicities_arr)
             var continent_arr = {};
             continent_arr.title = "CONTINENTS";
             continent_arr.folder = true;
@@ -199,8 +224,25 @@
                     var node = data.node;
                     var html = ""
                     switch (node.type) {
+                        case "ethnicity":
+                            const eth_total = parseInt(node.data.african) + parseInt(node.data.asian) + parseInt(node.data.east_indian) + parseInt(node.data.caucasian) + parseInt(node.data.hispanic)
+                            html += "<form id='ethnicityForm'>\n"
+                                  + "<table id='ethnicityTable'>\n"
+                                  + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
+                                  + "<tr><td>Name:</td><td><input type='text' id='name' style='width:100%;' value='"+node.title+"'></td></tr>\n"
+                                  + "<tr><td>Name (Korean):</td><td><input type='text' id='name_korean' style='width:100%;' value='"+node.data.name_korean+"'></td></tr>\n"
+                                  + "<tr><td>African:</td><td><input type='number' min='0' max='1000' id='african' style='width:100%;' value='"+node.data.african+"'></td></tr>\n"
+                                  + "<tr><td>Asian:</td><td><input type='number' min='0' max='1000' id='asian' style='width:100%;' value='"+node.data.asian+"'></td></tr>\n"
+                                  + "<tr><td>East Indian:</td><td><input type='number' min='0' max='1000' id='east_indian' style='width:100%;' value='"+node.data.east_indian+"'></td></tr>\n"
+                                  + "<tr><td>Caucasian:</td><td><input type='number' min='0' max='1000' id='caucasian' style='width:100%;' value='"+node.data.caucasian+"'></td></tr>\n"
+                                  + "<tr><td>Hispanic:</td><td><input type='number' min='0' max='1000' id='hispanic' style='width:100%;' value='"+node.data.hispanic+"'></td></tr>\n"
+                                  + "<tr><td>Total:</td><td>"+eth_total+"</td></tr>\n"
+                                  + "</table>\n"
+                                  + "<input type='submit' value='Submit'>\n"
+                                  + "</form>"
+                            $("#dataTable").html(html)
+                            break;
                         case "continent":
-                            console.log(node.data)
                             html += "<form id='continentForm'>\n"
                                   + "<table id='continentTable'>\n"
                                   + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
