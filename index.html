@@ -97,6 +97,7 @@
             // start parsing the new data
             var json = JSON.parse(result)
             var tree_json = [];
+
             var ethnicities_arr = {}
             var ethnicities = []
             ethnicities_arr.title = "ETHNICITIES";
@@ -114,11 +115,11 @@
                 ethnicity_obj.east_indian = ethnicity.$.east_indian
                 ethnicity_obj.caucasian = ethnicity.$.caucasian
                 ethnicity_obj.hispanic = ethnicity.$.hispanic
-                console.log(ethnicity_obj)
                 ethnicities.push(ethnicity_obj)
             }
             ethnicities_arr.children = ethnicities
             tree_json.push(ethnicities_arr)
+            
             var continent_arr = {};
             continent_arr.title = "CONTINENTS";
             continent_arr.folder = true;
@@ -213,6 +214,58 @@
             }
             continent_arr.children = continents
             tree_json.push(continent_arr)
+
+            var regions_arr = {}
+            regions_arr.title = "REGIONS"
+            regions_arr.folder = true
+            var regions = []
+            
+            for (region of json.WORLD.REGIONS[0].REGION) {
+                var region_obj = {}
+                region_obj.type = 'region'
+                region_obj.folder = true
+                region_obj.id = region.$.id
+                region_obj.title = region.$.name
+                region_obj.sort_order = region.$.sort_order
+                region_obj.name_korean = region.$.name_korean
+                var states = {}
+                var nations = {}
+                var state_arr = []
+                var nation_arr = []
+                states.folder = true
+                states.title = "STATES"
+                nations.folder = true
+                nations.title = "NATIONS"
+                try {
+                    for (state of region.REGION_STATES[0].REGION_STATE) {
+                        var state_obj = {}
+                        console.log(state.$.id)
+                        state_obj.title = state.$.id
+                        state_obj.id = state.$.id
+                        state_arr.push(state_obj)
+                    }
+                } catch (err) {
+                }
+                try {
+                    for (nation of region.REGION_NATIONS[0].REGION_NATION) {
+                        var nation_obj = {}
+                        nation_obj.title = nation.$.id
+                        nation_obj.id = nation.$.id
+                        nation_arr.push(nation_obj)
+                    }
+                } catch (err) {
+                }
+                states.children = state_arr
+                nations.children = nation_arr
+                region_obj.children = [states, nations]
+                regions.push(region_obj)
+            }
+
+            regions_arr.children = regions
+            console.log(regions_arr)
+            tree_json.push(regions_arr)
+
+            //console.log(region_obj)
 
             $("#xmlOutput").fancytree({
                 source: tree_json,
