@@ -32,6 +32,9 @@
     </style>
 </head>
 <body>
+    <div id="overlay">
+        <h1 style="color:white;">HELLO WORLD</h1>
+    </div>
     <div class="section group" style="position: absolute; top: 10px; width:100%;" >
         <div class="col span_1_of_2">
             <div id="xmlOutput" style="max-height: 840px; overflow: auto;"></div>
@@ -67,7 +70,7 @@
     })
 
     $("#loadXML").on("click",function(e) {
-        
+        $("#overlay").css("display","inline-block")
         ipcRenderer.send('open-xml', null)
     })
 
@@ -666,8 +669,9 @@
             $("#max_state_id").text(max_state_id)
             $("#max_city_id").text(max_city_id)
 
-
+            $("#overlay").css("display","none")
         } else {
+            $("#overlay").css("display","none")
             alert("cancelled!")
         }
     });

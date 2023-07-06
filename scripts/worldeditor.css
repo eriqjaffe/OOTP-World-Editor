@@ -6,6 +6,18 @@
     line-height: 1.5;
 }
 
+#overlay {
+	width: auto;
+	height: auto;
+	top: 0px;
+	left: 0px;
+	position:absolute;
+	z-index:2;
+	pointer-events:none;
+    display:none;
+    background: rgba(0,0,0,0.5);
+}
+
 table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
