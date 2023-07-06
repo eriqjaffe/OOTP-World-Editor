@@ -6,6 +6,7 @@
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 	<script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree-all-deps.min.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.fancytree.childcounter.js"></script>
     <link href="./scripts/worldeditor.css" rel="stylesheet">
     <link href="./scripts/skin-win8-n/ui.fancytree.min.css" rel="stylesheet">
     <script>
@@ -20,6 +21,12 @@
         var nation_count = 0
         var state_count = 0
         var city_count = 0
+        var ethnicities_by_id = {}
+        var cities_by_id = {}
+        var states_by_id = {}
+        var nations_by_id = {}
+        var continents_by_id = {}
+        var regions_by_id = {}
     </script>
     <style>
         
@@ -103,6 +110,7 @@
             ethnicities_arr.title = "ETHNICITIES";
             ethnicities_arr.folder = true
             for (ethnicity of json.WORLD.ETHNICITIES[0].ETHNICITY) {
+                ethnicities_by_id[ethnicity.$.id] = ethnicity.$.name
                 ethnicity_count++;
                 var ethnicity_obj = {}
                 ethnicity_obj.type = 'ethnicity'
@@ -125,6 +133,7 @@
             continent_arr.folder = true;
             var continents = []
             for (continent of json.WORLD.CONTINENTS[0].CONTINENT) {
+                continents_by_id[continent.$.id] = continent.$.name
                 continent_count++;
                 var continent_obj = {}
                 continent_obj.type = 'continent'
@@ -142,6 +151,7 @@
                 var nation_arr = []
                 for (nation of continent.NATIONS[0].NATION) {
                     const usa = (nation.$.hasOwnProperty('this_is_the_usa')) ? nation.$.this_is_the_usa : nation.$.this_is_modern_usa
+                    nations_by_id[nation.$.id] = nation.$.name
                     nation_count++;
                     var nation_obj = {}
                     nation_obj.type = 'nation'
@@ -166,6 +176,7 @@
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
                     var state_arr = []
                     for (state of nation.STATES[0].STATE) {
+                        states_by_id[state.$.id] = state.$.name
                         state_count++;
                         var state_obj = {}
                         state_obj.type = 'state'
@@ -184,6 +195,7 @@
                         var city_arr = []
                         if (state.CITIES[0].CITY != undefined) {
                             for (city of state.CITIES[0].CITY) {
+                                cities_by_id[city.$.id] = city.$.name
                                 city_count++;
                                 var city_obj = {}
                                 city_obj.type = 'city'
@@ -221,6 +233,7 @@
             var regions = []
             
             for (region of json.WORLD.REGIONS[0].REGION) {
+                regions_by_id[region.$.id] = region.$.name
                 var region_obj = {}
                 region_obj.type = 'region'
                 region_obj.folder = true
@@ -239,8 +252,7 @@
                 try {
                     for (state of region.REGION_STATES[0].REGION_STATE) {
                         var state_obj = {}
-                        console.log(state.$.id)
-                        state_obj.title = state.$.id
+                        state_obj.title = states_by_id[state.$.id] + " ("+state.$.id+")"
                         state_obj.id = state.$.id
                         state_arr.push(state_obj)
                     }
@@ -249,7 +261,7 @@
                 try {
                     for (nation of region.REGION_NATIONS[0].REGION_NATION) {
                         var nation_obj = {}
-                        nation_obj.title = nation.$.id
+                        nation_obj.title = nations_by_id[nation.$.id] + " ("+nation.$.id+")"
                         nation_obj.id = nation.$.id
                         nation_arr.push(nation_obj)
                     }
@@ -260,12 +272,8 @@
                 region_obj.children = [states, nations]
                 regions.push(region_obj)
             }
-
             regions_arr.children = regions
-            console.log(regions_arr)
             tree_json.push(regions_arr)
-
-            //console.log(region_obj)
 
             $("#xmlOutput").fancytree({
                 source: tree_json,
