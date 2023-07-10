@@ -27,3 +27,7 @@ ipcRenderer.on('add-city', (event, data) => {
 ipcRenderer.on('add-region', (event, data) => {
     $("#addRegionTrigger").trigger("click")
 });
+
+ipcRenderer.on('close-xml', (event, data) => {
+    $("#closeXML").trigger("click")
+})
