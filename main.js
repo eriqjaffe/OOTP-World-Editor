@@ -1,6 +1,11 @@
 const { app, BrowserWindow, dialog, Menu, shell, ipcMain  } = require('electron')
 const xml2js = require("xml2js");
 const fs = require('fs')
+const os = require('os')
+const path = require('path')
+const increment = require('add-filename-increment');
+
+const tempDir = os.tmpdir()
 
 const parser = new xml2js.Parser()
 let mainWindow;
@@ -30,6 +35,9 @@ ipcMain.on('open-xml', (event, arg) => {
         if (!result.canceled) {
             try {
                 fs.readFile(result.filePaths[0], 'utf8', function(err, data) {
+                    console.log(path.basename(result.filePaths[0]))
+                    const backup = increment(tempDir+"\\"+path.basename(result.filePaths[0]),{fs: true})
+                    fs.copyFileSync(result.filePaths[0], backup)
                     parser.parseString(data, function (err, result) {
                         Menu.getApplicationMenu().getMenuItemById('saveMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('saveAsMenu').enabled = true
@@ -213,14 +221,6 @@ ipcMain.on('open-xml', (event, arg) => {
     
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
-
-function createWindow () {
-    
-  
-    //mainWindow.loadURL(`file://${__dirname}/index.html?port=${server.address().port}&appVersion=${pkg.version}&preferredColorFormat=${preferredColorFormat}&preferredJerseyTexture=${preferredJerseyTexture}&preferredPantsTexture=${preferredPantsTexture}&preferredCapTexture=${preferredCapTexture}&gridsVisible=${gridsVisible}&checkForUpdates=${checkForUpdates}&preferredNameFont=${preferredNameFont}&preferredNumberFont=${preferredNumberFont}&preferredCapFont=${preferredCapFont}&preferredJerseyFont=${preferredJerseyFont}&seamsVisibleOnDiffuse=${seamsVisibleOnDiffuse}&preferredHeightMapBrightness=${preferredHeightMapBrightness}&preferredSeamOpacity=${preferredSeamOpacity}&imagemagick=${imInstalled}`);
-
-    
-}
 
 app.whenReady().then(() => {
 

@@ -7,6 +7,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "add-filename-increment": "^1.0.0",
     "bing-translate-api": "^2.9.1",
     "electron": "^25.2.0",
     "xml2js": "^0.6.0",
