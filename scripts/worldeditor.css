@@ -25,6 +25,15 @@ table, th, td {
     border-collapse: collapse;
 }
 
+.centerText {
+    text-align: center;
+}
+
+input[type="number"] {
+    width: 95%;
+    text-align: center;
+}
+
 /*  SECTIONS  */
 .section {
     clear: both;

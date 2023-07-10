@@ -62,78 +62,57 @@ function createWindow () {
           label: 'File',
           submenu: [
           {
-              click: () => mainWindow.webContents.send('load-uniform','click'),
-              accelerator: isMac ? 'Cmd+L' : 'Control+L',
-              label: 'Load XML',
+              click: () => mainWindow.webContents.send('open-xml','click'),
+              accelerator: isMac ? 'Cmd+O' : 'Control+O',
+              label: 'Open...',
           },
 		  { type: 'separator' },
           {
-              click: () => mainWindow.webContents.send('save-uniform','click'),
+              click: () => mainWindow.webContents.send('save-xml','click'),
               accelerator: isMac ? 'Cmd+S' : 'Control+S',
-              label: 'Save Uniform',
+              label: 'Save',
           },
           {
-              click: () => mainWindow.webContents.send('save-cap','click'),
-              accelerator: isMac ? 'Cmd+B' : 'Control+B',
-              label: 'Save Cap Only',
-          },
-          {
-              click: () => mainWindow.webContents.send('save-pants','click'),
-              accelerator: isMac ? 'Cmd+P' : 'Control+P',
-              label: 'Save Pants Only',
-          },
-          {
-              click: () => mainWindow.webContents.send('save-jersey','click'),
-              accelerator: isMac ? 'Cmd+J' : 'Control+J',
-              label: 'Save Jersey Only',
-          },
-          {
-              click: () => mainWindow.webContents.send('save-font','click'),
-              accelerator: isMac ? 'Cmd+F' : 'Control+F',
-              label: 'Save Font Only',
-          },
-		  { type: 'separator' },
-          {
-              click: () => mainWindow.webContents.send('save-swatches','click'),
+              click: () => mainWindow.webContents.send('save-xml-as','click'),
               accelerator: isMac ? 'Cmd+Shift+S' : 'Control+Shift+S',
-              label: 'Save Palette',
+              label: 'Save As',
           },
-          {
-              click: () => mainWindow.webContents.send('load-swatches','click'),
-              accelerator: isMac ? 'Cmd+Shift+L' : 'Control+Shift+L',
-              label: 'Load Palette',
-          },
-		  { type: 'separator' },
-          {
-              click: () => mainWindow.webContents.send('updateFonts','click'),
-              label: 'Refresh User Fonts',
-          },
-		  {
-			click: () => mainWindow.webContents.send('openFontFolder','click'),
-			label: 'Open User Fonts Folder',
-		  },
 		  { type: 'separator' },
           isMac ? { role: 'close' } : { role: 'quit' }
           ]
       },
 	  {
-		  label: 'Edit',
+		  label: 'Action',
 		  submenu: [
 			{
-				click: () => mainWindow.webContents.send('copy','click'),
+				click: () => mainWindow.webContents.send('add-ethnicity','click'),
+				accelerator: isMac ? 'Cmd+E' : 'Control+E',
+				label: 'Add Ethnicity',
+			},
+			{
+				click: () => mainWindow.webContents.send('add-continent','click'),
 				accelerator: isMac ? 'Cmd+C' : 'Control+C',
-				label: 'Copy',
+				label: 'Add Continent',
 			},
 			{
-				click: () => mainWindow.webContents.send('paste','click'),
-				accelerator: isMac ? 'Cmd+V' : 'Control+V',
-				label: 'Paste',
+				click: () => mainWindow.webContents.send('add-nation','click'),
+				accelerator: isMac ? 'Cmd+N' : 'Control+N',
+				label: 'Add Nation',
 			},
-			{ type: 'separator' },
 			{
-				click: () => mainWindow.webContents.send('prefs','click'),
-				accelerator: isMac ? 'Cmd+Shift+P' : 'Control+Shift+P',
-				label: 'Edit Preferences',
+				click: () => mainWindow.webContents.send('add-state','click'),
+				accelerator: isMac ? 'Cmd+T' : 'Control+T',
+				label: 'Add State',
+			},
+			{
+				click: () => mainWindow.webContents.send('add-city','click'),
+				accelerator: isMac ? 'Cmd+I' : 'Control+I',
+				label: 'Add City',
+			},
+			{
+				click: () => mainWindow.webContents.send('add-region','click'),
+				accelerator: isMac ? 'Cmd+R' : 'Control+R',
+				label: 'Add Region',
 			}
 		  ]
 	  },

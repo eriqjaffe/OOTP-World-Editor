@@ -75,6 +75,13 @@
   dependencies:
     "@types/node" "*"
 
+bing-translate-api@^2.9.1:
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/bing-translate-api/-/bing-translate-api-2.9.1.tgz#2fa984c758df3b1adb6c9ed291913bb0b5d1c0e6"
+  integrity sha512-DaYqa7iupfj+fj/KeaeZSp5FUY/ZR4sZ6jqoTP0RHkYOUfo7wwoxlhYDkh4VcvBBzuVORnBEgdXBVQrfM4kk7g==
+  dependencies:
+    got "^11.8.6"
+
 boolean@^3.0.1:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/boolean/-/boolean-3.2.0.tgz#9e5294af4e98314494cbb17979fa54ca159f116b"
@@ -241,7 +248,7 @@ globalthis@^1.0.1:
   dependencies:
     define-properties "^1.1.3"
 
-got@^11.8.5:
+got@^11.8.5, got@^11.8.6:
   version "11.8.6"
   resolved "https://registry.yarnpkg.com/got/-/got-11.8.6.tgz#276e827ead8772eddbcfc97170590b841823233a"
   integrity sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==
