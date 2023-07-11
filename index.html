@@ -37,7 +37,7 @@
         var continents_by_id = {}
         var regions_by_id = {}
         var nations_by_continent = {}
-        var states_by_nation = []
+        var states_by_nation = {}
         const time_zones = [{ tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-8.00", loc: "(GMT-08:00) Tijuana, Baja California" }, { tz: "-7.00", loc: "(GMT-07:00) Arizona" }, { tz: "-7.00", loc: "(GMT-07:00) Chihuahua, La Paz, Mazatlan" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central America" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Guadalajara, Mexico City, Monterrey" }, { tz: "-6.00", loc: "(GMT-06:00) Saskatchewan" }, { tz: "-5.00", loc: "(GMT-05:00) Bogota, Lima, Quito, Rio Branco" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Indiana (East)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Caracas, La Paz" }, { tz: "-4.00", loc: "(GMT-04:00) Manaus" }, { tz: "-4.00", loc: "(GMT-04:00) Santiago" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-3.00", loc: "(GMT-03:00) Buenos Aires, Georgetown" }, { tz: "-3.00", loc: "(GMT-03:00) Greenland" }, { tz: "-3.00", loc: "(GMT-03:00) Montevideo" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." }, { tz: "-1.00", loc: "(GMT-01:00) Azores" }, { tz: "0.00", loc: "(GMT+00:00) Casablanca, Monrovia, Reykjavik" }, { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" }, { tz: "1.00", loc: "(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague" }, { tz: "1.00", loc: "(GMT+01:00) Brussels, Copenhagen, Madrid, Paris" }, { tz: "1.00", loc: "(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb" }, { tz: "1.00", loc: "(GMT+01:00) West Central Africa" }, { tz: "2.00", loc: "(GMT+02:00) Amman" }, { tz: "2.00", loc: "(GMT+02:00) Athens, Bucharest, Istanbul" }, { tz: "2.00", loc: "(GMT+02:00) Beirut" }, { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "2.00", loc: "(GMT+02:00) Harare, Pretoria" }, { tz: "2.00", loc: "(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius" }, { tz: "2.00", loc: "(GMT+02:00) Jerusalem" }, { tz: "2.00", loc: "(GMT+02:00) Minsk" }, { tz: "2.00", loc: "(GMT+02:00) Windhoek" }, { tz: "3.00", loc: "(GMT+03:00) Kuwait, Riyadh, Baghdad" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.00", loc: "(GMT+03:00) Nairobi" }, { tz: "3.00", loc: "(GMT+03:00) Tbilisi" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" }, { tz: "4.00", loc: "(GMT+04:00) Baku" }, { tz: "4.00", loc: "(GMT+04:00) Yerevan" }, { tz: "4.50", loc: "(GMT+04:30) Kabul" }, { tz: "5.00", loc: "(GMT+05:00) Yekaterinburg" }, { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Sri Jayawardenapura" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.00", loc: "(GMT+06:00) Astana, Dhaka" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "7.00", loc: "(GMT+07:00) Krasnoyarsk" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" }, { tz: "8.00", loc: "(GMT+08:00) Kuala Lumpur, Singapore" }, { tz: "8.00", loc: "(GMT+08:00) Irkutsk, Ulaan Bataar" }, { tz: "8.00", loc: "(GMT+08:00) Perth" }, { tz: "8.00", loc: "(GMT+08:00) Taipei" }, { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.00", loc: "(GMT+09:00) Seoul" }, { tz: "9.00", loc: "(GMT+09:00) Yakutsk" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide" }, { tz: "9.50", loc: "(GMT+09:30) Darwin" }, { tz: "10.00", loc: "(GMT+10:00) Brisbane" }, { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "10.00", loc: "(GMT+10:00) Hobart" }, { tz: "10.00", loc: "(GMT+10:00) Guam, Port Moresby" }, { tz: "10.00", loc: "(GMT+10:00) Vladivostok" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }, { tz: "12.00", loc: "(GMT+12:00) Fiji, Kamchatka, Marshall Is." }]
     </script>
     <style>
@@ -331,10 +331,113 @@
         </table>
 	</div>
     <div id="addCity" class="jm-white-popup mfp-hide">
-		This is where add city would go
+		<table>
+            <tr>
+                <td>ID:</td>
+                <td><input type='text' id='newCityId' class="centerText" readonly></td>
+            </tr>
+            <tr>
+                <td>Continent:</td>
+                <td>
+                    <select id="newCityContinent">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Nation:</td>
+                <td>
+                    <select id="newCityNation">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>State:</td>
+                <td>
+                    <select id="newCityState">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" class="centerText toKorean" id="newCityName" value=""></td>
+            </tr>
+            <tr>
+                <td>Abbreviation:</td>
+                <td><input type="text" class="centerText toKorean" id="newCityAbbr" value=""></td>
+            </tr>
+            <tr>
+                <td>Population:</td>
+                <td><input type="number" id="newCityPopulation" value="0"></td>
+            </tr>
+            <tr>
+                <td>Time Zone:</td>
+                <td><select class="tzSelect" id="newCityTimeZone" style="width:100%;"></select></td>
+            </tr>
+            <tr>
+                <td>Observes DST:</td>
+                <td>
+                    <select id="newCityDST" style="width:100%;">
+                        <option value="0">0: No</option>
+                        <option value="1">1: Yes</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Latitude:</td>
+                <td><input type="text" id="newCityLatitude" value="0"></td>
+            </tr>
+            <tr>
+                <td>Longitude:</td>
+                <td><input type="text" id="newCityLongitude" value="0"></td>
+            </tr>
+            <tr>
+                <td>Altitude:</td>
+                <td>
+                    <select id='newCityAltitude' style='width:100%;'> 
+                        <option value='0'>0: ~0 m</option>
+                        <option value='1'>1: ~500 m</option>
+                        <option value='2'>2: ~1000 m</option>
+                        <option value='3'>3: ~1500 m</option>
+                        <option value='4'>4: ~2000 m</option>
+                        <option value='5'>5: ~2500 m</option>
+                        <option value='6'>6: ~3000 m</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Name (Korean):</td>
+                <td><input type="text" id="newCityNameK" value="0"></td>
+            </tr>
+            <tr>
+                <td>Abbreviation (Korean):</td>
+                <td><input type="text" id="newCityAbbrK" value="0"></td>
+            </tr>
+        </table>
 	</div>
     <div id="addRegion" class="jm-white-popup mfp-hide">
-		This is where add region would go
+		<table>
+            <tr>
+                <td>ID:</td>
+                <td><input type='text' name='newRegionID' id='newRegionID' class="centerText" readonly></td>
+            </tr>
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" class="centerText toKorean" name="newRegionName" id="newRegionName" required></td>
+            </tr>
+            <tr>
+                <td>Name (Korean):</td>
+                <td><input type="text" class="centerText" name="newRegionNameK" id="newRegionNameK" required></td>
+            </tr>
+            <tr>
+                <td>Region Type:</td>
+                <td>
+                    <select id="newRegionType">
+                        <option value="nations">Nations</option>
+                        <option value="states">States</option>
+                    </select>
+                </td>
+            </tr>
+        </table>    
 	</div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
@@ -355,6 +458,9 @@
                 .append($('<option>', { value : z.tz })
                 .text(z.loc));
             $('#newStateTimeZone')
+                .append($('<option>', { value : z.tz })
+                .text(z.loc));
+            $('#newCityTimeZone')
                 .append($('<option>', { value : z.tz })
                 .text(z.loc));
         }
@@ -530,6 +636,7 @@
                     }
                     nation_obj.children = state_arr
                     nation_arr.push(nation_obj)
+                    states_by_nation[nation.$.id] = state_arr
                 }
                 nations_by_continent[continent.$.id] = nation_arr
                 continent_obj.children = nation_arr
@@ -875,14 +982,49 @@
 		items: {
 			src: '#addCity',
 			type: 'inline'
-		}
+		},
+        callbacks: {
+            beforeOpen: function() {
+                $.each(continents_by_id, function(key, value) {
+                    $('#newCityContinent')
+                        .append($('<option>', { value : key })
+                        .text(value));
+                });
+                $("#newCityContinent").trigger("change")
+                $("#newCityId").val(max_city_id+1)
+            }
+        }
 	});
+
+    $("#newCityContinent").on("change", function() { 
+        $("#newCityNation").empty()
+        for (nation of nations_by_continent[$(this).val()]) {
+            $('#newCityNation')
+                    .append($('<option>', { value : nation.id })
+                    .text(nation.title));
+        }
+        $("#newCityNation").trigger("change")
+    })
+
+    $("#newCityNation").on("change", function() { 
+        $("#newCityState").empty()
+        for (state of states_by_nation[$(this).val()]) {
+            $('#newCityState')
+                    .append($('<option>', { value : state.id })
+                    .text(state.title));
+        }
+    })
 
     $("#addRegionTrigger").magnificPopup({
 		items: {
 			src: '#addRegion',
 			type: 'inline'
-		}
+		},
+        callbacks: {
+            beforeOpen: function() {
+                $("#newRegionId").val(max_region_id+1)
+            }
+        }
 	});
 
     $(".toKorean").on("keyup",function() {
