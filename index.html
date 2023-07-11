@@ -164,7 +164,7 @@
         
 	</div>
     <div id="addNation" class="jm-white-popup mfp-hide">
-		<form id="newNation">
+		<form id="newNationForm">
             <table id="nationTable">
                 <tr>
                     <td>ID:</td>
@@ -179,15 +179,15 @@
                 </tr>
                 <tr>
                     <td>Name:</td>
-                    <td><input type="text" class="centerText toKorean" id="newNationName" value=""></td>
+                    <td><input type="text" class="centerText toKorean" id="newNationName" value="" required></td>
                 </tr>
                 <tr>
                     <td>Abbreviation:</td>
-                    <td><input type="text" class="centerText toKorean" id="newNationAbbr" value=""></td>
+                    <td><input type="text" class="centerText toKorean" id="newNationAbbr" value="" required></td>
                 </tr>
                 <tr>
                     <td>Demonym:</td>
-                    <td><input type="text" class="centerText toKorean" id="newNationDem" value=""></td>
+                    <td><input type="text" class="centerText toKorean" id="newNationDem" value="" required></td>
                 </tr>
                 <tr>
                     <td>Population:</td>
@@ -265,6 +265,7 @@
                     <td><input type="text" class="centerText" id="newNationDemK" value=""></td>
                 </tr>
             </table>
+            <input type="submit" id="newNationSubmit" value="Add Nation">
         </form>   
 	</div>
     <div id="addState" class="jm-white-popup mfp-hide">
@@ -922,6 +923,7 @@
 		},
         callbacks: {
             beforeOpen: function() {
+                $("#newNationContinent").empty()
                 $.each(continents_by_id, function(key, value) {
                     $('#newNationContinent')
                         .append($('<option>', { value : key })
@@ -963,6 +965,9 @@
                         .append($('<option>', { value : key })
                         .text(value));
                 });
+                $("#newStateContinent").html($('#newStateContinent option').sort(function(x, y) {
+                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+                }))
                 $("#newStateContinent").trigger("change")
             }
         }
@@ -975,7 +980,9 @@
                     .append($('<option>', { value : nation.id })
                     .text(nation.title));
         }
-        
+        $("#newStateNation").html($('#newStateNation option').sort(function(x, y) {
+            return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+        }))
     })
 
     $("#addCityTrigger").magnificPopup({
@@ -985,11 +992,15 @@
 		},
         callbacks: {
             beforeOpen: function() {
+                $("#newCityContinent").empty()
                 $.each(continents_by_id, function(key, value) {
                     $('#newCityContinent')
                         .append($('<option>', { value : key })
                         .text(value));
                 });
+                $("#newCityContinent").html($('#newCityContinent option').sort(function(x, y) {
+                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+                }))
                 $("#newCityContinent").trigger("change")
                 $("#newCityId").val(max_city_id+1)
             }
@@ -1003,6 +1014,9 @@
                     .append($('<option>', { value : nation.id })
                     .text(nation.title));
         }
+        $("#newCityNation").html($('#newCityNation option').sort(function(x, y) {
+            return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+        }))
         $("#newCityNation").trigger("change")
     })
 
@@ -1013,6 +1027,9 @@
                     .append($('<option>', { value : state.id })
                     .text(state.title));
         }
+        $("#newCityState").html($('#newCityState option').sort(function(x, y) {
+            return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+        }))
     })
 
     $("#addRegionTrigger").magnificPopup({
@@ -1079,14 +1096,54 @@
             $("#max_continent_id").text(max_continent_id)
             $("#continent_count").text(continent_count)
             var tree = $.ui.fancytree.getTree("#xmlOutput")
-            var node = tree.findFirst("CONTINENT")
-            node.addChildren(continent_obj)
-            var newNode = node.findFirst($("#newContinentName").val())
-            node.setExpanded()
+            var world = tree.findFirst("CONTINENT")
+            world.addChildren(continent_obj)
+            var continent = world.findFirst($("#newContinentName").val())
+            world.setExpanded()
+            continent.setFocus()
+            continent.setActive()
+            $.magnificPopup.close()
+        }
+    })
+
+    $("#newNationForm").validate({
+        //debug: true,
+        errorClass: "invalid",
+        submitHandler: function() { 
+            nations_by_id[$("#newNationID").val()] = $("#newNationName").val()
+            nation_count++;
+            var nation_obj = {}
+            nation_obj.type = 'nation'
+            nation_obj.folder = true
+            nation_obj.id = $("#newNationID").val()
+            nation_obj.title = $("#newNationName").val()
+            nation_obj.title_korean = $("#newNationNameK").val()
+            nation_obj.short_korean = $("#newNationShortK").val()
+            nation_obj.pop = $("#newNationPopulation").val()
+            nation_obj.etid = $("#newNationEtid").val()
+            nation_obj.lid = $("#newNationLid").val()
+            nation_obj.capid = '0'
+            nation_obj.gender = $("#newNationGender").val()
+            nation_obj.bbqual = $("#newNationBbqual").val()
+            nation_obj.abbr = $("#newNationAbbr").val()
+            nation_obj.abbr_korean = $("#newNationAbbrK").val()
+            nation_obj.dem = $("#newNationDem").val()
+            nation_obj.dem_korean = $("#newNationDemK").val()
+            nation_obj.time_zone = $("#newNationTimeZone").val()
+            nation_obj.observes_dst = $("#newNationDST").val()
+            nation_obj.this_is_the_usa = $("#newNationUSA").val()
+            if (parseInt($("#newNationID").val()) > max_nation_id) { max_nation_id = parseInt($("#newNationID").val()) }
+            $("#max_nation_id").text(max_nation_id)
+            $("#nation_count").text(nation_count)
+            var tree = $.ui.fancytree.getTree("#xmlOutput")
+            var world = tree.findFirst("CONTINENT")
+            var continent = world.findFirst($("#newNationContinent option:selected" ).text())
+            continent.addChildren(nation_obj)
+            var newNode = continent.findFirst($("#newNationName").val())
+            continent.setExpanded()
             newNode.setFocus()
             newNode.setActive()
             $.magnificPopup.close()
-            console.log(continent_obj)
         }
     })
     </script>
