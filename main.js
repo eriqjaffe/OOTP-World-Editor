@@ -36,8 +36,8 @@ ipcMain.on('open-xml', (event, arg) => {
             try {
                 fs.readFile(result.filePaths[0], 'utf8', function(err, data) {
                     console.log(path.basename(result.filePaths[0]))
-                    const backup = increment(tempDir+"\\"+path.basename(result.filePaths[0]),{fs: true})
-                    fs.copyFileSync(result.filePaths[0], backup)
+                    //const backup = increment(tempDir+"\\"+path.basename(result.filePaths[0]),{fs: true})
+                    //fs.copyFileSync(result.filePaths[0], backup)
                     parser.parseString(data, function (err, result) {
                         Menu.getApplicationMenu().getMenuItemById('saveMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('saveAsMenu').enabled = true
