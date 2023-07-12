@@ -13,7 +13,7 @@ let mainWindow;
 const isMac = process.platform === 'darwin'
 
 ipcMain.on('menu-reset', (event,arg) => {
-    Menu.getApplicationMenu().getMenuItemById('saveMenu').enabled = false
+    /* Menu.getApplicationMenu().getMenuItemById('saveMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('saveAsMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('closeXMLMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addEthnicityMenu').enabled = false
@@ -21,8 +21,16 @@ ipcMain.on('menu-reset', (event,arg) => {
     Menu.getApplicationMenu().getMenuItemById('addNationMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addStateMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addCityMenu').enabled = false
-    Menu.getApplicationMenu().getMenuItemById('addRegionMenu').enabled = false
+    Menu.getApplicationMenu().getMenuItemById('addRegionMenu').enabled = false */
 })
+
+ipcMain.on('debug-load', (event, arg) => {
+    fs.readFile('.\\debug\\world_default.xml', 'utf8', function(err, data) {
+        parser.parseString(data, function (err, result) {
+            event.sender.send('xml-opened', JSON.stringify(result))
+        })
+    })
+});
 
 ipcMain.on('open-xml', (event, arg) => {
     const options = {
@@ -39,7 +47,7 @@ ipcMain.on('open-xml', (event, arg) => {
                     //const backup = increment(tempDir+"\\"+path.basename(result.filePaths[0]),{fs: true})
                     //fs.copyFileSync(result.filePaths[0], backup)
                     parser.parseString(data, function (err, result) {
-                        Menu.getApplicationMenu().getMenuItemById('saveMenu').enabled = true
+                        /* Menu.getApplicationMenu().getMenuItemById('saveMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('saveAsMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('closeXMLMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('addEthnicityMenu').enabled = true
@@ -47,7 +55,7 @@ ipcMain.on('open-xml', (event, arg) => {
                         Menu.getApplicationMenu().getMenuItemById('addNationMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('addStateMenu').enabled = true
                         Menu.getApplicationMenu().getMenuItemById('addCityMenu').enabled = true
-                        Menu.getApplicationMenu().getMenuItemById('addRegionMenu').enabled = true
+                        Menu.getApplicationMenu().getMenuItemById('addRegionMenu').enabled = true */
                         event.sender.send('xml-opened', JSON.stringify(result))
                     })
                 })
@@ -90,14 +98,14 @@ ipcMain.on('open-xml', (event, arg) => {
             click: () => mainWindow.webContents.send('save-xml','click'),
             accelerator: isMac ? 'Cmd+S' : 'Control+S',
             label: 'Save',
-            enabled: false
+            enabled: true
         },
         {
             id: 'saveAsMenu',
             click: () => mainWindow.webContents.send('save-xml-as','click'),
             accelerator: isMac ? 'Cmd+Shift+S' : 'Control+Shift+S',
             label: 'Save As',
-            enabled: false
+            enabled: true
         },
         { type: 'separator' },
         {
@@ -105,7 +113,7 @@ ipcMain.on('open-xml', (event, arg) => {
             click: () => mainWindow.webContents.send('close-xml','click'),
             accelerator: isMac ? 'Cmd+L' : 'Control+L',
             label: 'Close File',
-            enabled: false
+            enabled: true
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
@@ -119,42 +127,42 @@ ipcMain.on('open-xml', (event, arg) => {
               click: () => mainWindow.webContents.send('add-ethnicity','click'),
               accelerator: isMac ? 'Cmd+E' : 'Control+E',
               label: 'Add Ethnicity',
-              enabled: false
+              enabled: true
           },
           {
               id: 'addContinentMenu',
               click: () => mainWindow.webContents.send('add-continent','click'),
               accelerator: isMac ? 'Cmd+C' : 'Control+C',
               label: 'Add Continent',
-              enabled: false
+              enabled: true
           },
           {
               id: 'addNationMenu',
               click: () => mainWindow.webContents.send('add-nation','click'),
               accelerator: isMac ? 'Cmd+N' : 'Control+N',
               label: 'Add Nation',
-              enabled: false
+              enabled: true
           },
           {
               id: 'addStateMenu',
               click: () => mainWindow.webContents.send('add-state','click'),
               accelerator: isMac ? 'Cmd+T' : 'Control+T',
               label: 'Add State',
-              enabled: false
+              enabled: true
           },
           {
               id: 'addCityMenu',
               click: () => mainWindow.webContents.send('add-city','click'),
               accelerator: isMac ? 'Cmd+I' : 'Control+I',
               label: 'Add City',
-              enabled: false
+              enabled: true
           },
           {
               id: 'addRegionMenu',
               click: () => mainWindow.webContents.send('add-region','click'),
               accelerator: isMac ? 'Cmd+R' : 'Control+R',
               label: 'Add Region',
-              enabled: false
+              enabled: true
           }
         ]
     },

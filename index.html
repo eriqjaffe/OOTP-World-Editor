@@ -16,6 +16,7 @@
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
+        const XMLWriter = require('xml-writer');
         var max_world_id = 0
         var max_continent_id = 0
         var max_nation_id = 0
@@ -441,6 +442,7 @@
         </table>    
 	</div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
+    <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
     <input type="button" class="button" id="addEthnicityTrigger" value="Add Ethnicity" style="display:none;">
     <input type="button" class="button" id="addContinentTrigger" value="Add Continent" style="display:none;">
@@ -452,8 +454,10 @@
     require('./renderer.js')
 
     var fancyTreeReady = false;
+    var treeGlobal = "hello world"
 
     $(document).ready(function() {
+        ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
             $('#newNationTimeZone')
                 .append($('<option>', { value : z.tz })
@@ -480,6 +484,59 @@
         if (confirm("Are you sure?")) {
             window.location.reload()
         } 
+    })
+
+    $("#saveXML").on("click",function(e) {
+    
+        var json = {}
+        var world_obj = {}
+        var world_data = {}
+        
+        world_data.id = '1'
+        world_data.name = 'default'
+        world_data.timestamp = "OOTP Developments 2023-04-24 13:59:02"
+        world_data.version = '3'
+        world_obj.$ = world_data
+    
+        var continents = []
+        
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        var d = world.toDict(true)
+        var cont_arr = []
+        for (cont of d.children) {
+            var continent_obj = {}
+            var continent_data = {}
+            continent_data.abbr = cont.data.abbr
+            continent_data.abbr_korean = cont.data.abbr_korean
+            continent_data.dem = cont.data.dem
+            continent_data.dem_korean = cont.data.dem_korean
+            continent_data.etid = cont.data.etid
+            continent_data.id = cont.data.id
+            continent_data.name = cont.title
+            continent_data.name_korean = cont.data.title_korean
+            continent_data.pop = cont.data.pop
+            continent_obj.$ = continent_data
+            cont_arr.push(continent_obj)
+        }
+        console.log(cont_arr)
+        continents.CONTINENT = cont_arr
+        world_obj.CONTINENTS = continents
+        
+        json.WORLD = world_obj
+        console.log(json)
+        console.log(JSON.stringify(json))
+
+/*         var tempTree = $.ui.fancytree.getTree("#xmlOutput").toDict(true);
+        try {
+            treeGlobal = JSON.stringify(tempTree)
+            console.log(treeGlobal)
+        } catch (err) {
+            console.log(err)
+        }
+        
+        console.log(tempTree) */
+        
     })
 
     ipcRenderer.on('xml-opened', (event, result) => {
