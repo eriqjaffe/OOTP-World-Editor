@@ -10,6 +10,7 @@
     "add-filename-increment": "^1.0.0",
     "bing-translate-api": "^2.9.1",
     "electron": "^25.2.0",
+    "xml-writer": "^1.7.0",
     "xml2js": "^0.6.0",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.32"

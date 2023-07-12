@@ -17,6 +17,7 @@
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
+        const XMLWriter = require('xml-writer');
         var max_world_id = 0
         var max_continent_id = 0
         var max_nation_id = 0
@@ -488,32 +489,139 @@
 
     $("#saveXML").on("click",function(e) {
 
-        var xmldoc  = '<?xml version="1.0" encoding="UTF-8"?>'
-                    + '\r\n\n<!--\n'
-                    + 'OOTP loads this file whenever the user creates a new game. You can edit this file as long as you watch the syntax. Please read the online manual section about customizing the world XML file.\n'
-                    + 'NATION tokens:\n'
-                    + "use_hardcoded_ml_player_origins - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. Just disable it (set it to 0) or delete it and OOTP will not use the hard coded player distribution for that nation anymore.\n"
-                    + "this_is_modern_usa - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.\n"
-                    + '\n'
-                    + 'When OOTP creates fictional players for modern US major leagues, it will need to find the following nations by name: Dominican Republic, Venezuela, Puerto Rico, Mexico, Canada, Cuba, Japan, Panama, Australia, South Korea, Germany, Aruba, England, The Netherlands, Italy, Spain, Taiwan. So you should not change the names for these nations if you want to simulate realistic major leagues!\n'
-                    + '-->\n'
-                    + '\r\n'
-                    + '<WORLD id="1" name="default" version="3" timestamp="OOTP Developments 2023-04-24 13:59:02">\n'
-                    + '<ETHNICITIES>\n'
+        const tree = $.ui.fancytree.getTree("#xmlOutput")
 
-        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        const commentStr = "OOTP loads this file whenever the user creates a new game. You can edit this file as long as you watch the syntax. Please read the online manual section about customizing the world XML file.\n"
+                         + "NATION tokens:\n"
+                         + "use_hardcoded_ml_player_origins - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. Just disable it (set it to 0) or delete it and OOTP will not use the hard coded player distribution for that nation anymore.\n"
+                         + "this_is_modern_usa - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.\n"
+                         + "\r\n"
+                         + "When OOTP creates fictional players for modern US major leagues, it will need to find the following nations by name: Dominican Republic, Venezuela, Puerto Rico, Mexico, Canada, Cuba, Japan, Panama, Australia, South Korea, Germany, Aruba, England, The Netherlands, Italy, Spain, Taiwan. So you should not change the names for these nations if you want to simulate realistic major leagues!"
+
+        xw = new XMLWriter()
+        xw.startDocument('1.0', 'UTF-8')
+        xw.writeComment(commentStr)
+        xw.startElement('WORLD')
+        xw.writeAttribute("id","1")
+        xw.writeAttribute("name", "default")
+        xw.writeAttribute("version", "3")
+        xw.writeAttribute("timestamp", "OOTP Developments 2023-04-24 13:59:02")
+        xw.startElement("ETHNICITIES")
+        
         var ethnicities = tree.findFirst("ETHNICITIES")
         var eth = ethnicities.toDict(true)
         for (e of eth.children) {
-            xmldoc += '<ETHNICITY id="'+e.data.id+'" name="'+e.title+'" name_korean="'+e.data.name_korean+'" '
-                    + 'african="'+e.data.african+'" asian="'+e.data.asian+'" east_indian="'+e.data.east_indian+'" caucasian="'+e.data.caucasian+'" hispanic="'+e.data.hispanic+'" />\n'
+            xw.startElement("ETHNICITY")
+              .writeAttribute("id", e.data.id)
+              .writeAttribute("name", e.title)
+              .writeAttribute("name_korean", e.data.name_korean)
+              .writeAttribute("aftrican", e.data.african)
+              .writeAttribute("asian", e.data.asian)
+              .writeAttribute("east_indian", e.data.east_indian)
+              .writeAttribute("caucasian", e.data.caucasian)
+              .writeAttribute("hispanic", e.data.hispanic)
+              .endElement()
         }
-        xmldoc += "</ETHNICITIES>\n"
+        xw.endElement()
+
+        xw.startElement("CONTINENTS")
+        var continent = tree.findFirst("CONTINENT")
+        var cont = continent.toDict(true)
+        for (c of cont.children) {
+        xw.startElement("CONTINENT")
+            .writeAttribute("id", c.data.id)
+            .writeAttribute("name", c.title)
+            .writeAttribute("pop", c.data.pop)
+            .writeAttribute("etid", c.data.etid)
+            .writeAttribute("abbr", c.data.abbr)
+            .writeAttribute("dem", c.data.dem)
+            .writeAttribute("abbr_korean", c.data.abbr_korean)
+            .writeAttribute("dem_korean", c.data.dem_korean)
+            for(n of c.children){
+                xw.startElement("NATION")
+                  .writeAttribute("id", n.data.id)
+                  .writeAttribute("name", n.title)
+                  .writeAttribute("name_korean", n.data.name_korean)
+                  .writeAttribute("short_korean", n.data.short_korean)
+                  .writeAttribute("pop", n.data.pop)
+                  .writeAttribute("etid", n.data.etid)
+                  .writeAttribute("capid", n.data.capid)
+                  .writeAttribute("gender", n.data.gender)
+                  .writeAttribute("bbqual", n.data.bbqual)
+                  .writeAttribute("abbr", n.data.abbr)
+                  .writeAttribute("abbr_korean", n.data.abbr_korean)
+                  .writeAttribute("dem", n.data.dem)
+                  .writeAttribute("dem_korean", n.data.dem_korean)
+                  .writeAttribute("time_zone", n.data.time_zone)
+                for (s of n.children) {
+                    xw.startElement("STATE")
+                      .writeAttribute("id", s.data.id)
+                      .writeAttribute("name", s.title)
+                      .writeAttribute("name_korean", s.data.name_korean)
+                      .writeAttribute("pop", s.data.pop)
+                      .writeAttribute("abbr", s.data.abbr)
+                      .writeAttribute("abbr_korean", s.data.abbr_korean)
+                      .writeAttribute("time_zone", s.data.time_zone)
+                      .writeAttribute("observes_dst", s.data.observes_dst)
+                      .writeAttribute("lat",s.data.lat)
+                      .writeAttribute("long", s.data.long)
+                      console.log(s)
+                    if (s.children != undefined) {
+                        for (ci of s.children) {
+                            xw.startElement("CITY")
+                            .writeAttribute("id", ci.data.id)
+                            .writeAttribute("name", ci.title)
+                            .writeAttribute("name_korean", ci.data.name_korean)
+                            .writeAttribute("pop", ci.data.pop)
+                            .writeAttribute("time_zone", ci.data.time_zone)
+                            .writeAttribute("observes_dst", ci.data.observes_dst)
+                            .writeAttribute("lat", ci.data.lat)
+                            .writeAttribute("long", ci.data.long)
+                            .writeAttribute("abbr", ci.data.abbr)
+                            .writeAttribute("abbr_korean", ci.data.abbr_korean)
+                            .endElement()
+                        }                   
+                    }
+                    xw.endElement()
+                }
+                xw.endElement()
+            } 
+            xw.endElement()
+        }
 
 
-        xmldoc += "</WORLD>"
+        console.log(vkbeautify.xml(xw.toString()))
+        // var xmldoc  = '<?xml version="1.0" encoding="UTF-8"?>'
+        //             + '\r\n\n<!--\n'
+        //             + 'OOTP loads this file whenever the user creates a new game. You can edit this file as long as you watch the syntax. Please read the online manual section about customizing the world XML file.\n'
+        //             + 'NATION tokens:\n'
+        //             + "use_hardcoded_ml_player_origins - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. Just disable it (set it to 0) or delete it and OOTP will not use the hard coded player distribution for that nation anymore.\n"
+        //             + "this_is_modern_usa - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.\n"
+        //             + '\n'
+        //             + 'When OOTP creates fictional players for modern US major leagues, it will need to find the following nations by name: Dominican Republic, Venezuela, Puerto Rico, Mexico, Canada, Cuba, Japan, Panama, Australia, South Korea, Germany, Aruba, England, The Netherlands, Italy, Spain, Taiwan. So you should not change the names for these nations if you want to simulate realistic major leagues!\n'
+        //             + '-->\n'
+        //             + '\r\n'
+        //             + '<WORLD id="1" name="default" version="3" timestamp="OOTP Developments 2023-04-24 13:59:02">\n'
+        //             + '<ETHNICITIES>\n'
+
+        // var tree = $.ui.fancytree.getTree("#xmlOutput")
+        // var ethnicities = tree.findFirst("ETHNICITIES")
+        // var eth = ethnicities.toDict(true)
+        // for (e of eth.children) {
+        //     xmldoc += '<ETHNICITY id="'+e.data.id+'" name="'+e.title+'" name_korean="'+e.data.name_korean+'" '
+        //             + 'african="'+e.data.african+'" asian="'+e.data.asian+'" east_indian="'+e.data.east_indian+'" caucasian="'+e.data.caucasian+'" hispanic="'+e.data.hispanic+'" />\n'
+        // }
+        // xmldoc += "</ETHNICITIES>\n"
+        // xmldoc += "<CONTINENTS>\n"
+
+        // var continent = tree.findFirst("CONTINENT")
+        // var cont = worcontinentld.toDict(true)
+        // for (c of cont.children) {
+        //     xmldoc += "<CONTINENT id=\""+c.data.id+"\" name=\"Africa\" name_korean=\"아프리카\" pop=\"1000010001\" etid=\"0\ abbr=\"AF\" dem=\"African\" abbr_korean="AF" dem_korean="아프리카">"
+        // }
+        // xmldoc += "</WORLD>"
     
-        console.log(vkbeautify.xml(xmldoc))
+        // console.log(vkbeautify.xml(xmldoc))
         /* var json = {}
         var world_obj = {}
         var world_data = {}
