@@ -9,6 +9,7 @@
     <script type="text/javascript" src="./scripts/jquery.magnific-popup.min.js"></script>
     <script type="text/javascript" src="./scripts/jquery.validate.min.js"></script>
     <script type="text/javascript" src="./scripts/additional-methods.min.js"></script>
+    <script type="text/javascript" src="./scripts/vkbeautify.0.99.00.beta.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/translate@2/index.min.js"></script>
     <link href="./scripts/worldeditor.css" rel="stylesheet">
     <link href="./scripts/skin-win8-n/ui.fancytree.min.css" rel="stylesheet">
@@ -16,7 +17,6 @@
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
-        const XMLWriter = require('xml-writer');
         var max_world_id = 0
         var max_continent_id = 0
         var max_nation_id = 0
@@ -487,8 +487,34 @@
     })
 
     $("#saveXML").on("click",function(e) {
+
+        var xmldoc  = '<?xml version="1.0" encoding="UTF-8"?>'
+                    + '\r\n\n<!--\n'
+                    + 'OOTP loads this file whenever the user creates a new game. You can edit this file as long as you watch the syntax. Please read the online manual section about customizing the world XML file.\n'
+                    + 'NATION tokens:\n'
+                    + "use_hardcoded_ml_player_origins - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. Just disable it (set it to 0) or delete it and OOTP will not use the hard coded player distribution for that nation anymore.\n"
+                    + "this_is_modern_usa - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.\n"
+                    + '\n'
+                    + 'When OOTP creates fictional players for modern US major leagues, it will need to find the following nations by name: Dominican Republic, Venezuela, Puerto Rico, Mexico, Canada, Cuba, Japan, Panama, Australia, South Korea, Germany, Aruba, England, The Netherlands, Italy, Spain, Taiwan. So you should not change the names for these nations if you want to simulate realistic major leagues!\n'
+                    + '-->\n'
+                    + '\r\n'
+                    + '<WORLD id="1" name="default" version="3" timestamp="OOTP Developments 2023-04-24 13:59:02">\n'
+                    + '<ETHNICITIES>\n'
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var ethnicities = tree.findFirst("ETHNICITIES")
+        var eth = ethnicities.toDict(true)
+        for (e of eth.children) {
+            xmldoc += '<ETHNICITY id="'+e.data.id+'" name="'+e.title+'" name_korean="'+e.data.name_korean+'" '
+                    + 'african="'+e.data.african+'" asian="'+e.data.asian+'" east_indian="'+e.data.east_indian+'" caucasian="'+e.data.caucasian+'" hispanic="'+e.data.hispanic+'" />\n'
+        }
+        xmldoc += "</ETHNICITIES>\n"
+
+
+        xmldoc += "</WORLD>"
     
-        var json = {}
+        console.log(vkbeautify.xml(xmldoc))
+        /* var json = {}
         var world_obj = {}
         var world_data = {}
         
@@ -525,7 +551,7 @@
         
         json.WORLD = world_obj
         console.log(json)
-        console.log(JSON.stringify(json))
+        console.log(JSON.stringify(json)) */
 
 /*         var tempTree = $.ui.fancytree.getTree("#xmlOutput").toDict(true);
         try {
