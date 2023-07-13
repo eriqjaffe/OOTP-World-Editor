@@ -565,7 +565,6 @@
                       .writeAttribute("observes_dst", s.data.observes_dst)
                       .writeAttribute("lat",s.data.lat)
                       .writeAttribute("long", s.data.long)
-                      console.log(s)
                     if (s.children != undefined) {
                         for (ci of s.children) {
                             xw.startElement("CITY")
@@ -782,6 +781,25 @@
                     nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
                     nation_obj.this_is_the_usa = (usa != undefined) ? '1' : "0"
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
+                    console.log(nation.$.name)
+                    var nation_eth_obj = {}
+                    nation_eth_obj.title = "Ethnicities"
+                    nation_eth_obj.folder = false
+                    nation_eth_obj.type = 'nation_ethnicity'
+                    var nation_eth_arr = []
+                    if (nation.ETHN_PCTS != undefined) {
+                        for (n_eth of nation.ETHN_PCTS[0].ETHN_PCT) {
+                            var eth_obj = {}
+                            eth_obj.name = ethnicities_by_id[n_eth.$.etid]
+                            eth_obj.etid = n_eth.$.etid
+                            eth_obj.pct = n_eth.$.pct
+                            nation_eth_arr.push(eth_obj)
+                        }
+                        nation_eth_obj.subdata = (nation_eth_arr)
+                    }
+                    var states_obj = {}
+                    states_obj.title = "States"
+                    states_obj.folder = true
                     var state_arr = []
                     for (state of nation.STATES[0].STATE) {
                         states_by_id[state.$.id] = state.$.name
@@ -826,7 +844,10 @@
                         state_obj.children = city_arr
                         state_arr.push(state_obj)
                     }
-                    nation_obj.children = state_arr
+                    states_obj.children = (state_arr)
+                    //nation_obj.ETHNICITIES = nation_eth_obj
+                    console.log(nation_eth_obj)
+                    nation_obj.children = [nation_eth_obj, states_obj]
                     nation_arr.push(nation_obj)
                     states_by_nation[nation.$.id] = state_arr
                 }
@@ -834,6 +855,7 @@
                 continent_obj.children = nation_arr
                 continents.push(continent_obj)
             }
+            console.log(continent_arr)
             continent_arr.children = continents
             tree_json.push(continent_arr)
 
@@ -1037,6 +1059,19 @@
                             }
                             $("#time_zone").val(node.data.time_zone)
                             $("#altitude").val(node.data.altitude)
+                            break;
+                        case "nation_ethnicity":
+                            html += "<form id='nEthnicityForm'>\n"
+                                + "<table id='nEthnicityTable'>\n"
+                                + "<thead>\n<tr><td>ID</td><td>Ethnicity</td><td>PCT</td></tr>\n</thead>\n"
+                                + "<tbody>\n"
+                            if (node.data.subdata != undefined) {
+                                for (e of node.data.subdata) {
+                                    html += "<tr><td>"+e.etid+"</td><td>"+e.name+"</td><td>"+e.pct+"</td></tr>\n"
+                                }
+                            }
+                            html += "</tbody></table>"
+                            $("#dataTable").html(html)    
                             break;
                         default:
                             html += node.title + " - " + node.type + "<br>";
