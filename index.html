@@ -782,6 +782,22 @@
                     nation_obj.this_is_the_usa = (usa != undefined) ? '1' : "0"
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
                     console.log(nation.$.name)
+                    var second_nations_obj = {}
+                    second_nations_obj.title = "Second Nations"
+                    second_nations_obj.folder = false
+                    second_nations_obj.type = 'second_nations'
+                    var second_nations_arr = []
+                    if (nation.SECOND_NATIONS != undefined) {
+                        for (sn of nation.SECOND_NATIONS[0].SECOND_NATIONS) {
+                            var sn_obj = {}
+                            sn_obj.name = nations_by_id[sn.$.id]
+                            sn_obj.id = sn.$.id
+                            sn_obj.pct = sn.$.pct
+                            sn_obj.use_name = sn.$.use_name
+                            second_nations_arr.push(sn_obj)
+                        }
+                        second_nations_obj.subdata = (second_nations_arr)
+                    }
                     var nation_eth_obj = {}
                     nation_eth_obj.title = "Ethnicities"
                     nation_eth_obj.folder = false
@@ -847,7 +863,7 @@
                     states_obj.children = (state_arr)
                     //nation_obj.ETHNICITIES = nation_eth_obj
                     console.log(nation_eth_obj)
-                    nation_obj.children = [nation_eth_obj, states_obj]
+                    nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
                     nation_arr.push(nation_obj)
                     states_by_nation[nation.$.id] = state_arr
                 }
@@ -1059,6 +1075,26 @@
                             }
                             $("#time_zone").val(node.data.time_zone)
                             $("#altitude").val(node.data.altitude)
+                            break;
+                        case "second_nations":
+                            html += "<form id='secondNationsForm'>\n"
+                                + "<table id='secondNationsTable'>\n"
+                                + "<thead>\n<tr><td>ID</td><td>Name</td><td>PCT</td><td>Use Name?</td></tr>\n</thead>\n"
+                                + "<tbody>\n"
+                             if (node.data.subdata != undefined) {
+                                for (e of node.data.subdata) {
+                                    console.log(e)
+                                    var selected_no = (e.use_name == "0") ? " selected" : ""
+                                    var selected_yes = (e.use_name == "1") ? " selected" : ""
+                                    html += "<tr><td>"+e.id+"</td><td>"+nations_by_id[e.id]+"</td><td>"+e.pct+"</td>"
+                                    + "<td><select>\n"
+                                    + "<option value-'0'"+selected_no+">No</option>\n"
+                                    + "<option value-'1'"+selected_yes+">Yes</option>\n"
+                                    + "</select></td></tr>\n"
+                                }
+                            }
+                            html += "</tbody></table>"
+                            $("#dataTable").html(html)  
                             break;
                         case "nation_ethnicity":
                             html += "<form id='nEthnicityForm'>\n"
