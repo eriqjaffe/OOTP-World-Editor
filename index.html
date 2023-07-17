@@ -14,6 +14,11 @@
     <link href="./scripts/worldeditor.css" rel="stylesheet">
     <link href="./scripts/skin-win8-n/ui.fancytree.min.css" rel="stylesheet">
     <link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
+    <link href="./scripts/jquery.contextMenu.css" rel="stylesheet" type='text/css'/>
+    <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
+
+
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
@@ -715,12 +720,15 @@
             var ethnicities = []
             ethnicities_arr.title = "ETHNICITIES";
             ethnicities_arr.folder = true
+            ethnicities_arr.type = "ETHNICITIES_PARENT"
+            ethnicities_arr.icon = './images/people-group-solid.svg'
             for (ethnicity of json.WORLD.ETHNICITIES[0].ETHNICITY) {
                 ethnicities_by_id[ethnicity.$.id] = ethnicity.$.name
                 ethnicity_count++;
                 var ethnicity_obj = {}
                 ethnicity_obj.type = 'ethnicity'
                 ethnicity_obj.folder = false
+                ethnicity_obj.icon = './images/user-group-solid.svg'
                 ethnicity_obj.title = ethnicity.$.name
                 ethnicity_obj.name_korean = ethnicity.$.name_korean
                 ethnicity_obj.id = ethnicity.$.id
@@ -738,6 +746,8 @@
             var continent_arr = {};
             continent_arr.title = "CONTINENTS";
             continent_arr.folder = true;
+            continent_arr.icon = './images/globe-solid.svg'
+            continent_arr.type = "CONTINENTS_PARENT"
             var continents = []
             for (continent of json.WORLD.CONTINENTS[0].CONTINENT) {
                 continents_by_id[continent.$.id] = continent.$.name
@@ -745,6 +755,7 @@
                 var continent_obj = {}
                 continent_obj.type = 'continent'
                 continent_obj.folder = true
+                continent_obj.icon = './images/earth-americas-solid.svg'
                 continent_obj.id = continent.$.id
                 continent_obj.title = continent.$.name
                 continent_obj.title_korean = (continent.$.name_korean != undefined) ? continent.$.name_korean : ""
@@ -763,6 +774,7 @@
                     var nation_obj = {}
                     nation_obj.type = 'nation'
                     nation_obj.folder = true
+                    nation_obj.icon = './images/flag-solid.svg'
                     nation_obj.id = nation.$.id
                     nation_obj.title = nation.$.name
                     nation_obj.title_korean = (nation.$.name_korean != undefined) ? nation.$.name_korean : ""
@@ -781,10 +793,10 @@
                     nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
                     nation_obj.this_is_the_usa = (usa != undefined) ? '1' : "0"
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
-                    console.log(nation.$.name)
                     var second_nations_obj = {}
                     second_nations_obj.title = "Second Nations"
                     second_nations_obj.folder = false
+                    second_nations_obj.icon = './images/circle-plus-solid.svg'
                     second_nations_obj.type = 'second_nations'
                     var second_nations_arr = []
                     if (nation.SECOND_NATIONS != undefined) {
@@ -801,6 +813,7 @@
                     var nation_eth_obj = {}
                     nation_eth_obj.title = "Ethnicities"
                     nation_eth_obj.folder = false
+                    nation_eth_obj.icon = './images/user-group-solid.svg'
                     nation_eth_obj.type = 'nation_ethnicity'
                     var nation_eth_arr = []
                     if (nation.ETHN_PCTS != undefined) {
@@ -816,6 +829,8 @@
                     var states_obj = {}
                     states_obj.title = "States"
                     states_obj.folder = true
+                    states_obj.icon = './images/landmark-dome-solid.svg'
+                    states_obj.type = "STATES_PARENT"
                     var state_arr = []
                     for (state of nation.STATES[0].STATE) {
                         states_by_id[state.$.id] = state.$.name
@@ -823,6 +838,7 @@
                         var state_obj = {}
                         state_obj.type = 'state'
                         state_obj.folder = true
+                        state_obj.icon = './images/landmark-flag-solid.svg'
                         state_obj.id = state.$.id
                         state_obj.title = state.$.name
                         state_obj.title_korean = (state.$.name_korean != undefined) ? state.$.name_korean : ""
@@ -842,6 +858,7 @@
                                 var city_obj = {}
                                 city_obj.type = 'city'
                                 city_obj.folder = false
+                                city_obj.icon = './images/city-solid.svg'
                                 city_obj.id = city.$.id
                                 city_obj.title = city.$.name
                                 city_obj.title_korean = (city.$.name_korean != undefined) ? city.$.name_korean : ""
@@ -861,8 +878,6 @@
                         state_arr.push(state_obj)
                     }
                     states_obj.children = (state_arr)
-                    //nation_obj.ETHNICITIES = nation_eth_obj
-                    console.log(nation_eth_obj)
                     nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
                     nation_arr.push(nation_obj)
                     states_by_nation[nation.$.id] = state_arr
@@ -871,13 +886,14 @@
                 continent_obj.children = nation_arr
                 continents.push(continent_obj)
             }
-            console.log(continent_arr)
             continent_arr.children = continents
             tree_json.push(continent_arr)
 
             var regions_arr = {}
             regions_arr.title = "REGIONS"
             regions_arr.folder = true
+            regions_arr.icon = './images/map-solid.svg'
+            regions_arr.type = "REGIONS_PARENT"
             var regions = []
             
             for (region of json.WORLD.REGIONS[0].REGION) {
@@ -886,6 +902,7 @@
                 var region_obj = {}
                 region_obj.type = 'region'
                 region_obj.folder = true
+                region_obj.icon = "./images/map-location-dot-solid.svg"
                 region_obj.id = region.$.id
                 region_obj.title = region.$.name
                 region_obj.sort_order = region.$.sort_order
@@ -896,12 +913,15 @@
                 var nation_arr = []
                 states.folder = true
                 states.title = "STATES"
+                states.icon = './images/landmark-dome-solid.svg'
                 nations.folder = true
                 nations.title = "NATIONS"
+                nations.icon = './images/earth-americas-solid.svg'
                 try {
                     for (state of region.REGION_STATES[0].REGION_STATE) {
                         var state_obj = {}
                         state_obj.title = states_by_id[state.$.id] + " ("+state.$.id+")"
+                        state_obj.icon = './images/landmark-flag-solid.svg'
                         state_obj.id = state.$.id
                         state_arr.push(state_obj)
                     }
@@ -911,6 +931,7 @@
                     for (nation of region.REGION_NATIONS[0].REGION_NATION) {
                         var nation_obj = {}
                         nation_obj.title = nations_by_id[nation.$.id] + " ("+nation.$.id+")"
+                        nation_obj.icon = './images/flag-solid.svg'
                         nation_obj.id = nation.$.id
                         nation_arr.push(nation_obj)
                     }
@@ -926,6 +947,7 @@
             tree_json.push(regions_arr)
 
             $("#xmlOutput").fancytree({
+                extensions: [],
                 source: tree_json,
                 init: function(event, data){
                     fancyTreeReady = true
@@ -1115,6 +1137,100 @@
                     
                 }
             })
+
+            var cmItems = {}
+
+            $.contextMenu({
+                selector: "#xmlOutput span.fancytree-title",
+                build: function($trigger, e) {
+                    var node = $.ui.fancytree.getNode($trigger);
+                    console.log(node.type)
+                    switch (node.type) {
+                        case "ETHNICITIES_PARENT":
+                            cmItems = {
+                                "add": {name: "Add Ethnicity", icon: null}
+                            }
+                            break;  
+                        case "CONTINENTS_PARENT":
+                            cmItems = {
+                                "add": {name: "Add Continent", icon: null}
+                            }
+                            break;  
+                        case "REGIONS_PARENT":
+                            cmItems = {
+                                "add": {name: "Add Region", icon: null}
+                            }
+                            break;
+                        case "continent":
+                            cmItems = {
+                                "add": {name: "Add Nation", icon: null},
+                                "sep1": "----",
+                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                            }
+                            break;
+                        case "nation":
+                            cmItems = {
+                                "addState": {name: "Add State", icon: null},
+                                "addSecondNation": {name: "Add Second Nation", icon: null},
+                                "addEthnicity": {name: "Add Ethnicity", icon: null},
+                                "sep1": "----",
+                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                            }
+                            break;
+                        case "STATES_PARENT":
+                            cmItems = {
+                                "add": {name: "Add State", icon: null},
+                            }
+                            break;
+                        case "state":
+                            cmItems = {
+                                "add": {name: "Add City", icon: null},
+                                "sep1": "----",
+                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                            }
+                            break;
+                        case "city":
+                            cmItems = { 
+                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                            }
+                            break;
+                        default: 
+                            cmItems = {}
+                            break;
+                    }
+                    return {
+                        callback: function(key, options) {
+                            var m = "clicked: "+key
+                            console.log(m)
+                        },
+                        items: cmItems
+                    }
+                    //var node = $.ui.fancytree.getNode(opt.$trigger);
+                    //console.log(node);
+                }
+                /* items: {
+                    "cut": {name: "Cut", icon: "cut",
+                        callback: function(key, opt){
+                        var node = $.ui.fancytree.getNode(opt.$trigger);
+                        console.log("Clicked on " + key + " on " + node);
+                        }
+                    },
+                    "copy": {name: "Copy", icon: "copy"},
+                    "paste": {name: "Paste", icon: "paste", disabled: false },
+                    "sep1": "----",
+                    "edit": {name: "Edit", icon: "edit", disabled: true },
+                    "delete": {name: "Delete", icon: "delete", disabled: true },
+                    "more": {name: "More", items: {
+                    "sub1": {name: "Sub 1"},
+                    "sub1": {name: "Sub 2"}
+                    }}
+                    },
+                callback: function(itemKey, opt) {
+                    var node = $.ui.fancytree.getNode(opt.$trigger);
+                    console.log("select " + itemKey + " on " + node);
+                } */
+            });
+
 
             $("#continent_count").text(continent_count)
             $("#nation_count").text(nation_count)
