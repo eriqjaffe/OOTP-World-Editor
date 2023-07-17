@@ -669,10 +669,7 @@
         tmpXML = tmpXML.replaceAll("SECOND_NATION id","SECOND_NATIONS id")
         tmpXML = tmpXML.replace("<!--","\n<!--")
         tmpXML = tmpXML.replace("-->","-->\n")
-        //console.log(tmpXML)
 
-        const buff = Buffer.from(tmpXML)
-        console.log(buff.toString())
         ipcRenderer.send('save_xml',Buffer.from(tmpXML))
     })
 
