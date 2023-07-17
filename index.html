@@ -660,8 +660,6 @@
                 }
                 xw.endElement()
             }
-            //console.log("NATIONS" + r.children[0].title)
-            //console.log("STATES" + r.children[1].title)
             xw.endElement()
         }
 
@@ -671,88 +669,18 @@
         tmpXML = tmpXML.replaceAll("SECOND_NATION id","SECOND_NATIONS id")
         tmpXML = tmpXML.replace("<!--","\n<!--")
         tmpXML = tmpXML.replace("-->","-->\n")
-        console.log(tmpXML)
+        //console.log(tmpXML)
+
+        const buff = Buffer.from(tmpXML)
+        console.log(buff.toString())
+        ipcRenderer.send('save_xml',Buffer.from(tmpXML))
+    })
+
+    ipcRenderer.on('save_xml_result', (event, data) => {
+        if (data.status != "success") {
+            alert(data.message)
+        }
         $("#overlay").css("display","none")
-        // var xmldoc  = '<?xml version="1.0" encoding="UTF-8"?>'
-        //             + '\r\n\n<!--\n'
-        //             + 'OOTP loads this file whenever the user creates a new game. You can edit this file as long as you watch the syntax. Please read the online manual section about customizing the world XML file.\n'
-        //             + 'NATION tokens:\n'
-        //             + "use_hardcoded_ml_player_origins - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. Just disable it (set it to 0) or delete it and OOTP will not use the hard coded player distribution for that nation anymore.\n"
-        //             + "this_is_modern_usa - either 1 (=yes) or 0 (=no). If missing, the value will be set to 0. By default it's 1 for the USA nation record in the XML file. There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.\n"
-        //             + '\n'
-        //             + 'When OOTP creates fictional players for modern US major leagues, it will need to find the following nations by name: Dominican Republic, Venezuela, Puerto Rico, Mexico, Canada, Cuba, Japan, Panama, Australia, South Korea, Germany, Aruba, England, The Netherlands, Italy, Spain, Taiwan. So you should not change the names for these nations if you want to simulate realistic major leagues!\n'
-        //             + '-->\n'
-        //             + '\r\n'
-        //             + '<WORLD id="1" name="default" version="3" timestamp="OOTP Developments 2023-04-24 13:59:02">\n'
-        //             + '<ETHNICITIES>\n'
-
-        // var tree = $.ui.fancytree.getTree("#xmlOutput")
-        // var ethnicities = tree.findFirst("ETHNICITIES")
-        // var eth = ethnicities.toDict(true)
-        // for (e of eth.children) {
-        //     xmldoc += '<ETHNICITY id="'+e.data.id+'" name="'+e.title+'" name_korean="'+e.data.name_korean+'" '
-        //             + 'african="'+e.data.african+'" asian="'+e.data.asian+'" east_indian="'+e.data.east_indian+'" caucasian="'+e.data.caucasian+'" hispanic="'+e.data.hispanic+'" />\n'
-        // }
-        // xmldoc += "</ETHNICITIES>\n"
-        // xmldoc += "<CONTINENTS>\n"
-
-        // var continent = tree.findFirst("CONTINENT")
-        // var cont = worcontinentld.toDict(true)
-        // for (c of cont.children) {
-        //     xmldoc += "<CONTINENT id=\""+c.data.id+"\" name=\"Africa\" name_korean=\"아프리카\" pop=\"1000010001\" etid=\"0\ abbr=\"AF\" dem=\"African\" abbr_korean="AF" dem_korean="아프리카">"
-        // }
-        // xmldoc += "</WORLD>"
-    
-        // console.log(vkbeautify.xml(xmldoc))
-        /* var json = {}
-        var world_obj = {}
-        var world_data = {}
-        
-        world_data.id = '1'
-        world_data.name = 'default'
-        world_data.timestamp = "OOTP Developments 2023-04-24 13:59:02"
-        world_data.version = '3'
-        world_obj.$ = world_data
-    
-        var continents = []
-        
-        var tree = $.ui.fancytree.getTree("#xmlOutput")
-        var world = tree.findFirst("CONTINENT")
-        var d = world.toDict(true)
-        var cont_arr = []
-        for (cont of d.children) {
-            var continent_obj = {}
-            var continent_data = {}
-            continent_data.abbr = cont.data.abbr
-            continent_data.abbr_korean = cont.data.abbr_korean
-            continent_data.dem = cont.data.dem
-            continent_data.dem_korean = cont.data.dem_korean
-            continent_data.etid = cont.data.etid
-            continent_data.id = cont.data.id
-            continent_data.name = cont.title
-            continent_data.name_korean = cont.data.title_korean
-            continent_data.pop = cont.data.pop
-            continent_obj.$ = continent_data
-            cont_arr.push(continent_obj)
-        }
-        console.log(cont_arr)
-        continents.CONTINENT = cont_arr
-        world_obj.CONTINENTS = continents
-        
-        json.WORLD = world_obj
-        console.log(json)
-        console.log(JSON.stringify(json)) */
-
-/*         var tempTree = $.ui.fancytree.getTree("#xmlOutput").toDict(true);
-        try {
-            treeGlobal = JSON.stringify(tempTree)
-            console.log(treeGlobal)
-        } catch (err) {
-            console.log(err)
-        }
-        
-        console.log(tempTree) */
-        
     })
 
     ipcRenderer.on('xml-opened', (event, result) => {

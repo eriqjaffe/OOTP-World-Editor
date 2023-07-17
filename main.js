@@ -69,6 +69,49 @@ ipcMain.on('open-xml', (event, arg) => {
     })
 });
 
+ipcMain.on('save_xml', (event, data) => {
+    const result = {}
+    var saveOptions = {
+        defaultPath: ('world_default.xml'),
+        filters: [
+            { name: 'XML Files', extensions: ['xml'] }
+        ]
+    }
+    dialog.showSaveDialog(null, saveOptions).then((result) => { 
+        if (!result.canceled) {
+            fs.writeFile(result.filePath, data, (err) => {
+                if (err) {
+                    result.status = "error"
+                    result.message = err
+                    try {
+                        event.sender.send('save_xml_result', result)
+                    } catch (err) {
+                        console.log(err)
+                    }
+                    
+                } else {
+                    result.status = "success"
+                    result.message = null
+                    try {
+                        event.sender.send('save_xml_result', result)
+                    } catch (err) {
+                        console.log(err)
+                    }
+                }
+            });
+        } else {
+            result.status = "cancelled"
+            result.message = null
+            try {
+                event.sender.send('save_xml_result', result)
+            } catch (err) {
+                console.log(err)
+            }
+            
+        }
+    })
+})
+
   const template = [
     ...(isMac ? [{
         label: app.name,
