@@ -1147,7 +1147,6 @@
                 selector: "#xmlOutput span.fancytree-title",
                 build: function($trigger, e) {
                     var node = $.ui.fancytree.getNode($trigger);
-                    console.log(node.type)
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
                             cmItems = {
@@ -1204,34 +1203,60 @@
                     return {
                         callback: function(key, options) {
                             var m = "clicked: "+key
+                            console.log(node.type)
                             console.log(m)
+                            switch (node.type) {
+                                case "ETHNICITIES_PARENT":
+                                    $("#addEthnicityTrigger").click()
+                                    break;  
+                                case "CONTINENTS_PARENT":
+                                    if (key == "add") { $("#addContinentTrigger").click() }
+                                    break;  
+                                case "REGIONS_PARENT":
+                                    $("#addRegionTrigger").click()
+                                    break;
+                                case "continent":
+                                    $("#addNationTrigger").click()
+                                    break;
+                                case "nation":
+                                    switch (key) {
+                                        case "addState":
+                                            $("#addStateTrigger").click()
+                                            break;
+                                        case "addSecondNation":
+                                            console.log("add second nation TBD")
+                                            break;
+                                        case "addEthnicity":
+                                            console.log("add ethnicity TBD")
+                                            break;
+                                        case "delete":
+                                            confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all states and cities as well!")
+                                            break;
+                                    }
+                                    break;
+                                case "STATES_PARENT":
+                                    $("#addStateTrigger").click()
+                                    break;
+                                case "state":
+                                    switch (key) {
+                                        case "add":
+                                            $("#addCityTrigger").click()
+                                            break;
+                                        case "delete":
+                                            confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all cities as well!")
+                                            break;
+                                    }
+                                    break;
+                                case "city":
+                                    confirm("Are you sure you want to delete "+node.title+"?")
+                                    break;
+                                default: 
+                                    break;
+                            }
                         },
                         items: cmItems
                     }
-                    //var node = $.ui.fancytree.getNode(opt.$trigger);
-                    //console.log(node);
                 }
-                /* items: {
-                    "cut": {name: "Cut", icon: "cut",
-                        callback: function(key, opt){
-                        var node = $.ui.fancytree.getNode(opt.$trigger);
-                        console.log("Clicked on " + key + " on " + node);
-                        }
-                    },
-                    "copy": {name: "Copy", icon: "copy"},
-                    "paste": {name: "Paste", icon: "paste", disabled: false },
-                    "sep1": "----",
-                    "edit": {name: "Edit", icon: "edit", disabled: true },
-                    "delete": {name: "Delete", icon: "delete", disabled: true },
-                    "more": {name: "More", items: {
-                    "sub1": {name: "Sub 1"},
-                    "sub1": {name: "Sub 2"}
-                    }}
-                    },
-                callback: function(itemKey, opt) {
-                    var node = $.ui.fancytree.getNode(opt.$trigger);
-                    console.log("select " + itemKey + " on " + node);
-                } */
             });
 
 
@@ -1464,6 +1489,7 @@
             var continent_obj = {}
             continent_obj.type = 'continent'
             continent_obj.folder = true
+            continent_obj.icon = './images/earth-americas-solid.svg'
             continent_obj.id = $("#newContinentID").val()
             continent_obj.title = $("#newContinentName").val()
             continent_obj.title_korean = $("#newContinentNameK").val()
