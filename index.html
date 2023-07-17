@@ -1148,50 +1148,50 @@
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
                             cmItems = {
-                                "add": {name: "Add Ethnicity", icon: null}
+                                "add": {name: "Add Ethnicity", icon: 'add'}
                             }
                             break;  
                         case "CONTINENTS_PARENT":
                             cmItems = {
-                                "add": {name: "Add Continent", icon: null}
+                                "add": {name: "Add Continent", icon: 'add'}
                             }
                             break;  
                         case "REGIONS_PARENT":
                             cmItems = {
-                                "add": {name: "Add Region", icon: null}
+                                "add": {name: "Add Region", icon: 'add'}
                             }
                             break;
                         case "continent":
                             cmItems = {
-                                "add": {name: "Add Nation", icon: null},
+                                "add": {name: "Add Nation", icon: 'add'},
                                 "sep1": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
                         case "nation":
                             cmItems = {
-                                "addState": {name: "Add State", icon: null},
-                                "addSecondNation": {name: "Add Second Nation", icon: null},
-                                "addEthnicity": {name: "Add Ethnicity", icon: null},
+                                "addState": {name: "Add State", icon: 'add'},
+                                "addSecondNation": {name: "Add Second Nation", icon: 'add'},
+                                "addEthnicity": {name: "Add Ethnicity", icon: 'add'},
                                 "sep1": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
                         case "STATES_PARENT":
                             cmItems = {
-                                "add": {name: "Add State", icon: null},
+                                "add": {name: "Add State", icon: 'add'},
                             }
                             break;
                         case "state":
                             cmItems = {
-                                "add": {name: "Add City", icon: null},
+                                "add": {name: "Add City", icon: 'add'},
                                 "sep1": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
                         case "city":
                             cmItems = { 
-                                "delete": {name: "Delete \""+node.title +"\"", icon: null},
+                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
                         default: 
