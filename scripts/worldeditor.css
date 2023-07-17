@@ -25,6 +25,16 @@ table, th, td {
     border-collapse: collapse;
 }
 
+.left {
+    width:40%; 
+    font-weight:bold; 
+    padding-left:.5em;
+}
+
+.right {
+    text-align:center;
+}
+
 .centerText {
     text-align: center;
 }
@@ -33,6 +43,10 @@ input[type="number"] {
     width: 95%;
     text-align: center;
 }
+
+input[type="submit"] {
+    font-weight: bold;
+} 
 
 /*  SECTIONS  */
 .section {

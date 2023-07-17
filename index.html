@@ -127,46 +127,50 @@
         </form>
 	</div>
     <div id="addContinent" class="jm-white-popup mfp-hide">
+        <h2 style="text-align:center;">Add Continent</h2>
         <form id="newContinentForm" action="">
-            <table>
+            <table style="width: 80%; margin:0 auto;">
                 <tr>
-                    <td>ID:</td>
-                    <td><input type='text' name='newContinentID' id='newContinentID' class="centerText" readonly></td>
+                    <td class="left">ID:</td>
+                    <td class="right"><input style="display:none;" type='text' name='newContinentID' id='newContinentID' class="centerText">7</td>
                 </tr>
                 <tr>
-                    <td>Name:</td>
-                    <td><input type="text" class="centerText toKorean" name="newContinentName" id="newContinentName" required></td>
+                    <td class="left">Name:</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="newContinentName" id="newContinentName" required></td>
                 </tr>
                 <tr>
-                    <td>Abbreviation:</td>
-                    <td><input type="text" class="centerText toKorean" name="newContinentAbbr" id="newContinentAbbr" required></td>
+                    <td class="left">Abbreviation:</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="newContinentAbbr" id="newContinentAbbr" required></td>
                 </tr>
                 <tr>
-                    <td>Demonym:</td>
-                    <td><input type="text" class="centerText toKorean" name="newContinentDem" id="newContinentDem" required></td>
+                    <td class="left">Demonym:</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="newContinentDem" id="newContinentDem" required></td>
                 </tr>
                 <tr>
-                    <td>Population:</td>
-                    <td><input type="number" class="centerText" name="newContinentPop" id="newContinentPop" value="0"></td>
+                    <td class="left">Population:</td>
+                    <td class="left"><input style="width:95%;" type="number" class="centerText" name="newContinentPop" id="newContinentPop" value="0"></td>
                 </tr>
                 <tr>
-                    <td>ETID:</td>
-                    <td><input type="number" class="centerText" name="newContinentEtid" id="newContinentEtid" value="0"></td>
+                    <td class="left">ETID:</td>
+                    <td class="left"><input style="width:95%;" type="number" class="centerText" name="newContinentEtid" id="newContinentEtid" value="0"></td>
                 </tr>
                 <tr>
-                    <td>Name (Korean):</td>
-                    <td><input type="text" class="centerText" name="newContinentNameK" id="newContinentNameK" value=""></td>
+                    <td class="left">Name (Korean):</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText" name="newContinentNameK" id="newContinentNameK" value=""></td>
                 </tr>
                 <tr>
-                    <td>Abbreviation (Korean):</td>
-                    <td><input type="text" class="centerText" name="newContinentAbbrK" id="newContinentAbbrK" value=""></td>
+                    <td class="left">Abbreviation (Korean):</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText" name="newContinentAbbrK" id="newContinentAbbrK" value=""></td>
                 </tr>
                 <tr>
-                    <td>Demonym (Korean):</td>
-                    <td><input type="text" class="centerText" name="newContinentDemK" id="newContinentDemK" value=""></td>
+                    <td class="left">Demonym (Korean):</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText" name="newContinentDemK" id="newContinentDemK" value=""></td>
                 </tr>
             </table>
-            <input type="submit" id="newContinentSubmit" value="Add Continent">
+            <br>
+            <div style="text-align:center;">
+                <input type="submit" id="newContinentSubmit" value="Add Continent">
+            </div>
         </form>
         
 	</div>
