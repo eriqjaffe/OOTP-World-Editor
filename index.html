@@ -175,56 +175,47 @@
         
 	</div>
     <div id="addNation" class="jm-white-popup mfp-hide">
+        <h2 style="text-align:center;">Add Nation</h2>
 		<form id="newNationForm">
-            <table id="nationTable">
+            <table style="width:95%; margin:0 auto;">
                 <tr>
-                    <td>ID:</td>
-                    <td><input type='text' id='newNationID' class="centerText" readonly></td>
-                </tr>
-                <tr>
-                    <td>Continent:</td>
-                    <td>
-                        <select id="newNationContinent">
+                    <td class="left" style="width:25%;">ID:</td>
+                    <td class="right" style="width:25%;"><input type='text' id='newNationID' class="centerText" readonly></td>
+                    <td class="left" style="width:25%;">Continent:</td>
+                    <td class="right" style="width:25%;">
+                        <select style="width:95%;" id="newNationContinent">
                         </select>
                     </td>
                 </tr>
                 <tr>
-                    <td>Name:</td>
-                    <td><input type="text" class="centerText toKorean" id="newNationName" value="" required></td>
+                    <td class="left">Name:</td>
+                    <td class="right"><input type="text" class="centerText toKorean" id="newNationName" value="" required></td>
+                    <td class="left">Abbreviation:</td>
+                    <td class="right"><input type="text" class="centerText toKorean" id="newNationAbbr" value="" required></td>
                 </tr>
                 <tr>
-                    <td>Abbreviation:</td>
-                    <td><input type="text" class="centerText toKorean" id="newNationAbbr" value="" required></td>
+                    <td class="left">Demonym:</td>
+                    <td class="right"><input type="text" class="centerText toKorean" id="newNationDem" value="" required></td>
+                    <td class="left">Population:</td>
+                    <td class="right"><input type="number" id="newNationPopulation" value="0"></td>
                 </tr>
                 <tr>
-                    <td>Demonym:</td>
-                    <td><input type="text" class="centerText toKorean" id="newNationDem" value="" required></td>
+                    <td class="left">ETID:</td>
+                    <td class="right"><input type="number" id="newNationEtid" value="0"></td>
+                    <td class="left">LID:</td>
+                    <td class="right"><input type="number" id="newNationLid" value="0"></td>
                 </tr>
                 <tr>
-                    <td>Population:</td>
-                    <td><input type="number" id="newNationPopulation" value="0"></td>
-                </tr>
-                <tr>
-                    <td>ETID:</td>
-                    <td><input type="number" id="newNationEtid" value="0"></td>
-                </tr>
-                <tr>
-                    <td>LID:</td>
-                    <td><input type="number" id="newNationLid" value="0"></td>
-                </tr>
-                <tr>
-                    <td>Gender:</td>
-                    <td>
-                        <select id="newNationGender" style="width:100%;">
+                    <td class="left">Gender:</td>
+                    <td class="right">
+                        <select id="newNationGender" style="width:99%;">
                             <option value="0">0: Male</option>
                             <option value="1">1: Female</option>
                         </select>
                     </td>
-                </tr>
-                <tr>
-                    <td>Baseball Quality:</td>
-                    <td>
-                        <select id="newNationBbqual" style="width:100%;">
+                    <td class="left">Baseball Quality:</td>
+                    <td class="right">
+                        <select id="newNationBbqual" style="width:99%;">
                             <option value="5">5: Excellent</option>
                             <option value="4">4: Good</option>
                             <option value="3" selected>3: Average</option>
@@ -235,48 +226,45 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Time Zone:</td>
-                    <td>
+                    <td class="left">Observes DST:</td>
+                    <td class="right">
+                        <select id="newNationDST" style="width:99%;">
+                            <option value="0">0: No</option>
+                            <option value="1">1: Yes</option>
+                        </select>
+                    </td>
+                    <td class="left">Modern USA?</td>
+                    <td class="right">
+                        <select id="newNationUSA" style="width:99%;">
+                            <option value="0">0: No</option>
+                            <option value="1">1: Yes</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Name (Korean):</td>
+                    <td class="right"><input type="text" class="centerText" id="newNationNameK" value=""></td>
+                    <td class="left">Short (Korean):</td>
+                    <td class="right"><input type="text" class="centerText" id="newNationShortK" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbr. (Korean):</td>
+                    <td class="right"><input type="text" class="centerText" id="newNationAbbrK" value=""></td>
+                    <td class="left">Demonym (Korean):</td>
+                    <td class="right"><input type="text" class="centerText" id="newNationDemK" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Time Zone:</td>
+                    <td  class="right" colspan="3">
                         <select class="tzSelect" id="newNationTimeZone" style="width:100%;">
                         </select>
                     </td>
                 </tr>
-                <tr>
-                    <td>Observes DST:</td>
-                    <td>
-                        <select id="newNationDST" style="width:100%;">
-                            <option value="0">0: No</option>
-                            <option value="1">1: Yes</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Modern USA?</td>
-                    <td>
-                        <select id="newNationUSA" style="width:100%;">
-                            <option value="0">0: No</option>
-                            <option value="1">1: Yes</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Name (Korean):</td>
-                    <td><input type="text" class="centerText" id="newNationNameK" value=""></td>
-                </tr>
-                <tr>
-                    <td>Short (Korean):</td>
-                    <td><input type="text" class="centerText" id="newNationShortK" value=""></td>
-                </tr>
-                <tr>
-                    <td>Abbreviation (Korean):</td>
-                    <td><input type="text" class="centerText" id="newNationAbbrK" value=""></td>
-                </tr>
-                <tr>
-                    <td>Demonym (Korean):</td>
-                    <td><input type="text" class="centerText" id="newNationDemK" value=""></td>
-                </tr>
             </table>
-            <input type="submit" id="newNationSubmit" value="Add Nation">
+            <br>
+            <div style="text-align:center;">
+                <input type="submit" id="newNationSubmit" value="Add Nation">
+            </div>
         </form>   
 	</div>
     <div id="addState" class="jm-white-popup mfp-hide">
@@ -1330,7 +1318,6 @@
 	});
 
     function addNation(continent) {
-        console.log(continent)
         $.magnificPopup.open({
             closeOnBgClick: false,
             items: {
@@ -1369,6 +1356,8 @@
                     $("#newNationTimeZone :nth-child(30)").prop('selected', true);
                     $("#newNationDST :nth-child(1)").prop('selected', true);
                     $("#newNationUSA :nth-child(1)").prop('selected', true);
+
+                    $(this).css("height", "800px;")
                 }
             }
         });
