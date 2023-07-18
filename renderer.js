@@ -17,15 +17,15 @@ ipcRenderer.on('add-continent', (event, data) => {
 });
 
 ipcRenderer.on('add-nation', (event, data) => {
-    $("#addNationTrigger").trigger("click")
+    addNation(null)
 });
 
 ipcRenderer.on('add-state', (event, data) => {
-    $("#addStateTrigger").trigger("click")
+    addState(null, null)
 });
 
 ipcRenderer.on('add-city', (event, data) => {
-    $("#addCityTrigger").trigger("click")
+    addCity(null, null, null)
 });
 
 ipcRenderer.on('add-region', (event, data) => {

@@ -1207,8 +1207,6 @@
                     return {
                         callback: function(key, options) {
                             var m = "clicked: "+key
-                            console.log(node.type)
-                            console.log(m)
                             switch (node.type) {
                                 case "ETHNICITIES_PARENT":
                                     $("#addEthnicityTrigger").click()
@@ -1220,12 +1218,13 @@
                                     $("#addRegionTrigger").click()
                                     break;
                                 case "continent":
-                                    $("#addNationTrigger").click()
+                                    addNation(node.data.id)
                                     break;
                                 case "nation":
                                     switch (key) {
                                         case "addState":
-                                            $("#addStateTrigger").click()
+                                            addState(node.parent.data.id,node.data.id)
+                                            //$("#addStateTrigger").click()
                                             break;
                                         case "addSecondNation":
                                             console.log("add second nation TBD")
@@ -1239,12 +1238,13 @@
                                     }
                                     break;
                                 case "STATES_PARENT":
-                                    $("#addStateTrigger").click()
+                                    addState(node.parent.parent.data.id,node.parent.data.id)
                                     break;
                                 case "state":
                                     switch (key) {
                                         case "add":
-                                            $("#addCityTrigger").click()
+                                            //$("#addCityTrigger").click()
+                                            addCity(node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id)
                                             break;
                                         case "delete":
                                             confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all cities as well!")
@@ -1276,6 +1276,10 @@
             $("#max_city_id").text(max_city_id)
             $("#max_ethnicity_id").text(max_ethnicity_id)
             $("#max_region_id").text(max_region_id)
+
+            var tree = $.ui.fancytree.getTree("#xmlOutput")
+            var world = tree.findFirst("CONTINENT")
+            world.sortChildren(null, true);
 
             $("#overlay").css("display","none")
         } else {
@@ -1325,63 +1329,79 @@
         }
 	});
 
-    $("#addNationTrigger").magnificPopup({
-        closeOnBgClick: false,
-		items: {
-			src: '#addNation',
-			type: 'inline'
-		},
-        callbacks: {
-            beforeOpen: function() {
-                $("#newNationContinent").empty()
-                $.each(continents_by_id, function(key, value) {
-                    $('#newNationContinent')
-                        .append($('<option>', { value : key })
-                        .text(value));
-                });
-                $("#newNationContinent").html($('#newNationContinent option').sort(function(x, y) {
-                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
-                }))
-                $("#newNationContinent :nth-child(1)").prop('selected', true);
-                $("#newNationName").val("")
-                $("#newNationNameK").val("")
-                $("#newNationAbbr").val("")
-                $("#newNationAbbrK").val("")
-                $("#newNationShortK").val("")
-                $("#newNationDem").val("")
-                $("#newNationDemK").val("")
-                $("#newNationPopulation").val(0)
-                $("#newNationEtid").val(0)
-                $("#newNationLid").val(0)
-                $("#newNationID").val(max_nation_id+1)
-                $("#newNationGender :nth-child(1)").prop('selected', true);
-                $("#newNationBbqual :nth-child(3)").prop('selected', true);
-                $("#newNationTimeZone :nth-child(30)").prop('selected', true);
-                $("#newNationDST :nth-child(1)").prop('selected', true);
-                $("#newNationUSA :nth-child(1)").prop('selected', true);
+    function addNation(continent) {
+        console.log(continent)
+        $.magnificPopup.open({
+            closeOnBgClick: false,
+            items: {
+                src: '#addNation',
+                type: 'inline'
+            },
+            callbacks: {
+                beforeOpen: function() {
+                    $("#newNationContinent").empty()
+                    $.each(continents_by_id, function(key, value) {
+                        $('#newNationContinent')
+                            .append($('<option>', { value : key })
+                            .text(value));
+                    });
+                    $("#newNationContinent").html($('#newNationContinent option').sort(function(x, y) {
+                        return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+                    }))
+                    if (continent == null) {
+                        $("#newNationContinent :nth-child(1)").prop('selected', true);
+                    } else {
+                        $("#newNationContinent").val(continent).change();
+                    }
+                    $("#newNationName").val("")
+                    $("#newNationNameK").val("")
+                    $("#newNationAbbr").val("")
+                    $("#newNationAbbrK").val("")
+                    $("#newNationShortK").val("")
+                    $("#newNationDem").val("")
+                    $("#newNationDemK").val("")
+                    $("#newNationPopulation").val(0)
+                    $("#newNationEtid").val(0)
+                    $("#newNationLid").val(0)
+                    $("#newNationID").val(max_nation_id+1)
+                    $("#newNationGender :nth-child(1)").prop('selected', true);
+                    $("#newNationBbqual :nth-child(3)").prop('selected', true);
+                    $("#newNationTimeZone :nth-child(30)").prop('selected', true);
+                    $("#newNationDST :nth-child(1)").prop('selected', true);
+                    $("#newNationUSA :nth-child(1)").prop('selected', true);
+                }
             }
-        }
-	});
+        });
+    }
 
-    $("#addStateTrigger").magnificPopup({
-		items: {
-			src: '#addState',
-			type: 'inline'
-		},
-        callbacks: {
-            beforeOpen: function() {
-                $.each(continents_by_id, function(key, value) {
-                    $('#newStateContinent')
-                        .append($('<option>', { value : key })
-                        .text(value));
-                });
-                $("#newStateContinent").html($('#newStateContinent option').sort(function(x, y) {
-                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
-                }))
-                $("#newStateContinent").trigger("change")
+    function addState(continent,nation) {
+        $.magnificPopup.open({
+            items: {
+                src: '#addState',
+                type: 'inline'
+            },
+            callbacks: {
+                beforeOpen: function() {
+                    $.each(continents_by_id, function(key, value) {
+                        $('#newStateContinent')
+                            .append($('<option>', { value : key })
+                            .text(value));
+                    });
+                    if (continent == null) {
+                        $("#newStateContinent :nth-child(1)").prop('selected', true);
+                    } else {
+                        $("#newStateContinent").val(continent);
+                    }
+                    $("#newStateContinent").trigger("change")
+                    if (nation == null) {
+                        $("#newStateNation :nth-child(1)").prop('selected', true);
+                    } else {
+                        $("#newStateNation").val(nation);
+                    }
+                }
             }
-        }
 	});
+    }
 
     $("#newStateContinent").on("change", function() { 
         $("#newStateNation").empty()
@@ -1395,28 +1415,49 @@
         }))
     })
 
-    $("#addCityTrigger").magnificPopup({
-		items: {
-			src: '#addCity',
-			type: 'inline'
-		},
-        callbacks: {
-            beforeOpen: function() {
-                $("#newCityContinent").empty()
-                $.each(continents_by_id, function(key, value) {
-                    $('#newCityContinent')
-                        .append($('<option>', { value : key })
-                        .text(value));
-                });
-                $("#newCityContinent").html($('#newCityContinent option').sort(function(x, y) {
-                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
-                }))
-                $("#newCityContinent").trigger("change")
-                $("#newCityId").val(max_city_id+1)
+    function addCity(continent, nation, state) {
+        console.log(continent)
+        console.log(nation)
+        console.log(state)
+        $.magnificPopup.open({
+            items: {
+                src: '#addCity',
+                type: 'inline'
+            },
+            callbacks: {
+                beforeOpen: function() {
+                    $("#newCityContinent").empty()
+                    $.each(continents_by_id, function(key, value) {
+                        $('#newCityContinent')
+                            .append($('<option>', { value : key })
+                            .text(value));
+                    });
+                    $("#newCityContinent").html($('#newCityContinent option').sort(function(x, y) {
+                        return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+                    }))
+                    if (continent == null) { 
+                        $("#newCityContinent :nth-child(1)").prop('selected', true);
+                    } else {
+                        $("#newCityContinent").val(continent);
+                    }
+                    $("#newCityContinent").trigger("change")
+                    if (nation == null) { 
+                        $("#newCityNation :nth-child(1)").prop('selected', true);
+                    } else {
+                        $("#newCityNation").val(nation);
+                    }
+                    $("#newCityNation").trigger("change")
+                    if (state == null) { 
+                        $("#newCityState :nth-child(1)").prop('selected', true);
+                    } else {
+                        $("#newCityState").val(state);
+                    }
+                    $("#newCityId").val(max_city_id+1)
+                }
             }
-        }
-	});
-
+        });
+    }
+    
     $("#newCityContinent").on("change", function() { 
         $("#newCityNation").empty()
         for (nation of nations_by_continent[$(this).val()]) {
@@ -1509,6 +1550,7 @@
             var tree = $.ui.fancytree.getTree("#xmlOutput")
             var world = tree.findFirst("CONTINENT")
             world.addChildren(continent_obj)
+            world.sortChildren(null, true);
             var continent = world.findFirst($("#newContinentName").val())
             world.setExpanded()
             continent.setFocus()
@@ -1526,6 +1568,7 @@
             var nation_obj = {}
             nation_obj.type = 'nation'
             nation_obj.folder = true
+            nation_obj.icon = './images/flag-solid.svg'
             nation_obj.id = $("#newNationID").val()
             nation_obj.title = $("#newNationName").val()
             nation_obj.title_korean = $("#newNationNameK").val()
@@ -1550,6 +1593,7 @@
             var world = tree.findFirst("CONTINENT")
             var continent = world.findFirst($("#newNationContinent option:selected" ).text())
             continent.addChildren(nation_obj)
+            world.sortChildren(null, true);
             var newNode = continent.findFirst($("#newNationName").val())
             continent.setExpanded()
             newNode.setFocus()
