@@ -1144,21 +1144,21 @@
                             $("#dataTable").html(html)
                             break;
                         case "continent":
-                            html += "<form id='continentForm'>\n"
-                                  + "<table id='continentTable'>\n"
-                                  + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
-                                  + "<tr><td>Name:</td><td><input type='text' id='name' value='"+node.title+"'></td></tr>\n"
-                                  + "<tr><td>Abbreviation:</td><td><input type='text' id='abbr' value='"+node.data.abbr+"'></td></tr>\n"
-                                  + "<tr><td>Demonym:</td><td><input type='text' id='dem' value='"+node.data.dem+"'></td></tr>\n"
-                                  + "<tr><td>Population:</td><td><input type='number' id='pop' value='"+node.data.pop+"'></td></tr>\n"
-                                  + "<tr><td>ETID:</td><td><input type='number' id='etid' value='"+node.data.etid+"'></td></tr>\n"
-                                  + "<tr><td>Name (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.title_korean+"'></td></tr>\n"
-                                  + "<tr><td>Abbreviation (Korean):</td><td><input type='text' id='abbr_korean' value='"+node.data.abbr_korean+"'></td></tr>\n"
-                                  + "<tr><td>Demonym (Korean):</td><td><input type='text' id='dem_korean' value='"+node.data.dem_korean+"'></td></tr>\n"
+                            /*h tml += "<form id='editContinentForm' action=''>\n"
+                                  + "<table id='continentTable' style='width:100%;'>\n"
+                                  + "<tr><td class='left'>ID:</td><td><input type='text' id='id' value='"+node.data.id+"' style='display:none;'>"+node.data.id+"</td></tr>\n"
+                                  + "<tr><td class='left'>Name:</td><td><input type='text' id='name' value='"+node.title+"'></td></tr>\n"
+                                  + "<tr><td class='left'>Abbreviation:</td><td><input type='text' id='abbr' value='"+node.data.abbr+"'></td></tr>\n"
+                                  + "<tr><td class='left'>Demonym:</td><td><input type='text' id='dem' value='"+node.data.dem+"'></td></tr>\n"
+                                  + "<tr><td class='left'>Population:</td><td><input type='number' id='pop' value='"+node.data.pop+"'></td></tr>\n"
+                                  + "<tr><td class='left'>ETID:</td><td><input type='number' id='etid' value='"+node.data.etid+"'></td></tr>\n"
+                                  + "<tr><td class='left'>Name (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.title_korean+"'></td></tr>\n"
+                                  + "<tr><td class='left'>Abbreviation (Korean):</td><td><input type='text' id='abbr_korean' value='"+node.data.abbr_korean+"'></td></tr>\n"
+                                  + "<tr><td class='left'>Demonym (Korean):</td><td><input type='text' id='dem_korean' value='"+node.data.dem_korean+"'></td></tr>\n"
                                   + "</table>\n"
-                                  + "<input type='submit' value='Submit'>\n"
-                                  + "</form>"
-                            $("#dataTable").html(html)
+                                  + "<input type='submit' value='Submit Changes'>\n"
+                                  + "</form>" */
+                            $("#dataTable").html("Continent Form here?")
                             break;
                         case "nation":
                             html += "<form id='nationForm'>\n"
@@ -1330,8 +1330,10 @@
                             break;
                         case "continent":
                             cmItems = {
-                                "add": {name: "Add Nation", icon: 'add'},
+                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
                                 "sep1": "----",
+                                "add": {name: "Add Nation", icon: 'add'},
+                                "sep2": "----",
                                 "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
@@ -1379,7 +1381,17 @@
                                     $("#addRegionTrigger").click()
                                     break;
                                 case "continent":
-                                    addNation(node.data.id)
+                                    switch (key) {
+                                        case "add":
+                                            addNation(node.data.id)
+                                            break;
+                                        case "delete":
+                                            console.log("You chose to delete "+node.title)
+                                            break;
+                                        case "edit":
+                                            console.log("You chose to edit "+node.title)
+                                            break;
+                                    }
                                     break;
                                 case "nation":
                                     switch (key) {
@@ -1693,6 +1705,47 @@
             $("#newEthnicityTotal").css("color","green")
         }
         $("#newEthnicityTotal").html(sum)
+    })
+
+    $("#editContinentForm").validate({
+        submitHandler: function() { 
+            var tree = $.ui.fancytree.getTree("#xmlOutput")
+            var node = tree.getActiveNode();
+            console.log(node)
+        }
+        
+        //debug: true,
+        
+        /* errorClass: "invalid",
+        submitHandler: function() { 
+            continent_count++
+            continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
+            var continent_obj = {}
+            continent_obj.type = 'continent'
+            continent_obj.folder = true
+            continent_obj.icon = './images/earth-americas-solid.svg'
+            continent_obj.id = $("#newContinentID").val()
+            continent_obj.title = $("#newContinentName").val()
+            continent_obj.title_korean = $("#newContinentNameK").val()
+            continent_obj.pop = $("#newContinentPop").val()
+            continent_obj.etid = $("#newContinentEtid").val()
+            continent_obj.abbr = $("#newContinentAbbr").val()
+            continent_obj.dem = $("#newContinentDem").val()
+            continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
+            continent_obj.dem_korean = $("#newContinentDemK").val()
+            if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
+            $("#max_continent_id").text(max_continent_id)
+            $("#continent_count").text(continent_count)
+            var tree = $.ui.fancytree.getTree("#xmlOutput")
+            var world = tree.findFirst("CONTINENT")
+            world.addChildren(continent_obj)
+            world.sortChildren(null, true);
+            var continent = world.findFirst($("#newContinentName").val())
+            world.setExpanded()
+            continent.setFocus()
+            continent.setActive()
+            $.magnificPopup.close()
+        } */
     })
 
     $("#newContinentForm").validate({
