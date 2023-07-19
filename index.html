@@ -132,7 +132,7 @@
             <table style="width: 80%; margin:0 auto;">
                 <tr>
                     <td class="left">ID:</td>
-                    <td class="right"><input style="display:none;" type='text' name='newContinentID' id='newContinentID' class="centerText">7</td>
+                    <td class="right"><input style="display:none;" type='text' name='newContinentID' id='newContinentID' class="centerText"><span id="newContinentIDDisplay">0</span></td>
                 </tr>
                 <tr>
                     <td class="left">Name:</td>
@@ -180,10 +180,10 @@
             <table style="width:95%; margin:0 auto;">
                 <tr>
                     <td class="left" style="width:25%;">ID:</td>
-                    <td class="right" style="width:25%;"><input type='text' id='newNationID' class="centerText" readonly></td>
+                    <td class="right" style="width:25%;"><input style="display:none;" type='text' id='newNationID' class="centerText" readonly><span id="newNationIDDisplay">0</span></td>
                     <td class="left" style="width:25%;">Continent:</td>
                     <td class="right" style="width:25%;">
-                        <select style="width:95%;" id="newNationContinent">
+                        <select style="width:99%;" id="newNationContinent">
                         </select>
                     </td>
                 </tr>
@@ -268,151 +268,165 @@
         </form>   
 	</div>
     <div id="addState" class="jm-white-popup mfp-hide">
-		<table>
-            <tr>
-                <td>ID:</td>
-                <td><input type='text' id='newStateId' class="centerText" readonly></td>
-            </tr>
-            <tr>
-                <td>Continent:</td>
-                <td>
-                    <select id="newStateContinent">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Nation:</td>
-                <td>
-                    <select id="newStateNation">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Name:</td>
-                <td><input type="text" class="centerText toKorean" id="newStateName" value=""></td>
-            </tr>
-            <tr>
-                <td>Abbreviation:</td>
-                <td><input type="text" class="centerText toKorean" id="newStateAbbr" value=""></td>
-            </tr>
-            <tr>
-                <td>Population:</td>
-                <td><input type="number" id="newStatePopulation" value="0"></td>
-            </tr>
-            <tr>
-                <td>Time Zone:</td>
-                <td><select class="tzSelect" id="newStateTimeZone" style="width:100%;"></select></td>
-            </tr>
-            <tr>
-                <td>Observes DST:</td>
-                <td>
-                    <select id="newStateDST" style="width:100%;">
-                        <option value="0">0: No</option>
-                        <option value="1">1: Yes</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Latitude:</td>
-                <td><input type="text" id="newStateLatitude" value="0"></td>
-            </tr>
-            <tr>
-                <td>Longitude:</td>
-                <td><input type="text" id="newStateLongitude" value="0"></td>
-            </tr>
-            <tr>
-                <td>Name (Korean):</td>
-                <td><input type="text" id="newStateNameK" value="0"></td>
-            </tr>
-            <tr>
-                <td>Abbreviation (Korean):</td>
-                <td><input type="text" id="newStateAbbrK" value="0"></td>
-            </tr>
-        </table>
+		<h2 style="text-align:center;">Add State</h2>
+		<form id="newStateForm">
+            <table style="width:80%; margin:0 auto;">
+                <tr>
+                    <td class="left">ID:</td>
+                    <td class="right"><input style="display:none;" type='text' id='newStateId' class="centerText" readonly><span id="newStateIDDisplay">0</span></td>
+                </tr>
+                <tr>
+                    <td class="left">Continent:</td>
+                    <td class="right">
+                        <select style="width:99%;" id="newStateContinent">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Nation:</td>
+                    <td class="right">
+                        <select style="width:99%;" id="newStateNation">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Name:</td>
+                    <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="newStateName" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbreviation:</td>
+                    <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="newStateAbbr" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Population:</td>
+                    <td class="right"><input type="number" style="width:96%;"id="newStatePopulation" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Time Zone:</td>
+                    <td class="right"><select class="tzSelect" id="newStateTimeZone" style="width:99%;"></select></td>
+                </tr>
+                <tr>
+                    <td class="left">Observes DST:</td>
+                    <td class="right">
+                        <select id="newStateDST" style="width:99%;">
+                            <option value="0">0: No</option>
+                            <option value="1">1: Yes</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Latitude:</td>
+                    <td class="right"><input type="text" style="width:96%;" id="newStateLatitude" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Longitude:</td>
+                    <td class="right"><input type="text" style="width:96%;" id="newStateLongitude" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Name (Korean):</td>
+                    <td class="right"><input type="text" style="width:96%;"id="newStateNameK" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbreviation (Korean):</td>
+                    <td class="right"><input type="text" style="width:96%;" id="newStateAbbrK" value="0"></td>
+                </tr>
+            </table>
+            <br>
+            <div style="text-align:center;">
+                <input type="submit" id="newStateSubmit" value="Add State">
+            </div>
+        </form>
 	</div>
     <div id="addCity" class="jm-white-popup mfp-hide">
-		<table>
-            <tr>
-                <td>ID:</td>
-                <td><input type='text' id='newCityId' class="centerText" readonly></td>
-            </tr>
-            <tr>
-                <td>Continent:</td>
-                <td>
-                    <select id="newCityContinent">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Nation:</td>
-                <td>
-                    <select id="newCityNation">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>State:</td>
-                <td>
-                    <select id="newCityState">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Name:</td>
-                <td><input type="text" class="centerText toKorean" id="newCityName" value=""></td>
-            </tr>
-            <tr>
-                <td>Abbreviation:</td>
-                <td><input type="text" class="centerText toKorean" id="newCityAbbr" value=""></td>
-            </tr>
-            <tr>
-                <td>Population:</td>
-                <td><input type="number" id="newCityPopulation" value="0"></td>
-            </tr>
-            <tr>
-                <td>Time Zone:</td>
-                <td><select class="tzSelect" id="newCityTimeZone" style="width:100%;"></select></td>
-            </tr>
-            <tr>
-                <td>Observes DST:</td>
-                <td>
-                    <select id="newCityDST" style="width:100%;">
-                        <option value="0">0: No</option>
-                        <option value="1">1: Yes</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Latitude:</td>
-                <td><input type="text" id="newCityLatitude" value="0"></td>
-            </tr>
-            <tr>
-                <td>Longitude:</td>
-                <td><input type="text" id="newCityLongitude" value="0"></td>
-            </tr>
-            <tr>
-                <td>Altitude:</td>
-                <td>
-                    <select id='newCityAltitude' style='width:100%;'> 
-                        <option value='0'>0: ~0 m</option>
-                        <option value='1'>1: ~500 m</option>
-                        <option value='2'>2: ~1000 m</option>
-                        <option value='3'>3: ~1500 m</option>
-                        <option value='4'>4: ~2000 m</option>
-                        <option value='5'>5: ~2500 m</option>
-                        <option value='6'>6: ~3000 m</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Name (Korean):</td>
-                <td><input type="text" id="newCityNameK" value="0"></td>
-            </tr>
-            <tr>
-                <td>Abbreviation (Korean):</td>
-                <td><input type="text" id="newCityAbbrK" value="0"></td>
-            </tr>
-        </table>
+		<h2 style="text-align:center;">Add City</h2>
+		<form id="newStateForm">
+            <table style="width:80%; margin:0 auto;">
+                <tr>
+                    <td class="left">ID:</td>
+                    <td class="right"><input style="display:none;" type='text' id='newCityId' class="centerText" readonly><span id="newCityIDDisplay">0</span></td>
+                </tr>
+                <tr>
+                    <td class="left">Continent:</td>
+                    <td class="right">
+                        <select style="width:99%;" id="newCityContinent">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Nation:</td>
+                    <td class="right">
+                        <select style="width:99%;" id="newCityNation">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">State:</td>
+                    <td class="right">
+                        <select style="width:99%;" id="newCityState">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Name:</td>
+                    <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="newCityName" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbreviation:</td>
+                    <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="newCityAbbr" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Population:</td>
+                    <td class="right"><input type="number" style="width:97%;" id="newCityPopulation" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Time Zone:</td>
+                    <td class="right"><select class="tzSelect" id="newCityTimeZone" style="width:99%;"></select></td>
+                </tr>
+                <tr>
+                    <td class="left">Observes DST:</td>
+                    <td class="right">
+                        <select style="width:99%;" id="newCityDST" style="width:99%;">
+                            <option value="0">0: No</option>
+                            <option value="1">1: Yes</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Latitude:</td>
+                    <td class="right"><input type="text" style="width:97%;" id="newCityLatitude" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Longitude:</td>
+                    <td><input type="text" style="width:97%;" id="newCityLongitude" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Altitude:</td>
+                    <td class="right">
+                        <select style="width:99%;" id='newCityAltitude'> 
+                            <option value='0'>0: ~0 m</option>
+                            <option value='1'>1: ~500 m</option>
+                            <option value='2'>2: ~1000 m</option>
+                            <option value='3'>3: ~1500 m</option>
+                            <option value='4'>4: ~2000 m</option>
+                            <option value='5'>5: ~2500 m</option>
+                            <option value='6'>6: ~3000 m</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">Name (Korean):</td>
+                    <td class="right"><input type="text" style="width:97%;" id="newCityNameK" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbreviation (Korean):</td>
+                    <td class="right"><input type="text" style="width:97%;" id="newCityAbbrK" value="0"></td>
+                </tr>
+            </table>
+            <br>
+            <div style="text-align:center;">
+                <input type="submit" id="newCitySubmit" value="Add City">
+            </div>
+        </form>
 	</div>
     <div id="addRegion" class="jm-white-popup mfp-hide">
 		<table>
@@ -1313,6 +1327,7 @@
                 $("#newContinentPopulation").val(0)
                 $("#newContinentEtid").val(0)
                 $("#newContinentID").val(max_continent_id+1)
+                $("#newContinentIDDisplay").text(max_continent_id+1)
             }
         }
 	});
@@ -1351,6 +1366,7 @@
                     $("#newNationEtid").val(0)
                     $("#newNationLid").val(0)
                     $("#newNationID").val(max_nation_id+1)
+                    $("#newNationIDDisplay").text(max_nation_id+1)
                     $("#newNationGender :nth-child(1)").prop('selected', true);
                     $("#newNationBbqual :nth-child(3)").prop('selected', true);
                     $("#newNationTimeZone :nth-child(30)").prop('selected', true);
