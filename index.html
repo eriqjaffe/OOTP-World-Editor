@@ -433,6 +433,8 @@
         </form>
 	</div>
     <div id="addRegion" class="jm-white-popup mfp-hide">
+        <h2 style="text-align:center;">Add Region</h2>
+        <form id="newRegionForm">
 		<table style="width:95%; margin:0 auto;">
             <tr>
                 <td class="left" style="width:20%!important;">ID:</td>
@@ -454,13 +456,13 @@
                     <option val="cities">Cities</option>
                 </select>
                 <br/>
-                <select name="from[]" id="multi_d" class="form-control" size="26" multiple="multiple" style="height:200px;">
+                <select name="from[]" id="multi_d" class="form-control" size="26" multiple="multiple" style="height:250px;">
                     
                 </select>
             </div>
             
             <div class="col-xs-2">
-                <button type="button" id="multi_d_rightAll" class="btn btn-default btn-block" style="margin-top: 20px;"><i class="glyphicon glyphicon-forward"></i></button>
+                <button type="button" id="multi_d_rightAll" class="btn btn-default btn-block" style="margin-top: 90px;"><i class="glyphicon glyphicon-forward"></i></button>
                 <button type="button" id="multi_d_rightSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
                 <button type="button" id="multi_d_leftSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
                 <button type="button" id="multi_d_leftAll" class="btn btn-default btn-block"><i class="glyphicon glyphicon-backward"></i></button>
@@ -468,18 +470,21 @@
             
             <div class="col-xs-5">
                 <b>Nations</b>
-                <select name="to[]" id="multi_d_to" class="form-control" size="8" multiple="multiple" style="height:100px;"></select>
+                <select name="to[]" id="multi_d_to" class="form-control" size="8" multiple="multiple" style="height:80px;"></select>
                 
                 
                 <b>States</b>
-                <select name="to_2[]" id="multi_d_to_2" class="form-control" size="8" multiple="multiple" style="height:100px;"></select>
+                <select name="to_2[]" id="multi_d_to_2" class="form-control" size="8" multiple="multiple" style="height:80px;"></select>
 
                 
                 <b>Cities</b>
-                <select name="to_2[]" id="multi_d_to_3" class="form-control" size="8" multiple="multiple" style="height:100px;"></select>
+                <select name="to_2[]" id="multi_d_to_3" class="form-control" size="8" multiple="multiple" style="height:80px;"></select>
             </div>
         </div>
-        <input type="submit" class="submit" value="Add New Region">
+        <div style="text-align:center; margin-top:10px;">
+            <input type="submit" id="newRegionSubmit" value="Add Region">
+        </div>
+        </form>
 	</div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
@@ -523,76 +528,96 @@
             search: {
                 left: '<input type="text" name="q" class="form-control" placeholder="Search..." />'
             },
-
-            afterMoveToRight: function($left, $right, $options) { 
-                console.log("HELLO WORLD")
-            },
     
             moveToRight: function(Multiselect, $options, event, silent, skipStack) {
                 var destination = null;
+                var target = null;
                 var button = $(event.currentTarget).attr('id');
                 
                 switch ($("#newRegionSource").val()) {
                     case ("Nations"):
                         destination = Multiselect.$right.eq(0)
+                        target = "multi_d_to"
                         break;
                     case ("States"):
                         destination = Multiselect.$right.eq(1)
+                        target = "multi_d_to2"
                         break;
                     case ("Cities"):
                         destination = Multiselect.$right.eq(2)
+                        target = "multi_d_to3"
                         break;
                 }
     
                 if (button == 'multi_d_rightSelected') {
                     var $left_options = Multiselect.$left.find('> option:selected');
+
                     destination.append($left_options);
+
+                    var usedNames = {};
+                    $("#"+target+" > option").each(function () {
+                        if(usedNames[this.text]) {
+                            $(this).remove();
+                        } else {
+                            usedNames[this.text] = this.value;
+                        }
+                    });
     
                     if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
                         destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
                     }
+                    
                 } else if (button == 'multi_d_rightAll') {
                     var $left_options = Multiselect.$left.children(':visible');
                     destination.append($left_options);
     
+                    var usedNames = {};
+                    $("#multi_d > option").each(function () {
+                        if(usedNames[this.text]) {
+                            $(this).remove();
+                        } else {
+                            usedNames[this.text] = this.value;
+                        }
+                    });
+
                     if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
                         destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
                     }
                 }
+                $("#newRegionSource").trigger("change")
             },
 
             moveToLeft: function(Multiselect, $options, event, silent, skipStack) {
                 var button = $(event.currentTarget).attr('id');
-                var destination = null;
-                var button = $(event.currentTarget).attr('id');
+                var src = null;
                 
                 switch ($("#newRegionSource").val()) {
                     case ("Nations"):
-                        destination = Multiselect.$right.eq(0)
+                        src = Multiselect.$right.eq(0)
                         break;
                     case ("States"):
-                        destination = Multiselect.$right.eq(1)
+                        src = Multiselect.$right.eq(1)
                         break;
                     case ("Cities"):
-                        destination = Multiselect.$right.eq(2)
+                        src = Multiselect.$right.eq(2)
                         break;
                 }
-    
+
+                var src_id = $(src[0]).attr("id")
+
                 if (button == 'multi_d_leftSelected') {
-                    var $right_options = destination.find('> option:selected');
-                    Multiselect.$left.append($right_options);
-    
-                    if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
-                        Multiselect.$left.find('> option').sort(Multiselect.callbacks.sort).appendTo(Multiselect.$left);
-                    }
+                    $("#"+$(src[0]).attr("id")+" > option:selected").each(function() {
+                        $(this).remove()
+                    })
                 } else if (button == 'multi_d_leftAll') {
-                    var $right_options = destination.children(':visible');
-                    Multiselect.$left.append($right_options);
-    
-                    if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
-                        Multiselect.$left.find('> option').sort(Multiselect.callbacks.sort).appendTo(Multiselect.$left);
-                    }
-                } 
+                    $("#"+$(src[0]).attr("id")+" > option:visible").each(function() {
+                        $(this).remove()
+                    })
+                }
+
+                $("#"+$(src[0]).attr("id")).html($('#'+$(src[0]).attr("id")+' option').sort(function(x, y) {
+                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+                }))
             }
         });
 
