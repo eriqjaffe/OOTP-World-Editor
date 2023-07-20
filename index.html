@@ -10,6 +10,8 @@
     <script type="text/javascript" src="./scripts/jquery.validate.min.js"></script>
     <script type="text/javascript" src="./scripts/additional-methods.min.js"></script>
     <script type="text/javascript" src="./scripts/vkbeautify.0.99.00.beta.js"></script>
+    <script type="text/javascript" src="./scripts/snap.svg-min.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.listtopie.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/translate@2/index.min.js"></script>
     <script type="text/javascript" src="./scripts/multiselect.min.js"></script>
     <link href="./scripts/worldeditor.css" rel="stylesheet">
@@ -17,6 +19,7 @@
     <link href="./scripts/bootstrap.css" rel="stylesheet">
     <link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <link href="./scripts/jquery.contextMenu.css" rel="stylesheet" type='text/css'/>
+    <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
 
@@ -130,6 +133,53 @@
         </div>
         </form>
 	</div>
+    <div id="editEthnicity" class="jm-white-popup mfp-hide">
+        <h2 style="text-align:center;">Edit Ethnicity</h2>
+        <form id="editEthnicityForm" action="">
+            <table style="width: 80%; margin:0 auto;">
+                <tr>
+                    <td class="left">ID:</td>
+                    <td class="right"><input type='text' style="display:none;" id='editEthnicityID' class="centerText" readonly><span id="newCEthnicityDisplay">0</span></td>
+                </tr>
+                <tr>
+                    <td class="left">Name:</td>
+                    <td class="right"><input type='text' style="width:95%;" id='editEthnicityName' class="centerText toKorean"></td>
+                </tr>
+                <tr>
+                    <td class="left">Name (Korean):</td>
+                    <td class="right"><input type='text' style="width:95%;" id='editEthnicityNameK' class="centerText"></td>
+                </tr>
+                <tr>
+                    <td class="left">African:</td>
+                    <td class="right"><input type='number' style="width:95%;" class='editEthPct' min='0' max='1000' id='editEthnicityAfrican' value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Asian:</td>
+                    <td class="right"><input type='number' style="width:95%;" class='editEthPct' min='0' max='1000' id='editEthnicityAsian' value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">East Indian:</td>
+                    <td class="right"><input type='number' style="width:95%;" class='editEthPct' min='0' max='1000' id='editEthnicityEastIndian' value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Caucasian:</td>
+                    <td class="right"><input type='number' style="width:95%;" class='editEthPct' min='0' max='1000' id='editEthnicityCaucasian' value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Hispanic:</td>
+                    <td class="right"><input type='number' style="width:95%;" class='editEthPct' min='0' max='1000' d='editEthnicityHispanic' value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Total:</td>
+                    <td class="right" id="editEthnicityTotal" style="text-align:center;"></td>
+                </tr>
+            </table>
+            <br>
+        <div style="text-align:center;">
+            <input type="submit" id="editEthnicitySubmit" value="Add Continent">
+        </div>
+        </form>
+	</div>
     <div id="addContinent" class="jm-white-popup mfp-hide">
         <h2 style="text-align:center;">Add Continent</h2>
         <form id="newContinentForm" action="">
@@ -177,6 +227,53 @@
             </div>
         </form>
         
+	</div>
+    <div id="editContinent" class="jm-white-popup mfp-hide">
+        <h2 style="text-align:center;">Edit Continent</h2>
+        <form id="editContinentForm" action="">
+            <table style="width: 80%; margin:0 auto;">
+                <tr>
+                    <td class="left">ID:</td>
+                    <td class="right"><input style="display:none;" type='text' name='editContinentID' id='editContinentID' class="centerText"><span id="editContinentIDDisplay">0</span></td>
+                </tr>
+                <tr>
+                    <td class="left">Name:</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editContinentName" id="editContinentName" required></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbreviation:</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editContinentAbbr" id="editContinentAbbr" required></td>
+                </tr>
+                <tr>
+                    <td class="left">Demonym:</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editContinentDem" id="editContinentDem" required></td>
+                </tr>
+                <tr>
+                    <td class="left">Population:</td>
+                    <td class="left"><input style="width:95%;" type="number" class="centerText" name="editContinentPop" id="editContinentPop" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">ETID:</td>
+                    <td class="left"><input style="width:95%;" type="number" class="centerText" name="editContinentEtid" id="editContinentEtid" value="0"></td>
+                </tr>
+                <tr>
+                    <td class="left">Name (Korean):</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText" name="editContinentNameK" id="editContinentNameK" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Abbreviation (Korean):</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText" name="editContinentAbbrK" id="editContinentAbbrK" value=""></td>
+                </tr>
+                <tr>
+                    <td class="left">Demonym (Korean):</td>
+                    <td class="left"><input style="width:95%;" type="text" class="centerText" name="editContinentDemK" id="editContinentDemK" value=""></td>
+                </tr>
+            </table>
+            <br>
+            <div style="text-align:center;">
+                <input type="submit" id="editContinentSubmit" value="Submit Changes">
+            </div>
+        </form>
 	</div>
     <div id="addNation" class="jm-white-popup mfp-hide">
         <h2 style="text-align:center;">Add Nation</h2>
@@ -1124,24 +1221,45 @@
                     $("#dataTable").html("")
                     var node = data.node;
                     var html = ""
+                    console.log(node.type)
                     switch (node.type) {
+                        case "ETHNICITIES_PARENT":
+                            //var count = node.countChildren(false)
+                            $("#dataTable").html(node.countChildren(false)+" Ethnicities found")
+                            break;
                         case "ethnicity":
-                            const eth_total = parseInt(node.data.african) + parseInt(node.data.asian) + parseInt(node.data.east_indian) + parseInt(node.data.caucasian) + parseInt(node.data.hispanic)
-                            html += "<form id='ethnicityForm'>\n"
-                                  + "<table id='ethnicityTable'>\n"
-                                  + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
-                                  + "<tr><td>Name:</td><td><input type='text' id='name' style='width:100%;' value='"+node.title+"'></td></tr>\n"
-                                  + "<tr><td>Name (Korean):</td><td><input type='text' id='name_korean' style='width:100%;' value='"+node.data.name_korean+"'></td></tr>\n"
-                                  + "<tr><td>African:</td><td><input type='number' min='0' max='1000' id='african' style='width:100%;' value='"+node.data.african+"'></td></tr>\n"
-                                  + "<tr><td>Asian:</td><td><input type='number' min='0' max='1000' id='asian' style='width:100%;' value='"+node.data.asian+"'></td></tr>\n"
-                                  + "<tr><td>East Indian:</td><td><input type='number' min='0' max='1000' id='east_indian' style='width:100%;' value='"+node.data.east_indian+"'></td></tr>\n"
-                                  + "<tr><td>Caucasian:</td><td><input type='number' min='0' max='1000' id='caucasian' style='width:100%;' value='"+node.data.caucasian+"'></td></tr>\n"
-                                  + "<tr><td>Hispanic:</td><td><input type='number' min='0' max='1000' id='hispanic' style='width:100%;' value='"+node.data.hispanic+"'></td></tr>\n"
-                                  + "<tr><td>Total:</td><td>"+eth_total+"</td></tr>\n"
-                                  + "</table>\n"
-                                  + "<input type='submit' value='Submit'>\n"
-                                  + "</form>"
+                            html = "<div id='pieChart'>\n"
+                                 + "<div data-lcolor='#313c42'>"+node.data.african/10+"<span>African</span></div>\n"
+                                 + "<div data-lcolor='#ef8e39'>"+node.data.asian/10+"<span>Asian</span></div>\n"
+                                 + "<div data-lcolor='#005ce6'>"+node.data.east_indian/10+"<span>East Indian</span></div>\n"
+                                 + "<div data-lcolor='#de2821'>"+node.data.caucasian/10+"<span>Caucasian</span></div>\n"
+                                 + "<div data-lcolor='#de2821'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
+                                 + "</div>\n"
+                                 + "<h6 style='text-align: center;'><b>Ethnicities</b></h6>\n"
+                                 + "<div  style='text-align: center;' class='result_list'></div>"
+
+                            //const eth_total = parseInt(node.data.african) + parseInt(node.data.asian) + parseInt(node.data.east_indian) + parseInt(node.data.caucasian) + parseInt(node.data.hispanic)
+                            //$("#dataTable").html("ethnicity here?")
                             $("#dataTable").html(html)
+                            $("#pieChart").listtopie({
+                                size:'auto',  
+                                strokeWidth:2,
+                                hoverEvent:false,
+                                hoverBorderColor:'#585858',
+                                hoverWidth:2,
+                                textSize:'16',
+                                marginCenter:30,
+                                listVal:true,
+                                strokeColor:'#fff',
+                                listValMouseOver: true,
+                                infoText:true,
+                                setValues:false,
+                                listValInsertClass:'result_list',
+                                backColorOpacity: '0.8',
+                                hoverSectorColor:true,
+                                usePercent:true,
+                                speedDraw:150
+                            });
                             break;
                         case "continent":
                             /*h tml += "<form id='editContinentForm' action=''>\n"
@@ -1161,40 +1279,7 @@
                             $("#dataTable").html("Continent Form here?")
                             break;
                         case "nation":
-                            html += "<form id='nationForm'>\n"
-                                + "<table id='nationTable'>\n"
-                                + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
-                                + "<tr><td>Name:</td><td><input type='text' id='name' value='"+node.title+"'></td></tr>\n"
-                                + "<tr><td>Abbreviation:</td><td><input type='text' id='abbr' value='"+node.data.abbr+"'></td></tr>\n"
-                                + "<tr><td>Demonym:</td><td><input type='text' id='dem' value='"+node.data.dem+"'></td></tr>\n"
-                                + "<tr><td>Population:</td><td><input type='number' id='pop' value='"+node.data.pop+"'></td></tr>\n"
-                                + "<tr><td>ETID:</td><td><input type='text' id='etid' value='"+node.data.etid+"'></td></tr>\n"
-                                + "<tr><td>LID:</td><td><input type='text' id='lid' value='"+node.data.lid+"'></td></tr>\n"
-                                + "<tr><td>Gender:</td><td><select id='gender' style='width:100%;'>\n"
-                                + "<option value='0'>0: Male</option>\n"
-                                + "<option value='1'>1: Female</option></select></td></tr>\n"
-                                + "<tr><td>Baseball Quality:</td><td><select id='bbqual' style='width:100%;'>\n"
-                                + "<option value='5'>5: Excellent</option>\n"
-                                + "<option value='4'>4: Good</option>\n"
-                                + "<option value='3'>3: Average</option>\n"
-                                + "<option value='2'>2: Fair</option>\n"
-                                + "<option value='1'>1: Poor</option>\n"
-                                + "<option value='0'>0: Non-Existent</option></select></td></tr>\n"
-                                + "<tr><td>Time Zone:</td><td><select id='time_zone' style='width:100%;'>\n"     
-                                + "</select></td></tr>\n"    
-                                + "<tr><td>Observes DST:</td><td><select id='observes_dst' style='width:100%;'>\n"
-                                + "<option value='0'>0: No</option>\n"
-                                + "<option value='1'>1: Yes</option></select></td></tr>\n"
-                                + "<tr><td>Modern USA?</td><td><select id='this_is_the_usa' style='width:100%;'>\n"
-                                + "<option value='0'>0: No</option>\n"
-                                + "<option value='1'>1: Yes</option></select></td></tr>\n"
-                                + "<tr><td>Name (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.title_korean+"'></td></tr>\n"
-                                + "<tr><td>Short (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.short_korean+"'></td></tr>\n"
-                                + "<tr><td>Abbreviation (Korean):</td><td><input type='text' id='abbr_korean' value='"+node.data.abbr_korean+"'></td></tr>\n"
-                                + "<tr><td>Demonym (Korean):</td><td><input type='text' id='dem_korean' value='"+node.data.dem_korean+"'></td></tr>\n"
-                                + "</table>\n"
-                                + "<input type='submit' value='Submit'>\n"
-                                + "</form>"
+                            html += "nation data here"
                             $("#dataTable").html(html)
                             $("#bbqual").val(node.data.bbqual)
                             $("#gender").val(node.data.gender)
@@ -1208,21 +1293,7 @@
                             $("#time_zone").val(node.data.time_zone)
                             break;
                         case "state":
-                            html += "<form id='cityForm'>\n"
-                                + "<table id='cityTable'>\n"
-                                + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
-                                + "<tr><td>Name:</td><td><input type='text' id='name' value='"+node.title+"'></td></tr>\n"
-                                + "<tr><td>Abbreviation:</td><td><input type='text' id='abbr' value='"+node.data.abbr+"'></td></tr>\n"
-                                + "<tr><td>Population:</td><td><input type='text' id='abbr' value='"+node.data.pop+"'></td></tr>\n"
-                                + "<tr><td>Time Zone:</td><td><select id='time_zone' style='width:100%;'>\n"
-                                + "</option></select></td></tr>\n"
-                                + "<tr><td>Observes DST:</td><td><select id='observes_dst' style='width:100%;'>\n"
-                                + "<option value='0'>0: No</option>\n"
-                                + "<option value='1'>1: Yes</option></select></td></tr>\n"
-                                + "<tr><td>Latitude:</td><td><input type='text' id='abbr' value='"+node.data.lat+"'></td></tr>\n"
-                                + "<tr><td>Longitude:</td><td><input type='text' id='abbr' value='"+node.data.long+"'></td></tr>\n"
-                                + "<tr><td>Name (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.title_korean+"'></td></tr>\n"
-                                + "<tr><td>Abbreviation (Korean):</td><td><input type='text' id='abbr_korean' value='"+node.data.abbr_korean+"'></td></tr></table>\n"
+                            html += "city data here"
                             $("#dataTable").html(html)
                             $("#observes_dst").val(node.data.observes_dst)
                             for (z of time_zones) {
@@ -1233,45 +1304,20 @@
                             $("#time_zone").val(node.data.time_zone)
                             break;
                         case "city":
-                            html += "<form id='cityForm'>\n"
-                                + "<table id='cityTable'>\n"
-                                + "<tr><td>ID:</td><td>"+node.data.id+"</td></tr>\n"
-                                + "<tr><td>Name:</td><td><input type='text' id='name' value='"+node.title+"'></td></tr>\n"
-                                + "<tr><td>Abbreviation:</td><td><input type='text' id='abbr' value='"+node.data.abbr+"'></td></tr>\n"
-                                + "<tr><td>Population:</td><td><input type='text' id='abbr' value='"+node.data.pop+"'></td></tr>\n"
-                                + "<tr><td>Time Zone:</td><td><select id='time_zone' style='width:100%;'>\n"
-                                + "</select></td></tr>\n"
-                                + "<tr><td>Observes DST:</td><td><select id='observes_dst' style='width:100%;'>\n"
-                                + "<option value='0'>0: No</option>\n"
-                                + "<option value='1'>1: Yes</option></select></td></tr>\n"
-                                + "<tr><td>Latitude:</td><td><input type='text' id='abbr' value='"+node.data.lat+"'></td></tr>\n"
-                                + "<tr><td>Longitude:</td><td><input type='text' id='abbr' value='"+node.data.long+"'></td></tr>\n"
-                                + "<tr><td>Altitude:</td><td><select id='altitude' style='width:100%;'>\n"
-                                + "<option value='0'>0: ~0 m</option>\n"
-                                + "<option value='1'>1: ~500 m</option>\n"
-                                + "<option value='2'>2: ~1000 m</option>\n"
-                                + "<option value='3'>3: ~1500 m</option>\n"
-                                + "<option value='4'>4: ~2000 m</option>\n"
-                                + "<option value='5'>5: ~2500 m</option>\n"
-                                + "<option value='6'>6: ~3000 m</option></select></td></tr>\n"
-                                + "<tr><td>Name (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.title_korean+"'></td></tr>\n"
-                                + "<tr><td>Abbreviation (Korean):</td><td><input type='text' id='abbr_korean' value='"+node.data.abbr_korean+"'></td></tr></table>\n"
+                            html += "city data gere"
                             $("#dataTable").html(html)
-                            $("#observes_dst").val(node.data.observes_dst)
+                            /* $("#observes_dst").val(node.data.observes_dst)
                             for (z of time_zones) {
                                 $('#time_zone')
                                     .append($('<option>', { value : z.tz })
                                     .text(z.loc));
                             }
                             $("#time_zone").val(node.data.time_zone)
-                            $("#altitude").val(node.data.altitude)
+                            $("#altitude").val(node.data.altitude) */
                             break;
                         case "second_nations":
-                            html += "<form id='secondNationsForm'>\n"
-                                + "<table id='secondNationsTable'>\n"
-                                + "<thead>\n<tr><td>ID</td><td>Name</td><td>PCT</td><td>Use Name?</td></tr>\n</thead>\n"
-                                + "<tbody>\n"
-                             if (node.data.subdata != undefined) {
+                            html += "second nations data here"
+                             /* if (node.data.subdata != undefined) {
                                 for (e of node.data.subdata) {
                                     console.log(e)
                                     var selected_no = (e.use_name == "0") ? " selected" : ""
@@ -1283,20 +1329,12 @@
                                     + "</select></td></tr>\n"
                                 }
                             }
-                            html += "</tbody></table>"
+                            html += "</tbody></table>" */
                             $("#dataTable").html(html)  
                             break;
                         case "nation_ethnicity":
-                            html += "<form id='nEthnicityForm'>\n"
-                                + "<table id='nEthnicityTable'>\n"
-                                + "<thead>\n<tr><td>ID</td><td>Ethnicity</td><td>PCT</td></tr>\n</thead>\n"
-                                + "<tbody>\n"
-                            if (node.data.subdata != undefined) {
-                                for (e of node.data.subdata) {
-                                    html += "<tr><td>"+e.etid+"</td><td>"+e.name+"</td><td>"+e.pct+"</td></tr>\n"
-                                }
-                            }
-                            html += "</tbody></table>"
+                            html += "nation_ethnicity data here"
+                            
                             $("#dataTable").html(html)    
                             break;
                         default:
@@ -1315,7 +1353,7 @@
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
                             cmItems = {
-                                "add": {name: "Add Ethnicity", icon: 'add'}
+                               "add": {name: "Add Ethnicity", icon: 'add'}
                             }
                             break;  
                         case "CONTINENTS_PARENT":
@@ -1363,6 +1401,14 @@
                                 "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
+                        case "ethnicity": {
+                            cmItems = {
+                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                                "sep1": "----",
+                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                            }
+                            break;
+                        }
                         default: 
                             cmItems = {}
                             break;
@@ -1375,7 +1421,11 @@
                                     $("#addEthnicityTrigger").click()
                                     break;  
                                 case "CONTINENTS_PARENT":
-                                    if (key == "add") { $("#addContinentTrigger").click() }
+                                    switch (key) {
+                                        case "add":
+                                            $("#addContinentTrigger").click()
+                                            break;
+                                    }
                                     break;  
                                 case "REGIONS_PARENT":
                                     $("#addRegionTrigger").click()
@@ -1389,7 +1439,7 @@
                                             console.log("You chose to delete "+node.title)
                                             break;
                                         case "edit":
-                                            console.log("You chose to edit "+node.title)
+                                            editContinent(node)
                                             break;
                                     }
                                     break;
@@ -1426,6 +1476,16 @@
                                     break;
                                 case "city":
                                     confirm("Are you sure you want to delete "+node.title+"?")
+                                    break;
+                                case "ethnicity":
+                                    switch (key) {
+                                        case "delete":
+                                            console.log("You chose to delete "+node.title)
+                                            break;
+                                        case "edit":
+                                            editEthnicity(node)
+                                            break;
+                                    }
                                     break;
                                 default: 
                                     break;
@@ -1508,6 +1568,56 @@
             }
         }
 	});
+
+    function editEthnicity(node) {
+        $.magnificPopup.open({
+            closeOnBgClick: false,
+            items: {
+                src: "#editEthnicity",
+                type: 'inline'
+            },
+            callbacks: {
+                beforeOpen: function() {
+                    console.log(node)
+                    $("#editEthnicityName").val(node.title)
+                    $("#editEthnicityNameK").val(node.data.name_korean)
+                    $("#editEthnicityID").val(max_ethnicity_id+1)
+                    $("#editEthnicityAfrican").val(node.data.african)
+                    $("#editEthnicityAsian").val(node.data.asian)
+                    $("#editEthnicityEastIndian").val(node.data.east_indian)
+                    $("#editEthnicityCaucasian").val(node.data.caucasian)
+                    $("#editEthnicityHispanic").val(node.data.hispanic)
+                    $("#editEthnicityTotal").css("color","red")
+                    $("#editEthnicityTotal").html("0")
+                }
+            }
+            
+        })
+    }
+    function editContinent(node) {
+        $.magnificPopup.open({
+            closeOnBgClick: false,
+            items: {
+                src: '#editContinent',
+                type: 'inline'
+            },
+            callbacks: {
+                beforeOpen: function() {
+                    console.log(node)
+                    $("#editContinentName").val(node.title)
+                    $("#editContinentNameK").val(node.data.title_korean)
+                    $("#editContinentAbbr").val(node.data.abbr)
+                    $("#editContinentAbbrK").val(node.data.abbr_korean)
+                    $("#editContinentDem").val(node.data.dem)
+                    $("#editContinentDemK").val(node.data.dem_korean)
+                    $("#editContinentPop").val(parseInt(node.data.pop))
+                    $("#editContinentEtid").val(parseInt(node.data.etid))
+                    $("#editContinentID").val(node.data.id)
+                    $("#editContinentIDDisplay").text(node.data.id)
+                }
+            }
+        })
+    }
 
     function addNation(continent) {
         $.magnificPopup.open({

@@ -374,7 +374,7 @@ img.mfp-img {
   padding-top: 0; }
   
 .white-popup {
-  font-family: 'Archivo Narrow', sans-serif;
+  /* font-family: 'Archivo Narrow', sans-serif; */
   position: relative;
   background: rgb(255, 255, 255);
   background: rgba(255, 255, 255, 0.9);
@@ -391,7 +391,7 @@ img.mfp-img {
 }
 
 .cm-white-popup {
-  font-family: "Quicksand", sans-serif;
+  /* font-family: "Quicksand", sans-serif; */
   position: relative;
   background: rgb(255, 255, 255);
   background: rgba(255, 255, 255, 0.9);
@@ -408,7 +408,6 @@ img.mfp-img {
 }
 
 .jm-white-popup {
-  font-family: "Leckerli One", sans-serif;
   position: relative;
   background: rgb(255, 255, 255);
   background: rgba(255, 255, 255, 0.9);
@@ -425,7 +424,7 @@ img.mfp-img {
 }
 
 .wait-popup {
-  font-family: 'Archivo Narrow', sans-serif;
+  /* font-family: 'Archivo Narrow', sans-serif; */
   position: relative;
   background: rgb(255, 255, 255);
   background: ;

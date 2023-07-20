@@ -1,5 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
-
+@import url(https://fonts.googleapis.com/css?family=Lato:900,400,300,300italic,400italic,700,700italic);
 * {
     font-family: 'Lato', Helvetica, sans-serif;
     color: #333447;
@@ -18,6 +17,11 @@
 	pointer-events:none;
     display:none;
     background: rgba(0,0,0,0.5);
+}
+
+input[type='number']::-webkit-inner-spin-button, 
+input[type='number']::-webkit-outer-spin-button { 
+    opacity: 1;
 }
 
 table, th, td {
