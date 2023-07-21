@@ -7,8 +7,6 @@
 	<script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree-all-deps.min.js"></script>
     <script type="text/javascript" src="./scripts/jquery.magnific-popup.min.js"></script>
-    <script type="text/javascript" src="./scripts/jquery.validate.min.js"></script>
-    <script type="text/javascript" src="./scripts/additional-methods.min.js"></script>
     <script type="text/javascript" src="./scripts/vkbeautify.0.99.00.beta.js"></script>
     <script type="text/javascript" src="./scripts/snap.svg-min.js"></script>
     <script type="text/javascript" src="./scripts/jquery.listtopie.min.js"></script>
@@ -392,11 +390,11 @@
                 </tr>
                 <tr>
                     <td class="left">Name:</td>
-                    <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="newStateName" value=""></td>
+                    <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="newStateName" value="" required></td>
                 </tr>
                 <tr>
                     <td class="left">Abbreviation:</td>
-                    <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="newStateAbbr" value=""></td>
+                    <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="newStateAbbr" value="" required></td>
                 </tr>
                 <tr>
                     <td class="left">Population:</td>
@@ -440,7 +438,7 @@
 	</div>
     <div id="addCity" class="jm-white-popup mfp-hide">
 		<h2 style="text-align:center;">Add City</h2>
-		<form id="newStateForm">
+		<form id="newCityForm">
             <table style="width:80%; margin:0 auto;">
                 <tr>
                     <td class="left">ID:</td>
@@ -469,11 +467,11 @@
                 </tr>
                 <tr>
                     <td class="left">Name:</td>
-                    <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="newCityName" value=""></td>
+                    <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="newCityName" value="" required></td>
                 </tr>
                 <tr>
                     <td class="left">Abbreviation:</td>
-                    <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="newCityAbbr" value=""></td>
+                    <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="newCityAbbr" value="" required></td>
                 </tr>
                 <tr>
                     <td class="left">Population:</td>
@@ -1221,10 +1219,9 @@
                     $("#dataTable").html("")
                     var node = data.node;
                     var html = ""
-                    console.log(node.type)
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
-                            //var count = node.countChildren(false)
+                            //var count = node.countChildren(false)topie
                             $("#dataTable").html(node.countChildren(false)+" Ethnicities found")
                             break;
                         case "ethnicity":
@@ -1235,8 +1232,8 @@
                                  + "<div data-lcolor='#de2821'>"+node.data.caucasian/10+"<span>Caucasian</span></div>\n"
                                  + "<div data-lcolor='#de2821'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
                                  + "</div>\n"
-                                 + "<h6 style='text-align: center;'><b>Ethnicities</b></h6>\n"
-                                 + "<div  style='text-align: center;' class='result_list'></div>"
+                                 + "<h4 style='text-align: center;'><b>"+node.title+"</b></h4>\n"
+                                 + "<div class='result_list'></div>"
 
                             //const eth_total = parseInt(node.data.african) + parseInt(node.data.asian) + parseInt(node.data.east_indian) + parseInt(node.data.caucasian) + parseInt(node.data.hispanic)
                             //$("#dataTable").html("ethnicity here?")
@@ -1594,6 +1591,7 @@
             
         })
     }
+
     function editContinent(node) {
         $.magnificPopup.open({
             closeOnBgClick: false,
@@ -1674,6 +1672,8 @@
             },
             callbacks: {
                 beforeOpen: function() {
+                    var tree = $.ui.fancytree.getTree("#xmlOutput")
+                    var con = tree.findFirst("CONTINENTS")
                     $.each(continents_by_id, function(key, value) {
                         $('#newStateContinent')
                             .append($('<option>', { value : key })
@@ -1690,9 +1690,22 @@
                     } else {
                         $("#newStateNation").val(nation);
                     }
+                    var n = findNation($("#newStateContinent option:selected" ).text(), $("#newStateNation option:selected" ).text())
+                    $("#newStateId").val(max_state_id+1)
+                    $("#newStateIDDisplay").text(max_state_id+1)
+                    $("#newStateName").val("")
+                    $("#newStateNameK").val("")
+                    $("#newStatePopulation").val(0)
+                    $("#newStateAbbr").val("")
+                    $("#newStateAbbrK").val("")
+                    $("#newStateTimeZone").val(n.data.time_zone)
+                    //$("#newStateTimeZone :nth-child(30)").prop('selected', true);
+                    $("#newStateDST :nth-child(1)").prop('selected', true);
+                    $("#newStateLatitude").val()
+                    $("#newStateLongitude").val()
                 }
             }
-	});
+	    });
     }
 
     $("#newStateContinent").on("change", function() { 
@@ -1705,12 +1718,54 @@
         $("#newStateNation").html($('#newStateNation option').sort(function(x, y) {
             return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
         }))
+        $("#newStateNation").trigger("change")
     })
 
+    $("#newStateNation").on("change",function() {
+        n = findNation($("#newStateContinent option:selected").text(), $("#newStateNation option:selected" ).text())
+        $("#newStateTimeZone").val(n.data.time_zone)
+    })
+
+    function findContinent(continent) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        var arr = world.findAll(continent)
+        for (c of arr) {
+            if (c.type == "continent") {
+                if (c.title == continent) {
+                    return c
+                }
+            }
+        }
+    }
+
+    function findNation(continent, nation) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var con = findContinent(continent)
+        var arr = con.findAll(nation) 
+        for (n of arr) {
+            if (n.type == "nation") {
+                if (n.title == nation) {
+                    return n
+                }
+            }
+        }
+    }
+
+    function findState(continent, nation, state) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var nat = findNation(continent, nation)
+        var arr = nat.findAll(state)
+        for (s of arr) {
+            if (s.type == "state") {
+                if (s.title == state) {
+                    return s
+                }
+            }
+        }
+    }
+
     function addCity(continent, nation, state) {
-        console.log(continent)
-        console.log(nation)
-        console.log(state)
         $.magnificPopup.open({
             items: {
                 src: '#addCity',
@@ -1744,7 +1799,23 @@
                     } else {
                         $("#newCityState").val(state);
                     }
+                    var s = findState($("#newCityContinent option:selected" ).text(), $("#newCityNation option:selected" ).text(), $("#newCityState option:selected" ).text())
                     $("#newCityId").val(max_city_id+1)
+                    $("#newCityIDDisplay").text(max_city_id+1)
+                    $("#newCityName").val("")
+                    $("#newCityAbbr").val("")
+                    $("#newCityPopulation").val(0)
+                    $("#newCityTimeZone").val(s.data.time_zone)
+                    if (s.data.observes_dst == undefined) {
+                        $("#newCityDST").val(0)
+                    } else {
+                        $("#newCityDST").val(s.data.observes_dst)
+                    }
+                    $("#newCityLatitude").val(0)
+                    $("#newCityLongitude").val(0)
+                    $("#newCityAltitude").val("0")
+                    $("#newCityNameK").val("")
+                    $("#newCityAbbrK").val("")
                 }
             }
         });
@@ -1773,6 +1844,7 @@
         $("#newCityState").html($('#newCityState option').sort(function(x, y) {
             return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
         }))
+        $("#newCityState").trigger("change")
     })
 
     $("#addRegionTrigger").magnificPopup({
@@ -1817,122 +1889,188 @@
         $("#newEthnicityTotal").html(sum)
     })
 
-    $("#editContinentForm").validate({
-        submitHandler: function() { 
-            var tree = $.ui.fancytree.getTree("#xmlOutput")
-            var node = tree.getActiveNode();
-            console.log(node)
-        }
+    // $("#editContinentForm").validate({
+    //     submitHandler: function() { 
+    //         var tree = $.ui.fancytree.getTree("#xmlOutput")
+    //         var node = tree.getActiveNode();
+    //         console.log(node)
+    //     }
         
-        //debug: true,
+    //     //debug: true,
         
-        /* errorClass: "invalid",
-        submitHandler: function() { 
-            continent_count++
-            continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
-            var continent_obj = {}
-            continent_obj.type = 'continent'
-            continent_obj.folder = true
-            continent_obj.icon = './images/earth-americas-solid.svg'
-            continent_obj.id = $("#newContinentID").val()
-            continent_obj.title = $("#newContinentName").val()
-            continent_obj.title_korean = $("#newContinentNameK").val()
-            continent_obj.pop = $("#newContinentPop").val()
-            continent_obj.etid = $("#newContinentEtid").val()
-            continent_obj.abbr = $("#newContinentAbbr").val()
-            continent_obj.dem = $("#newContinentDem").val()
-            continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
-            continent_obj.dem_korean = $("#newContinentDemK").val()
-            if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
-            $("#max_continent_id").text(max_continent_id)
-            $("#continent_count").text(continent_count)
-            var tree = $.ui.fancytree.getTree("#xmlOutput")
-            var world = tree.findFirst("CONTINENT")
-            world.addChildren(continent_obj)
-            world.sortChildren(null, true);
-            var continent = world.findFirst($("#newContinentName").val())
-            world.setExpanded()
-            continent.setFocus()
-            continent.setActive()
-            $.magnificPopup.close()
-        } */
+    //     /* errorClass: "invalid",
+    //     submitHandler: function() { 
+    //         continent_count++
+    //         continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
+    //         var continent_obj = {}
+    //         continent_obj.type = 'continent'
+    //         continent_obj.folder = true
+    //         continent_obj.icon = './images/earth-americas-solid.svg'
+    //         continent_obj.id = $("#newContinentID").val()
+    //         continent_obj.title = $("#newContinentName").val()
+    //         continent_obj.title_korean = $("#newContinentNameK").val()
+    //         continent_obj.pop = $("#newContinentPop").val()
+    //         continent_obj.etid = $("#newContinentEtid").val()
+    //         continent_obj.abbr = $("#newContinentAbbr").val()
+    //         continent_obj.dem = $("#newContinentDem").val()
+    //         continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
+    //         continent_obj.dem_korean = $("#newContinentDemK").val()
+    //         if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
+    //         $("#max_continent_id").text(max_continent_id)
+    //         $("#continent_count").text(continent_count)
+    //         var tree = $.ui.fancytree.getTree("#xmlOutput")
+    //         var world = tree.findFirst("CONTINENT")
+    //         world.addChildren(continent_obj)
+    //         world.sortChildren(null, true);
+    //         var continent = world.findFirst($("#newContinentName").val())
+    //         world.setExpanded()
+    //         continent.setFocus()
+    //         continent.setActive()
+    //         $.magnificPopup.close()
+    //     } */
+    // })
+
+
+    $("#newContinentForm").on("submit", function(e) {
+        e.preventDefault()
+        continent_count++
+        continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
+        var continent_obj = {}
+        continent_obj.type = 'continent'
+        continent_obj.folder = true
+        continent_obj.icon = './images/earth-americas-solid.svg'
+        continent_obj.id = $("#newContinentID").val()
+        continent_obj.title = $("#newContinentName").val()
+        continent_obj.title_korean = $("#newContinentNameK").val()
+        continent_obj.pop = $("#newContinentPop").val()
+        continent_obj.etid = $("#newContinentEtid").val()
+        continent_obj.abbr = $("#newContinentAbbr").val()
+        continent_obj.dem = $("#newContinentDem").val()
+        continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
+        continent_obj.dem_korean = $("#newContinentDemK").val()
+        if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
+        $("#max_continent_id").text(max_continent_id)
+        $("#continent_count").text(continent_count)
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        world.addChildren(continent_obj)
+        world.sortChildren(null, true);
+        var continent = world.findFirst($("#newContinentName").val())
+        world.setExpanded()
+        continent.setFocus()
+        continent.setActive()
+        $.magnificPopup.close()
+
     })
 
-    $("#newContinentForm").validate({
-        //debug: true,
-        errorClass: "invalid",
-        submitHandler: function() { 
-            continent_count++
-            continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
-            var continent_obj = {}
-            continent_obj.type = 'continent'
-            continent_obj.folder = true
-            continent_obj.icon = './images/earth-americas-solid.svg'
-            continent_obj.id = $("#newContinentID").val()
-            continent_obj.title = $("#newContinentName").val()
-            continent_obj.title_korean = $("#newContinentNameK").val()
-            continent_obj.pop = $("#newContinentPop").val()
-            continent_obj.etid = $("#newContinentEtid").val()
-            continent_obj.abbr = $("#newContinentAbbr").val()
-            continent_obj.dem = $("#newContinentDem").val()
-            continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
-            continent_obj.dem_korean = $("#newContinentDemK").val()
-            if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
-            $("#max_continent_id").text(max_continent_id)
-            $("#continent_count").text(continent_count)
-            var tree = $.ui.fancytree.getTree("#xmlOutput")
-            var world = tree.findFirst("CONTINENT")
-            world.addChildren(continent_obj)
-            world.sortChildren(null, true);
-            var continent = world.findFirst($("#newContinentName").val())
-            world.setExpanded()
-            continent.setFocus()
-            continent.setActive()
-            $.magnificPopup.close()
+    $("#newNationForm").on("submit", function(e) {
+        e.preventDefault()
+        nations_by_id[$("#newNationID").val()] = $("#newNationName").val()
+        nation_count++;
+        var nation_obj = {}
+        nation_obj.type = 'nation'
+        nation_obj.folder = true
+        nation_obj.icon = './images/flag-solid.svg'
+        nation_obj.id = $("#newNationID").val()
+        nation_obj.title = $("#newNationName").val()
+        nation_obj.title_korean = $("#newNationNameK").val()
+        nation_obj.short_korean = $("#newNationShortK").val()
+        nation_obj.pop = $("#newNationPopulation").val()
+        nation_obj.etid = $("#newNationEtid").val()
+        nation_obj.lid = $("#newNationLid").val()
+        nation_obj.capid = '0'
+        nation_obj.gender = $("#newNationGender").val()
+        nation_obj.bbqual = $("#newNationBbqual").val()
+        nation_obj.abbr = $("#newNationAbbr").val()
+        nation_obj.abbr_korean = $("#newNationAbbrK").val()
+        nation_obj.dem = $("#newNationDem").val()
+        nation_obj.dem_korean = $("#newNationDemK").val()
+        nation_obj.time_zone = $("#newNationTimeZone").val()
+        nation_obj.observes_dst = $("#newNationDST").val()
+        nation_obj.this_is_the_usa = $("#newNationUSA").val()
+        if (parseInt($("#newNationID").val()) > max_nation_id) { max_nation_id = parseInt($("#newNationID").val()) }
+        $("#max_nation_id").text(max_nation_id)
+        $("#nation_count").text(nation_count)
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        var continent = world.findFirst($("#newNationContinent option:selected" ).text())
+        continent.addChildren(nation_obj)
+        world.sortChildren(null, true);
+        var newNodes = continent.findAll($("#newNationName").val())
+        for (node of newNodes) {
+            if (node.title == $("#newNationName").val()) {
+                node.setFocus()
+                node.setActive()
+                node.makeVisible({scrollIntoView: true});
+                break;
+            }
         }
+        nations_by_continent[$("#newNationContinent").val()].push(nation_obj)
+        $.magnificPopup.close()
     })
 
-    $("#newNationForm").validate({
-        //debug: true,
-        errorClass: "invalid",
-        submitHandler: function() { 
-            nations_by_id[$("#newNationID").val()] = $("#newNationName").val()
-            nation_count++;
-            var nation_obj = {}
-            nation_obj.type = 'nation'
-            nation_obj.folder = true
-            nation_obj.icon = './images/flag-solid.svg'
-            nation_obj.id = $("#newNationID").val()
-            nation_obj.title = $("#newNationName").val()
-            nation_obj.title_korean = $("#newNationNameK").val()
-            nation_obj.short_korean = $("#newNationShortK").val()
-            nation_obj.pop = $("#newNationPopulation").val()
-            nation_obj.etid = $("#newNationEtid").val()
-            nation_obj.lid = $("#newNationLid").val()
-            nation_obj.capid = '0'
-            nation_obj.gender = $("#newNationGender").val()
-            nation_obj.bbqual = $("#newNationBbqual").val()
-            nation_obj.abbr = $("#newNationAbbr").val()
-            nation_obj.abbr_korean = $("#newNationAbbrK").val()
-            nation_obj.dem = $("#newNationDem").val()
-            nation_obj.dem_korean = $("#newNationDemK").val()
-            nation_obj.time_zone = $("#newNationTimeZone").val()
-            nation_obj.observes_dst = $("#newNationDST").val()
-            nation_obj.this_is_the_usa = $("#newNationUSA").val()
-            if (parseInt($("#newNationID").val()) > max_nation_id) { max_nation_id = parseInt($("#newNationID").val()) }
-            $("#max_nation_id").text(max_nation_id)
-            $("#nation_count").text(nation_count)
-            var tree = $.ui.fancytree.getTree("#xmlOutput")
-            var world = tree.findFirst("CONTINENT")
-            var continent = world.findFirst($("#newNationContinent option:selected" ).text())
-            continent.addChildren(nation_obj)
-            world.sortChildren(null, true);
-            var newNode = continent.findFirst($("#newNationName").val())
-            continent.setExpanded()
-            newNode.setFocus()
-            newNode.setActive()
-            $.magnificPopup.close()
-        }
+    $("#newStateForm").on("submit", function(e) {
+        e.preventDefault()
+        states_by_id[$("#newStateId").val()] = $("#newStateName").val()
+        state_count++;
+        var state_obj = {}
+        state_obj.type = 'state'
+        state_obj.folder = true
+        state_obj.icon = './images/landmark-flag-solid.svg'
+        state_obj.id = $("#newStateId").val()
+        state_obj.title = $("#newStateName").val()
+        state_obj.title_korean = $("#newStateNameK").val()
+        state_obj.pop = $("#newStatePopulation").val()
+        state_obj.abbr = $("#newStateAbbr").val()
+        state_obj.abbr_korean = $("#newStateAbbrK").val()
+        state_obj.time_zone = $("#newStateTimeZone").val()
+        state_obj.observes_dst = $("#newStateDST").val()
+        state_obj.lat = $("#newStateLatitude").val()
+        state_obj.long = $("#newStateLongitude").val()
+        if (parseInt($("#newStateId").val()) > max_state_id) { max_state_id = parseInt($("#newStateId").val()) }
+        $("#max_state_id").text(max_state_id)
+        $("#state_count").text(state_count)
+        var nation = findNation($("#newStateContinent option:selected").text(), $("#newStateNation option:selected").text())
+        var states = nation.findFirst("States")
+        states.addChildren(state_obj)
+        states.sortChildren(null, true)
+        var node = states.findFirst($("#newStateName").val())
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+        $.magnificPopup.close()
+    })
+
+    $("#newCityForm").on("submit", function(e) {
+        e.preventDefault()
+        cities_by_id[$("#newCityId").val()] = $("#newCityName").val()
+        city_count++;
+        var city_obj = {}
+        city_obj.type = 'city'
+        city_obj.folder = false
+        city_obj.icon = './images/city-solid.svg'
+        city_obj.id = $("#newCityId").val()
+        city_obj.title = $("#newCityName").val()
+        city_obj.title_korean = $("#newCityNameK").val()
+        city_obj.pop = $("#newCityPopulation").val()
+        city_obj.lat = $("#newCityLatitude").val()
+        city_obj.long = $("#newCityLongitude").val()
+        city_obj.abbr = $("#newCityAbbr").val()
+        city_obj.altitude = $("#newCityAltitude").val()
+        city_obj.abbr_korean = $("#newCityAbbrK").val()
+        city_obj.time_zone = $("#newCityTimeZone").val()
+        city_obj.observes_dst = $("#newCityDST").val()
+        if (parseInt($("#newCityId").val()) > max_city_id) { max_city_id = parseInt($("#newCityId").val()) }
+        $("#max_city_id").text(max_city_id)
+        $("#city_count").text(city_count)
+        var state = findState($("#newCityContinent option:selected").text(), $("#newCityNation option:selected").text(), $("#newCityState option:selected").text())
+        state.addChildren(city_obj)
+        state.sortChildren(null, true)
+        var node = state.findFirst($("#newCityName").val())
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+        $.magnificPopup.close()
     })
     </script>
 </html>
