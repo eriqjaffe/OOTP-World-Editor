@@ -49,6 +49,8 @@
         var nations_by_continent = {}
         var states_by_nation = {}
         const time_zones = [{ tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-8.00", loc: "(GMT-08:00) Tijuana, Baja California" }, { tz: "-7.00", loc: "(GMT-07:00) Arizona" }, { tz: "-7.00", loc: "(GMT-07:00) Chihuahua, La Paz, Mazatlan" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central America" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Guadalajara, Mexico City, Monterrey" }, { tz: "-6.00", loc: "(GMT-06:00) Saskatchewan" }, { tz: "-5.00", loc: "(GMT-05:00) Bogota, Lima, Quito, Rio Branco" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Indiana (East)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Caracas, La Paz" }, { tz: "-4.00", loc: "(GMT-04:00) Manaus" }, { tz: "-4.00", loc: "(GMT-04:00) Santiago" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-3.00", loc: "(GMT-03:00) Buenos Aires, Georgetown" }, { tz: "-3.00", loc: "(GMT-03:00) Greenland" }, { tz: "-3.00", loc: "(GMT-03:00) Montevideo" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." }, { tz: "-1.00", loc: "(GMT-01:00) Azores" }, { tz: "0.00", loc: "(GMT+00:00) Casablanca, Monrovia, Reykjavik" }, { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" }, { tz: "1.00", loc: "(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague" }, { tz: "1.00", loc: "(GMT+01:00) Brussels, Copenhagen, Madrid, Paris" }, { tz: "1.00", loc: "(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb" }, { tz: "1.00", loc: "(GMT+01:00) West Central Africa" }, { tz: "2.00", loc: "(GMT+02:00) Amman" }, { tz: "2.00", loc: "(GMT+02:00) Athens, Bucharest, Istanbul" }, { tz: "2.00", loc: "(GMT+02:00) Beirut" }, { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "2.00", loc: "(GMT+02:00) Harare, Pretoria" }, { tz: "2.00", loc: "(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius" }, { tz: "2.00", loc: "(GMT+02:00) Jerusalem" }, { tz: "2.00", loc: "(GMT+02:00) Minsk" }, { tz: "2.00", loc: "(GMT+02:00) Windhoek" }, { tz: "3.00", loc: "(GMT+03:00) Kuwait, Riyadh, Baghdad" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.00", loc: "(GMT+03:00) Nairobi" }, { tz: "3.00", loc: "(GMT+03:00) Tbilisi" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" }, { tz: "4.00", loc: "(GMT+04:00) Baku" }, { tz: "4.00", loc: "(GMT+04:00) Yerevan" }, { tz: "4.50", loc: "(GMT+04:30) Kabul" }, { tz: "5.00", loc: "(GMT+05:00) Yekaterinburg" }, { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Sri Jayawardenapura" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.00", loc: "(GMT+06:00) Astana, Dhaka" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "7.00", loc: "(GMT+07:00) Krasnoyarsk" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" }, { tz: "8.00", loc: "(GMT+08:00) Kuala Lumpur, Singapore" }, { tz: "8.00", loc: "(GMT+08:00) Irkutsk, Ulaan Bataar" }, { tz: "8.00", loc: "(GMT+08:00) Perth" }, { tz: "8.00", loc: "(GMT+08:00) Taipei" }, { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.00", loc: "(GMT+09:00) Seoul" }, { tz: "9.00", loc: "(GMT+09:00) Yakutsk" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide" }, { tz: "9.50", loc: "(GMT+09:30) Darwin" }, { tz: "10.00", loc: "(GMT+10:00) Brisbane" }, { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "10.00", loc: "(GMT+10:00) Hobart" }, { tz: "10.00", loc: "(GMT+10:00) Guam, Port Moresby" }, { tz: "10.00", loc: "(GMT+10:00) Vladivostok" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }, { tz: "12.00", loc: "(GMT+12:00) Fiji, Kamchatka, Marshall Is." }]
+        const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
+        const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
     </script>
 
 </head>
@@ -1259,58 +1261,76 @@
                             });
                             break;
                         case "continent":
-                            /*h tml += "<form id='editContinentForm' action=''>\n"
-                                  + "<table id='continentTable' style='width:100%;'>\n"
-                                  + "<tr><td class='left'>ID:</td><td><input type='text' id='id' value='"+node.data.id+"' style='display:none;'>"+node.data.id+"</td></tr>\n"
-                                  + "<tr><td class='left'>Name:</td><td><input type='text' id='name' value='"+node.title+"'></td></tr>\n"
-                                  + "<tr><td class='left'>Abbreviation:</td><td><input type='text' id='abbr' value='"+node.data.abbr+"'></td></tr>\n"
-                                  + "<tr><td class='left'>Demonym:</td><td><input type='text' id='dem' value='"+node.data.dem+"'></td></tr>\n"
-                                  + "<tr><td class='left'>Population:</td><td><input type='number' id='pop' value='"+node.data.pop+"'></td></tr>\n"
-                                  + "<tr><td class='left'>ETID:</td><td><input type='number' id='etid' value='"+node.data.etid+"'></td></tr>\n"
-                                  + "<tr><td class='left'>Name (Korean):</td><td><input type='text' id='name_korean' value='"+node.data.title_korean+"'></td></tr>\n"
-                                  + "<tr><td class='left'>Abbreviation (Korean):</td><td><input type='text' id='abbr_korean' value='"+node.data.abbr_korean+"'></td></tr>\n"
-                                  + "<tr><td class='left'>Demonym (Korean):</td><td><input type='text' id='dem_korean' value='"+node.data.dem_korean+"'></td></tr>\n"
-                                  + "</table>\n"
-                                  + "<input type='submit' value='Submit Changes'>\n"
-                                  + "</form>" */
-                            $("#dataTable").html("Continent Form here?")
+                            html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
+                                 + '<div style="width:100%; border:1px solid blue; text-align:center;">\n'
+                                 + '<table class="blank" style="width:100%;">\n'
+                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
+                                 + '</table></div>'
+                            $("#dataTable").html(html)
                             break;
                         case "nation":
-                            html += "nation data here"
+                        /* capid="1581" time_zone="1" */
+                            html = '<h2 style="text-align:center;">'+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                                 + '<div style="width:100%; border:1px solid blue; text-align:center;">\n'
+                                 + '<table class="blank" style="width:100%;">\n'
+                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+node.data.time_zone+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+node.data.gender+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
+                                 + '</table></div>'
                             $("#dataTable").html(html)
-                            $("#bbqual").val(node.data.bbqual)
-                            $("#gender").val(node.data.gender)
-                            $("#observes_dst").val(node.data.observes_dst)
-                            $("#this_is_the_usa").val(node.data.this_is_the_usa)
-                            for (z of time_zones) {
-                                $('#time_zone')
-                                    .append($('<option>', { value : z.tz })
-                                    .text(z.loc));
-                            }
-                            $("#time_zone").val(node.data.time_zone)
                             break;
                         case "state":
-                            html += "city data here"
+                            var lat = (node.data.latitude == undefined) ? "0.0" : node.data.latitude
+                            var lon = (node.data.longitude == undefined) ? "0.0" : node.data.latitude
+                            html = '<h2 style="text-align:center;">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                                 + '<div style="width:100%; border:1px solid blue; text-align:center;">\n'
+                                 + '<table class="blank" style="width:100%;">\n'
+                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+node.data.time_zone+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+node.data.observes_dst+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
                             $("#dataTable").html(html)
-                            $("#observes_dst").val(node.data.observes_dst)
-                            for (z of time_zones) {
-                                $('#time_zone')
-                                    .append($('<option>', { value : z.tz })
-                                    .text(z.loc));
-                            }
-                            $("#time_zone").val(node.data.time_zone)
                             break;
                         case "city":
-                            html += "city data gere"
+                        /* <CITY id="1827" name="Alpine" name_korean="알파인" pop="6272" time_zone="-6" observes_dst="1" lat="30.36000" long="-103.66000" altitude="2" abbr="ALP" abbr_korean="ALP" /> */
+                            var lat = (node.data.latitude == undefined) ? "0.0" : node.data.latitude
+                            var lon = (node.data.longitude == undefined) ? "0.0" : node.data.latitude
+                            var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
+                            html = '<h2 style="text-align:center;">'+node.parent.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                                 + '<div style="width:100%; border:1px solid blue; text-align:center;">\n'
+                                 + '<table class="blank" style="width:100%;">\n'
+                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Altitude:</td><td class="right_float">'+altitudes[alt]+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+node.data.time_zone+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+node.data.observes_dst+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
                             $("#dataTable").html(html)
-                            /* $("#observes_dst").val(node.data.observes_dst)
-                            for (z of time_zones) {
-                                $('#time_zone')
-                                    .append($('<option>', { value : z.tz })
-                                    .text(z.loc));
-                            }
-                            $("#time_zone").val(node.data.time_zone)
-                            $("#altitude").val(node.data.altitude) */
                             break;
                         case "second_nations":
                             html += "second nations data here"

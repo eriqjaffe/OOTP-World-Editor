@@ -29,6 +29,26 @@ table, th, td {
     border-collapse: collapse;
 }
 
+.blank {
+    border:none;
+    border-radius: 10px;
+}
+
+.left_float {
+    width:50%; 
+    font-weight:bold; 
+    padding-right:.5em;
+    text-align: right;
+    border: none;
+}
+
+.right_float {
+    width:50%; 
+    padding-left:.5em;
+    text-align: left;
+    border: none;
+}
+
 .left {
     width:40%; 
     font-weight:bold; 
