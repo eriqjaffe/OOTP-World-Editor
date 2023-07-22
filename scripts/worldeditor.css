@@ -24,10 +24,6 @@ input[type='number']::-webkit-outer-spin-button {
     opacity: 1;
 }
 
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
 
 .blank {
     border:none;
@@ -39,14 +35,12 @@ table, th, td {
     font-weight:bold; 
     padding-right:.5em;
     text-align: right;
-    border: none;
 }
 
 .right_float {
     width:50%; 
     padding-left:.5em;
     text-align: left;
-    border: none;
 }
 
 .left {
@@ -61,6 +55,11 @@ table, th, td {
 
 .centerText {
     text-align: center;
+}
+
+.rightDiv {
+    display:none; 
+    width:100%;
 }
 
 input[type="number"] {

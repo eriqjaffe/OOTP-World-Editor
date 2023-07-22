@@ -9,11 +9,11 @@ ipcRenderer.on('save-xml', (event, data) => {
 })
 
 ipcRenderer.on('add-ethnicity', (event, data) => {
-    $("#addEthnicityTrigger").trigger("click")
+    rightDivContent("#addEthnicity")
 });
 
 ipcRenderer.on('add-continent', (event, data) => {
-    $("#addContinentTrigger").trigger("click")
+    rightDivContent("#addContinent")
 });
 
 ipcRenderer.on('add-nation', (event, data) => {
@@ -29,7 +29,7 @@ ipcRenderer.on('add-city', (event, data) => {
 });
 
 ipcRenderer.on('add-region', (event, data) => {
-    $("#addRegionTrigger").trigger("click")
+    rightDivContent("#addRegion")
 });
 
 ipcRenderer.on('close-xml', (event, data) => {
