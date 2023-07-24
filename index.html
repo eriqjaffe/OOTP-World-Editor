@@ -17,10 +17,11 @@
     <link href="./scripts/bootstrap.css" rel="stylesheet">
     <link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <link href="./scripts/jquery.contextMenu.css" rel="stylesheet" type='text/css'/>
+    <link href="./scripts/datatables.min.css" rel="stylesheet" type='text/css'/>
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
-
+    <script type="text/javascript" src="./scripts/datatables.min.js"></script>
 
     <script>
         const { ipcRenderer } = require('electron');
@@ -51,6 +52,14 @@
         const time_zones = [{ tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-8.00", loc: "(GMT-08:00) Tijuana, Baja California" }, { tz: "-7.00", loc: "(GMT-07:00) Arizona" }, { tz: "-7.00", loc: "(GMT-07:00) Chihuahua, La Paz, Mazatlan" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central America" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Guadalajara, Mexico City, Monterrey" }, { tz: "-6.00", loc: "(GMT-06:00) Saskatchewan" }, { tz: "-5.00", loc: "(GMT-05:00) Bogota, Lima, Quito, Rio Branco" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Indiana (East)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Caracas, La Paz" }, { tz: "-4.00", loc: "(GMT-04:00) Manaus" }, { tz: "-4.00", loc: "(GMT-04:00) Santiago" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-3.00", loc: "(GMT-03:00) Buenos Aires, Georgetown" }, { tz: "-3.00", loc: "(GMT-03:00) Greenland" }, { tz: "-3.00", loc: "(GMT-03:00) Montevideo" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." }, { tz: "-1.00", loc: "(GMT-01:00) Azores" }, { tz: "0.00", loc: "(GMT+00:00) Casablanca, Monrovia, Reykjavik" }, { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" }, { tz: "1.00", loc: "(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague" }, { tz: "1.00", loc: "(GMT+01:00) Brussels, Copenhagen, Madrid, Paris" }, { tz: "1.00", loc: "(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb" }, { tz: "1.00", loc: "(GMT+01:00) West Central Africa" }, { tz: "2.00", loc: "(GMT+02:00) Amman" }, { tz: "2.00", loc: "(GMT+02:00) Athens, Bucharest, Istanbul" }, { tz: "2.00", loc: "(GMT+02:00) Beirut" }, { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "2.00", loc: "(GMT+02:00) Harare, Pretoria" }, { tz: "2.00", loc: "(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius" }, { tz: "2.00", loc: "(GMT+02:00) Jerusalem" }, { tz: "2.00", loc: "(GMT+02:00) Minsk" }, { tz: "2.00", loc: "(GMT+02:00) Windhoek" }, { tz: "3.00", loc: "(GMT+03:00) Kuwait, Riyadh, Baghdad" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.00", loc: "(GMT+03:00) Nairobi" }, { tz: "3.00", loc: "(GMT+03:00) Tbilisi" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" }, { tz: "4.00", loc: "(GMT+04:00) Baku" }, { tz: "4.00", loc: "(GMT+04:00) Yerevan" }, { tz: "4.50", loc: "(GMT+04:30) Kabul" }, { tz: "5.00", loc: "(GMT+05:00) Yekaterinburg" }, { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Sri Jayawardenapura" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.00", loc: "(GMT+06:00) Astana, Dhaka" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "7.00", loc: "(GMT+07:00) Krasnoyarsk" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" }, { tz: "8.00", loc: "(GMT+08:00) Kuala Lumpur, Singapore" }, { tz: "8.00", loc: "(GMT+08:00) Irkutsk, Ulaan Bataar" }, { tz: "8.00", loc: "(GMT+08:00) Perth" }, { tz: "8.00", loc: "(GMT+08:00) Taipei" }, { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.00", loc: "(GMT+09:00) Seoul" }, { tz: "9.00", loc: "(GMT+09:00) Yakutsk" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide" }, { tz: "9.50", loc: "(GMT+09:30) Darwin" }, { tz: "10.00", loc: "(GMT+10:00) Brisbane" }, { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "10.00", loc: "(GMT+10:00) Hobart" }, { tz: "10.00", loc: "(GMT+10:00) Guam, Port Moresby" }, { tz: "10.00", loc: "(GMT+10:00) Vladivostok" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }, { tz: "12.00", loc: "(GMT+12:00) Fiji, Kamchatka, Marshall Is." }]
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
+
+        $.extend( $.fn.dataTable.defaults, {
+            searching: false,
+            ordering:  false,
+            paging: false, 
+            info: false,
+            scrollY: 750
+        } );
     </script>
 
 </head>
@@ -1093,7 +1102,6 @@
                     if (nation.SECOND_NATIONS != undefined) {
                         for (sn of nation.SECOND_NATIONS[0].SECOND_NATIONS) {
                             var sn_obj = {}
-                            sn_obj.name = nations_by_id[sn.$.id]
                             sn_obj.id = sn.$.id
                             sn_obj.pct = sn.$.pct
                             sn_obj.use_name = sn.$.use_name
@@ -1198,39 +1206,36 @@
                 region_obj.title = region.$.name
                 region_obj.sort_order = region.$.sort_order
                 region_obj.name_korean = region.$.name_korean
-                var states = {}
-                var nations = {}
+                var city_arr = []
                 var state_arr = []
                 var nation_arr = []
-                states.folder = true
-                states.title = "STATES"
-                states.icon = './images/landmark-dome-solid.svg'
-                nations.folder = true
-                nations.title = "NATIONS"
-                nations.icon = './images/earth-americas-solid.svg'
+                try {
+                    for (city of REGION_CITIES[0].REGION_CITY) {
+                        var city_obj ={}
+                        city_obj.title = cities_by_id[city.$.id]
+                        city_obj.id = city.$.id
+                        city_arr.push(city_obj)
+                    }
+                } catch (err) {}
                 try {
                     for (state of region.REGION_STATES[0].REGION_STATE) {
                         var state_obj = {}
-                        state_obj.title = states_by_id[state.$.id] + " ("+state.$.id+")"
-                        state_obj.icon = './images/landmark-flag-solid.svg'
+                        state_obj.title = states_by_id[state.$.id]
                         state_obj.id = state.$.id
                         state_arr.push(state_obj)
                     }
-                } catch (err) {
-                }
+                } catch (err) {}
                 try {
                     for (nation of region.REGION_NATIONS[0].REGION_NATION) {
                         var nation_obj = {}
-                        nation_obj.title = nations_by_id[nation.$.id] + " ("+nation.$.id+")"
-                        nation_obj.icon = './images/flag-solid.svg'
+                        nation_obj.title = nations_by_id[nation.$.id]
                         nation_obj.id = nation.$.id
                         nation_arr.push(nation_obj)
                     }
-                } catch (err) {
-                }
-                states.children = state_arr
-                nations.children = nation_arr
-                region_obj.children = [states, nations]
+                } catch (err) {}
+                region_obj.nations = nation_arr
+                region_obj.states = state_arr
+                region_obj.cities = city_arr
                 regions.push(region_obj)
                 if (parseInt(region.$.id) > max_region_id) { max_region_id = parseInt(region.$.id) }
             }
@@ -1288,10 +1293,29 @@
                             });
                             break;
                         case "continent":
+                            var nat = 0;
+                            var stt = 0;
+                            var cty = 0;
+                            node.visit(function(n) {
+                                switch (n.type) {
+                                    case "nation":
+                                        nat++
+                                        break;
+                                    case "state":
+                                        stt++
+                                        break;
+                                    case "city":
+                                        cty++
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            })
                             html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Continent</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
@@ -1299,19 +1323,46 @@
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
+                                 + "<tr class='blank'><td class='left_float'>Nations:</td><td class='right_float'>"+nat+"</td><tr>\n"
+                                 + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
+                                 + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
                                  + '</table></div>'
                                  $("#infoPanel").html(html)
                                  rightDivContent("#infoPanel")
                             break;
                         case "nation":
-                        /* capid="1581" time_zone="1" */
+                            var stt = 0;
+                            var cty = 0;
+                            var eth = 0;
+                            var sec = 0;
+                            node.visit(function(n) {
+                                switch (n.type) {
+                                    case "state":
+                                        stt++
+                                        break;
+                                    case "city":
+                                        cty++
+                                        break;
+                                    case "nation_ethnicity":
+                                        eth = n.data.subdata.length
+                                        break;
+                                    case "second_nations":
+                                        if (n.data.subdata != undefined) { sec = n.data.subdata.length }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            })
+                            var cap = (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") ? "<span style='color:red;'>None Set</span>" : cities_by_id[node.data.capid]
                             html = '<h2 style="text-align:center;">'+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Nation</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+node.data.time_zone+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
@@ -1320,17 +1371,26 @@
                                  + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
+                                 + "<tr class='blank'><td class='left_float'>Ethnicities:</td><td class='right_float'>"+eth+"</td><tr>\n"
+                                 + "<tr class='blank'><td class='left_float'>Second Nations:</td><td class='right_float'>"+sec+"</td><tr>\n"
+                                 + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
+                                 + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
                                  + '</table></div>'
                                  $("#infoPanel").html(html)
                                  rightDivContent("#infoPanel")
                             break;
                         case "state":
+                            var cty = 0;
+                            node.visit(function(n) {
+                                if (n.type == "city") { cty++ }
+                            })
                             var lat = (node.data.latitude == undefined) ? "0.0" : node.data.latitude
                             var lon = (node.data.longitude == undefined) ? "0.0" : node.data.latitude
                             html = '<h2 style="text-align:center;">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">State</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
@@ -1339,11 +1399,11 @@
                                  + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+node.data.observes_dst+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
+                                 + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
                                  $("#infoPanel").html(html)
                                  rightDivContent("#infoPanel")
                             break;
                         case "city":
-                        /* <CITY id="1827" name="Alpine" name_korean="알파인" pop="6272" time_zone="-6" observes_dst="1" lat="30.36000" long="-103.66000" altitude="2" abbr="ALP" abbr_korean="ALP" /> */
                             var lat = (node.data.latitude == undefined) ? "0.0" : node.data.latitude
                             var lon = (node.data.longitude == undefined) ? "0.0" : node.data.latitude
                             var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
@@ -1351,6 +1411,7 @@
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">State</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
@@ -1360,32 +1421,71 @@
                                  + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+node.data.observes_dst+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
-                                 $("#infoPanel").html(html)
-                                 rightDivContent("#infoPanel")
+                            $("#infoPanel").html(html)
+                            rightDivContent("#infoPanel")
+                            break;
                         case "second_nations":
-                            html += "second nations data here"
-                             /* if (node.data.subdata != undefined) {
-                                for (e of node.data.subdata) {
-                                    console.log(e)
-                                    var selected_no = (e.use_name == "0") ? " selected" : ""
-                                    var selected_yes = (e.use_name == "1") ? " selected" : ""
-                                    html += "<tr><td>"+e.id+"</td><td>"+nations_by_id[e.id]+"</td><td>"+e.pct+"</td>"
-                                    + "<td><select>\n"
-                                    + "<option value-'0'"+selected_no+">No</option>\n"
-                                    + "<option value-'1'"+selected_yes+">Yes</option>\n"
-                                    + "</select></td></tr>\n"
+                            html = '<h2 style="text-align:center;">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+'</h2>\n'
+                                 + '<div style="width:100%; text-align:center;">\n'
+                            if (node.data.subdata == undefined) {
+                                html += "<br>No Second Nations defined"
+                            } else {
+                                html += "<table class='blank' style='width:100%;'>\n"
+                                      + "<tr style='font-weight:bold;'><td>Nation</td><td>Percent</td><td>Use Name</td></tr>\n"
+                                      + "<tbody id='sntb'>\n"
+                                for (sn of node.data.subdata) {
+                                    var un = (sn.use_name == "1") ? "Yes": "No"
+                                    html += "<tr><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
                                 }
+                                html += "</tbody></table>\n"
                             }
-                            html += "</tbody></table>" */
-                            $("#dataTable").html(html)  
+                            html += "</div>"
+                            $("#infoPanel").html(html)
+                            if (node.data.subdata != undefined) {
+                                sortTable(document.getElementById("sntb"), 0, true)
+                            }
+                            rightDivContent("#infoPanel")
                             break;
                         case "nation_ethnicity":
-                            html += "nation_ethnicity data here"
-                            
-                            $("#dataTable").html(html)    
+                            html = '<h2 style="text-align:center;">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+'</h2>\n'
+                                 + '<div style="width:100%; text-align:center;">\n'
+                            if (node.data.subdata == undefined) {
+                                html += "<br>No Ethnicities defined"
+                            } else {
+                                console.log(node.data.subdata)
+                                html += "<table class='blank' style='width:100%;'>\n"
+                                      + "<tr style='font-weight:bold;'><td>Ethnicity</td><td>Percent</td></tr>\n"
+                                for (sn of node.data.subdata) {
+                                    html += "<tr><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
+                                }
+                                html += "</table>\n"
+                            }
+                            html += "</div>"
+                            $("#infoPanel").html(html)
+                            rightDivContent("#infoPanel")
+                            break;
+                        case "region":
+                            const n_arr = node.data.nations.sort(sortByKey('title'))
+                            const s_arr = node.data.states.sort(sortByKey('title'))
+                            const c_arr = node.data.cities.sort(sortByKey('title'))
+                            var longest = findLargestArray(n_arr, s_arr, c_arr)
+                            html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
+                                 + '<div style="width:100%; text-align:center;">\n'
+                                 + "<table id='regionInfoTable' style='width:100%;' class='cell-border compact stripe'>"
+                                 + "<thead><tr style='font-weight:bold;'><td style='width:33%;' class='dt-head-center'>Nations</td><td style='width:33%;' class='dt-head-center'>States</td><td style='width:33%;' class='dt-head-center'>Cities</td></tr></thead>\n"
+                                 + "<tbody>\n"
+                            for (i = 0; i < longest.length; i++) {
+                                html += "<tr><td>"+formatValue(n_arr[i])+"</td><td>"+formatValue(s_arr[i])+"</td><td>"+formatValue(c_arr[i])+"</td></tr>"
+                            }
+                            html += "</tbody></table>"
+                            html += "</div>\n" 
+                            $("#infoPanel").html(html)
+                            $('#regionInfoTable').DataTable({});
+                            rightDivContent("#infoPanel")
                             break;
                         default:
                             html += node.title + " - " + node.type + "<br>";
+                            break;
                     }
                     
                 }
@@ -2092,5 +2192,42 @@
         })
         $(div).css("display","inline-block")
     }
+
+    function sortTable(tbody, index, ascending) {
+        Array.prototype.slice.call(tbody.children).sort(
+            (tr1, tr2) => tr1.children[index].textContent.localeCompare(tr2.children[index].textContent) * (ascending ? 1 : -1)
+        ).forEach(tr => tbody.appendChild(tr));
+    }
+
+    function findLargestArray(arr1, arr2, arr3) {
+        const lengths = [arr1.length, arr2.length, arr3.length];
+        const maxIndex = lengths.indexOf(Math.max(...lengths));
+
+        switch (maxIndex) {
+            case 0:
+            return arr1;
+            case 1:
+            return arr2;
+            case 2:
+            return arr3;
+            default:
+            return null; // In case of all arrays having the same length or invalid input
+        }
+    }
+
+    const sortByKey = (key) => (a, b) => {
+        if (a[key] < b[key]) return -1;
+        if (a[key] > b[key]) return 1;
+        return 0;
+    };
+
+    function formatValue(val) {
+        if (val == undefined) {
+            return "&nbsp;"
+        } else {
+            return val.title + " ("+val.id+")"
+        }
+    }
+
     </script>
 </html>
