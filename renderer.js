@@ -29,7 +29,7 @@ ipcRenderer.on('add-city', (event, data) => {
 });
 
 ipcRenderer.on('add-region', (event, data) => {
-    rightDivContent("#addRegion")
+    $("#addRegionTrigger").trigger("click")
 });
 
 ipcRenderer.on('close-xml', (event, data) => {

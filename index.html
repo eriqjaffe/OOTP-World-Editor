@@ -22,6 +22,7 @@
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/datatables.min.js"></script>
+    <script type="text/javascript" src="./scripts/latinize.js"></script>
 
     <script>
         const { ipcRenderer } = require('electron');
@@ -34,6 +35,7 @@
         var max_city_id = 0
         var max_ethnicity_id = 0
         var max_region_id = 0
+        var max_region_sort_order = 0
         var world_count = 0
         var continent_count = 0
         var nation_count = 0
@@ -461,7 +463,7 @@
                         <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input type='text' style="display:none;" name='newRegionID' id='newRegionID' class="centerText"><span id="newREgionIdDisplay"></span></td>
+                            <td class="right"><input type='text' style="display:none;" name='newRegionID' id='newRegionID' class="centerText"><span id="newRegionIdDisplay"></span></td>
                         </tr>
                         <tr>
                             <td class="left">Name:</td>
@@ -469,20 +471,30 @@
                         </tr>
                         <tr>
                             <td class="left">Name (Korean):</td>
-                            <td class="right"><input type="text" class="centerText" name="newRegionNameK" id="newRegionNameK" required></td>
+                            <td class="right"><input type="text" class="centerText" name="newRegionNameK" id="newRegionNameK"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Region Source:</td>
+                            <td class="right">
+                                <select id="newRegionSource" style="width:100%;">
+                                    <option val="nations">Nations</option>
+                                    <option val="states">States</option>
+                                    <option val="cities">Cities</option>
+                                </select>
+                            </td>
+                        </tr>
+                        tr>
+                            <td class="left"><span id="filterLabel">Nations</span> From:</td>
+                            <td class="right">
+                                <select id="newRegionFilter" style="width:100%;"></select>
+                            </td>
                         </tr>
                         </tbody>
                 </table>
                 <br/>
                 <div class="row">
                     <div class="col-xs-5">
-                        <select id="newRegionSource">
-                            <option val="nations">Nations</option>
-                            <option val="states">States</option>
-                            <option val="cities">Cities</option>
-                        </select>
-                        <br/>
-                        <select name="from[]" id="multi_d" class="form-control" size="26" multiple="multiple" style="height:575px;">
+                        <select name="from[]" id="multi_d" class="form-control" size="26" multiple="multiple" style="height:500px;">
                             
                         </select>
                     </div>
@@ -496,15 +508,17 @@
                     
                     <div class="col-xs-5">
                         <b>Nations</b>
-                        <select name="to[]" id="multi_d_to" class="form-control" size="8" multiple="multiple" style="height:190px;"></select>
+                        <fieldset id="newRegionFields" required>
+                        <select name="to[]" id="multi_d_to" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
                         
                         
                         <b>States</b>
-                        <select name="to_2[]" id="multi_d_to_2" class="form-control" size="8" multiple="multiple" style="height:190px;"></select>
+                        <select name="to_2[]" id="multi_d_to_2" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
 
                         
                         <b>Cities</b>
-                        <select name="to_2[]" id="multi_d_to_3" class="form-control" size="8" multiple="multiple" style="height:190px;"></select>
+                        <select name="to_2[]" id="multi_d_to_3" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+                        </fieldset>
                     </div>
                 </div>
                 <div style="text-align:center; margin-top:10px;">
@@ -678,6 +692,8 @@
             search: {
                 left: '<input type="text" name="q" class="form-control" placeholder="Search..." />'
             },
+
+            
     
             moveToRight: function(Multiselect, $options, event, silent, skipStack) {
                 var destination = null;
@@ -734,6 +750,16 @@
                         destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
                     }
                 }
+                //#multi_d_to, #multi_d_to_2, #multi_d_to_3
+                //console.log($('#multi_d_to option').length)
+
+                var req = ($('#multi_d_to option').length + $('#multi_d_to_2 option').length + $('#multi_d_to_3 option').length == 0) ? true : false
+
+                $(".nrTarget").each(function() {
+                    $(this).prop('required',req);
+                })
+
+
                 $("#newRegionSource").trigger("change")
             },
 
@@ -768,12 +794,17 @@
                 $("#"+$(src[0]).attr("id")).html($('#'+$(src[0]).attr("id")+' option').sort(function(x, y) {
                     return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
                 }))
+
+                var req = ($('#multi_d_to option').length + $('#multi_d_to_2 option').length + $('#multi_d_to_3 option').length == 0) ? true : false
+
+                $(".nrTarget").each(function() {
+                    $(this).prop('required',req);
+                })
             }
         });
 
-        
-
         $(".headlessTable").dataTable({ordering: false, scrollY: "auto"})
+
         ipcRenderer.send('menu-reset', null)
     })
 
@@ -794,24 +825,79 @@
 
     $("#newRegionSource").on("change",function(e) {
         $('#multi_d').empty()
+        $('#newRegionFilter').empty()
+        $("#filterLabel").html($(this).val())
         var src = null;
         switch ($(this).val()) {
             case ("Nations"):
-                src = nations_by_id
+                src = continents_by_id
                 break;
             case ("States"):
-                src = states_by_id
+                src = nations_by_id
                 break;
             case ("Cities"):
-                src = cities_by_id
+                src = nations_by_id
                 break;
         }
+
         $.each(src, function(key, value) {
-            $('#multi_d')
+            $('#newRegionFilter')
                 .append($('<option>', { value : key })
                 .text(value));
         });
+
+        sortDropdown("#newRegionFilter")
+        $("#newRegionFilter :nth-child(1)").prop('selected', true);
+        $("#newRegionFilter").trigger("change")
         
+    })
+
+    $("#newRegionFilter").on("change", function(e) {
+        $('#multi_d').empty()
+        switch ($("#newRegionSource").val()) {
+            case ("Nations"):
+                for (x of nations_by_continent[$(this).val()]) {
+                    $('#multi_d')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
+                }
+                break;
+            case ("States"):
+                for (x of states_by_nation[$(this).val()]) {
+                    $('#multi_d')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
+                }
+                break;
+            case ("Cities"):
+                var src_nation = null
+                var tree = $.ui.fancytree.getTree("#xmlOutput")
+                var world = tree.findFirst("CONTINENTS")
+                var arr = world.findAll($("#newRegionFilter option:selected").text()) 
+                for (n of arr) {
+                    if (n.type == "nation") {
+                        if (n.title == $("#newRegionFilter option:selected").text()) {
+                            var src_nation = n
+                            break;
+                        }
+                    }
+                }
+                //console.log(src_nation)
+                var states = src_nation.findFirst("States")
+                console.log(states)
+                // have to figure that out still
+                break;
+        }
+
+        
+
+        sortDropdown("#multi_d")
+
+/*         $.each(src, function(key, value) {
+            $('#multi_d')
+                .append($('<option>', { value : key })
+                .text(value));
+        }); */
     })
 
     $("#saveXML").on("click",function(e) {
@@ -1278,6 +1364,7 @@
                 region_obj.cities = city_arr
                 regions.push(region_obj)
                 if (parseInt(region.$.id) > max_region_id) { max_region_id = parseInt(region.$.id) }
+                if (parseInt(region.$.sort_order) > max_region_sort_order) { max_region_sort_order = parseInt(region.$.sort_order) }
             }
             regions_arr.children = regions
             tree_json.push(regions_arr)
@@ -1797,6 +1884,14 @@
         rightDivContent("#addContinent")
     })
 
+    $("#addRegionTrigger").on("click", function(e) {
+		$("#newRegionID").val(max_region_id+1)
+        $("#newRegionIdDisplay").html(max_region_id+1)
+        $("#newRegionSource").val("Nations")
+        $("#newRegionSource").trigger("change")
+        rightDivContent("#addRegion")
+	});
+
     function editEthnicity(node) {
         const t = parseInt(node.data.african) 
                 + parseInt(node.data.asian) 
@@ -2032,18 +2127,6 @@
         $("#newCityState").trigger("change")
     })
 
-/*     $("#addRegionTrigger").magnificPopup({
-		items: {
-			src: '#addRegion',
-			type: 'inline'
-		},
-        callbacks: {
-            beforeOpen: function() {
-                $("#newRegionId").val(max_region_id+1)
-            }
-        }
-	}); */
-
     $(".toKorean").on("keyup",function() {
         var id = $(this).attr("id")
         translate($(this).val(), null, 'ko').then(res => {
@@ -2076,7 +2159,6 @@
 
     $("#newEthnicityForm").on("submit", function(e) {
         e.preventDefault()
-        
         ethnicity_count++;
         var ethnicity_obj = {}
         ethnicity_obj.type = 'ethnicity'
@@ -2099,6 +2181,8 @@
         ethnicity.setFocus()
         ethnicity.setActive()
         ethnicity.makeVisible({scrollIntoView: true});
+        $("#max_ethnicity_id").text(max_ethnicity_id)
+        $("#ethnicity_count").text(ethnicity_count)
     })
 
     $("#newContinentForm").on("submit", function(e) {
@@ -2201,10 +2285,6 @@
 
     $("#newStateForm").on("submit", function(e) {
         e.preventDefault()
-/*         if (isValidLatitude($("#newStateLatitude").val().trim()) == false) {
-            alert("Invalid Latitude!")
-            return false;
-        } */
         states_by_id[$("#newStateId").val()] = $("#newStateName").val()
         state_count++;
         var state_obj = {}
@@ -2267,6 +2347,64 @@
 
     })
 
+    $("#newRegionForm").on("submit", function(e) {
+        e.preventDefault()
+        regions_by_id[$("#newRegionID").val()] = $("#newRegionName").val()
+        var region_obj = {}
+        region_obj.type = 'region'
+        region_obj.folder = true
+        region_obj.icon = "./images/map-location-dot-solid.svg"
+        region_obj.id = $("#newRegionID").val()
+        region_obj.title = $("#newRegionName").val()
+        region_obj.sort_order = max_region_sort_order+1
+        region_obj.name_korean = $("#newRegionNameK").val()
+        var city_arr = []
+        if ($('#multi_d_to_3 option').length > 0) {
+            $("#multi_d_to_3 option").each(function() {
+                var city_obj ={}
+                city_obj.title = this.text
+                city_obj.id = this.value
+                city_arr.push(city_obj)
+            });
+        }
+        var state_arr = []
+        if ($('#multi_d_to_2 option').length > 0) {
+            $("#multi_d_to_2 option").each(function() {
+                var state_obj ={}
+                state_obj.title = this.text
+                state_obj.id = this.value
+                state_arr.push(state_obj)
+            });
+        } 
+        var nation_arr = []
+        if ($('#multi_d_to option').length > 0) {
+            console.log("NATIONS FOUND")
+            $("#multi_d_to option").each(function() {
+                var nation_obj ={}
+                nation_obj.title = this.text
+                nation_obj.id = this.value
+                nation_arr.push(nation_obj)
+            });
+        }
+        region_obj.nations = nation_arr
+        region_obj.states = state_arr
+        region_obj.cities = city_arr
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("REGIONS")
+        world.addChildren(region_obj)
+        world.sortChildren(null, true);
+        var region = world.findFirst($("#newRegionName").val())
+        world.setExpanded()
+        region.setFocus()
+        region.setActive()
+        region.makeVisible({scrollIntoView: true});
+        region_count++;
+        $("#max_region_id").text(max_region_id)
+        $("#region_count").text(region_count)
+        if (parseInt($("#newRegionID").val()) > max_region_id) { max_region_id = parseInt($("#newRegionID").val()) }
+        max_region_sort_order++
+    })
+    
     function rightDivContent(div) {
         $(".rightDiv").each(function() {
             $(this).css("display","none")
@@ -2320,5 +2458,31 @@
         return /^-?([0-9]|[1-9][0-9]|1[0-7][0-9]|180)(\.\d+)?$/.test(input);
     }
 
+    function removeDiacritics(str) {
+        return latinize(str)
+    }
+
+    function addDiacriticsToOption(option, originalText) {
+        var normalizedText = removeDiacritics(originalText);
+        var sortedText = option.text.toLowerCase();
+        var startIndex = sortedText.indexOf(normalizedText);
+        var sortedChars = sortedText.split("");
+        var diacriticChars = originalText
+            .split("")
+            .slice(normalizedText.length)
+            .join("");
+
+        sortedChars.splice(startIndex, 0, diacriticChars);
+
+        return sortedChars.join("");
+    }
+
+    function sortDropdown(dropdown) {
+        $(dropdown).html($(dropdown + ' option').sort(function(x, y) {
+            var textX = latinize($(x).text().toLowerCase());
+            var textY = latinize($(y).text().toLowerCase());
+            return textX < textY ? -1 : 1;
+        }));
+    }
     </script>
 </html>
