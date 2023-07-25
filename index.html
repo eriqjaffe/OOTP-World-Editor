@@ -1427,41 +1427,36 @@
                         case "second_nations":
                             html = '<h2 style="text-align:center;">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
-                            if (node.data.subdata == undefined) {
-                                html += "<br>No Second Nations defined"
-                            } else {
-                                html += "<table class='blank' style='width:100%;'>\n"
-                                      + "<tr style='font-weight:bold;'><td>Nation</td><td>Percent</td><td>Use Name</td></tr>\n"
-                                      + "<tbody id='sntb'>\n"
+                                 + "<table id='secondNationsTable' class='cell-border compact stripe' style='width:100%;'>\n"
+                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Nation</td><td class='dt-head-center'>Percent</td><td class='dt-head-center'>Use Name</td></tr></thead>\n"
+                                 + "<tbody id='sntb'>\n"
+                            if (node.data.subdata != undefined) {        
                                 for (sn of node.data.subdata) {
                                     var un = (sn.use_name == "1") ? "Yes": "No"
                                     html += "<tr><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
                                 }
-                                html += "</tbody></table>\n"
                             }
-                            html += "</div>"
+                            html += "</tbody></table></div>\n"
                             $("#infoPanel").html(html)
-                            if (node.data.subdata != undefined) {
-                                sortTable(document.getElementById("sntb"), 0, true)
-                            }
+                            sortTable(document.getElementById("sntb"), 0, true)
+                            $('#secondNationsTable').DataTable({ ordering: true });
                             rightDivContent("#infoPanel")
                             break;
                         case "nation_ethnicity":
                             html = '<h2 style="text-align:center;">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
-                            if (node.data.subdata == undefined) {
-                                html += "<br>No Ethnicities defined"
-                            } else {
-                                console.log(node.data.subdata)
-                                html += "<table class='blank' style='width:100%;'>\n"
-                                      + "<tr style='font-weight:bold;'><td>Ethnicity</td><td>Percent</td></tr>\n"
+                                 + "<table id='nationEthnicityTable' class='cell-border compact stripe' style='width:100%;'>\n"
+                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Ethnicity</td><td class='dt-head-center'>Percent</td></tr></thead>\n"
+                                 + "<tbody id='sntb'>\n"
+                            if (node.data.subdata != undefined) {
                                 for (sn of node.data.subdata) {
                                     html += "<tr><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
                                 }
-                                html += "</table>\n"
                             }
-                            html += "</div>"
+                            html += "</tbody></table></div>"
                             $("#infoPanel").html(html)
+                            //sortTable(document.getElementById("sntb"), 0, true)
+                            $('#nationEthnicityTable').DataTable({ ordering: true, order: [[1, 'desc']] });
                             rightDivContent("#infoPanel")
                             break;
                         case "region":
@@ -1497,6 +1492,7 @@
                 selector: "#xmlOutput span.fancytree-title",
                 build: function($trigger, e) {
                     var node = $.ui.fancytree.getNode($trigger);
+                    console.log(node.type)
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
                             cmItems = {
@@ -1553,6 +1549,22 @@
                                 "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
                                 "sep1": "----",
                                 "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                            }
+                            break;
+                        }
+                        case "nation_ethnicity": {
+                            cmItems = {
+                                "add": {name: "Add Ethnicity", icon: 'add'},
+                                "sep1": "----",
+                                "edit": {name: "Edit Ethnicities for \""+node.parent.title +"\"", icon: 'edit'},
+                            }
+                            break;
+                        }
+                        case "second_nations": {
+                            cmItems = {
+                                "add": {name: "Add Second Nation", icon: 'add'},
+                                "sep1": "----",
+                                "edit": {name: "Edit Second Nations for \""+node.parent.title +"\"", icon: 'edit'},
                             }
                             break;
                         }
@@ -1634,6 +1646,26 @@
                                             break;
                                     }
                                     break;
+                                case "nation_ethnicity":
+                                    switch (key) {
+                                        case "add":
+                                            console.log("add nation ethnicity to "+node.parent.title)
+                                            break;
+                                        case "edit":
+                                            console.log("edit nation ethnicities for "+node.parent.title)
+                                            break;
+                                    }
+                                    break;
+                                case "second_nations":
+                                    switch (key) {
+                                        case "add":
+                                            console.log("add second nations to "+node.parent.title)
+                                            break;
+                                        case "edit":
+                                            console.log("edit second nations for "+node.parent.title)
+                                            break;
+                                    }
+                                    break;
                                 default: 
                                     break;
                             }
@@ -1700,30 +1732,18 @@
     })
 
     $("#addContinentTrigger").on("click", function(e) {
+        $("#newContinentName").val("Ruthlandia")
+        $("#newContinentNameK").val("")
+        $("#newContinentAbbr").val("RTH")
+        $("#newContinentAbbrK").val("")
+        $("#newContinentDem").val("Ruthlandian")
+        $("#newContinentDemK").val("")
+        $("#newContinentPopulation").val(0)
+        $("#newContinentEtid").val(0)
+        $("#newContinentID").val(max_continent_id+1)
+        $("#newContinentIDDisplay").text(max_continent_id+1)
         rightDivContent("#addContinent")
     })
-
-    /* $("#addContinentTrigger").magnificPopup({
-        closeOnBgClick: false,
-		items: {
-			src: '#addContinent',
-			type: 'inline'
-		},
-        callbacks: {
-            beforeOpen: function() {
-                $("#newContinentName").val("Ruthlandia")
-                $("#newContinentNameK").val("")
-                $("#newContinentAbbr").val("RTH")
-                $("#newContinentAbbrK").val("")
-                $("#newContinentDem").val("Ruthlandian")
-                $("#newContinentDemK").val("")
-                $("#newContinentPopulation").val(0)
-                $("#newContinentEtid").val(0)
-                $("#newContinentID").val(max_continent_id+1)
-                $("#newContinentIDDisplay").text(max_continent_id+1)
-            }
-        }
-	}); */
 
     function editEthnicity(node) {
         const t = parseInt(node.data.african) 
@@ -2039,15 +2059,13 @@
     //         world.setExpanded()
     //         continent.setFocus()
     //         continent.setActive()
-    //         $.magnificPopup.close()
+    // 
     //     } */
     // })
 
 
     $("#newContinentForm").on("submit", function(e) {
         e.preventDefault()
-        continent_count++
-        continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
         var continent_obj = {}
         continent_obj.type = 'continent'
         continent_obj.folder = true
@@ -2060,10 +2078,7 @@
         continent_obj.abbr = $("#newContinentAbbr").val()
         continent_obj.dem = $("#newContinentDem").val()
         continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
-        continent_obj.dem_korean = $("#newContinentDemK").val()
-        if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
-        $("#max_continent_id").text(max_continent_id)
-        $("#continent_count").text(continent_count)
+        continent_obj.dem_korean = $("#newContinentDemK").val() 
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("CONTINENT")
         world.addChildren(continent_obj)
@@ -2072,8 +2087,12 @@
         world.setExpanded()
         continent.setFocus()
         continent.setActive()
-        $.magnificPopup.close()
-
+        continent_count++
+        if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
+        continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
+        nations_by_continent[$("#newContinentID").val()] = []
+        $("#max_continent_id").text(max_continent_id)
+        $("#continent_count").text(continent_count)
     })
 
     $("#newNationForm").on("submit", function(e) {
@@ -2101,6 +2120,26 @@
         nation_obj.time_zone = $("#newNationTimeZone").val()
         nation_obj.observes_dst = $("#newNationDST").val()
         nation_obj.this_is_the_usa = $("#newNationUSA").val()
+        var states_obj = {}
+        states_obj.title = "States"
+        states_obj.folder = true
+        states_obj.icon = './images/landmark-dome-solid.svg'
+        states_obj.type = "STATES_PARENT"
+        states_obj.children = ([])
+        var second_nations_obj = {}
+        second_nations_obj.title = "Second Nations"
+        second_nations_obj.folder = false
+        second_nations_obj.icon = './images/circle-plus-solid.svg'
+        second_nations_obj.type = 'second_nations'
+        second_nations_obj.subdata = []
+        var nation_eth_obj = {}
+        nation_eth_obj.title = "Ethnicities"
+        nation_eth_obj.folder = false
+        nation_eth_obj.icon = './images/user-group-solid.svg'
+        nation_eth_obj.type = 'nation_ethnicity'
+        nation_eth_obj.subdata = []
+        nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
+        //nation_obj.children = [states_obj]
         if (parseInt($("#newNationID").val()) > max_nation_id) { max_nation_id = parseInt($("#newNationID").val()) }
         $("#max_nation_id").text(max_nation_id)
         $("#nation_count").text(nation_count)
@@ -2118,8 +2157,9 @@
                 break;
             }
         }
+        states_by_nation[$("#newNationID").val()] = []
         nations_by_continent[$("#newNationContinent").val()].push(nation_obj)
-        $.magnificPopup.close()
+        console.log(states_by_nation)
     })
 
     $("#newStateForm").on("submit", function(e) {
@@ -2151,7 +2191,9 @@
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
-        $.magnificPopup.close()
+        console.log(states_by_nation[$("#newStateNation").val()])
+        states_by_nation[$("#newStateNation").val()].push(state_obj)
+        console.log(states_by_nation[$("#newStateNation").val()])
     })
 
     $("#newCityForm").on("submit", function(e) {
@@ -2183,7 +2225,7 @@
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
-        $.magnificPopup.close()
+
     })
 
     function rightDivContent(div) {
