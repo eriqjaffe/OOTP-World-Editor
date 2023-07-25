@@ -55,7 +55,7 @@
 
         $.extend( $.fn.dataTable.defaults, {
             searching: false,
-            ordering:  false,
+            ordering:  true,
             paging: false, 
             info: false,
             scrollY: 750
@@ -859,28 +859,35 @@
                     .writeAttribute("dem", n.data.dem)
                     .writeAttribute("dem_korean", n.data.dem_korean)
                     .writeAttribute("time_zone", n.data.time_zone)
-                    if (n.children[0].data != undefined) {
-                        xw.startElement("SECOND_NATIONS")
-                        for (sn of n.children[0].data.subdata) {
-                            xw.startElement("SECOND_NATION")
-                            .writeAttribute("id", sn.id)
-                            .writeAttribute("pct", sn.pct) 
-                            .writeAttribute("use_name", sn.use_name)
-                            .endElement()
+                    // second nations & nation ethnicities
+                    for (child of n.children) {
+                        if (child.type == "second_nations") {
+                            if (child.data != undefined) {
+                                xw.startElement("SECOND_NATIONS")
+                                for (sn of child.data.subdata) {
+                                    xw.startElement("SECOND_NATION")
+                                    .writeAttribute("id", sn.id)
+                                    .writeAttribute("pct", sn.pct) 
+                                    .writeAttribute("use_name", sn.use_name)
+                                    .endElement()
+                                }
+                                xw.endElement()
+                            }
                         }
-                        xw.endElement()
-                    }
-                    if (n.children[1].data != undefined) {
-                        xw.startElement("ETHN_PCTS")
-                        for (e of n.children[1].data.subdata) {
-                            xw.startElement("ETHN_PCT")
-                            .writeAttribute("name", e.name)
-                            .writeAttribute("etid", e.etid) 
-                            .writeAttribute("pct", sn.pct)
-                            .endElement()
+                        if (child.type == "nation_ethnicity") {
+                            if (child.data != undefined) {
+                                xw.startElement("ETHN_PCTS")
+                                for (e of child.data.subdata) {
+                                    xw.startElement("ETHN_PCT")
+                                    .writeAttribute("etid", e.etid) 
+                                    .writeAttribute("pct", e.pct)
+                                    .endElement()
+                                }
+                                xw.endElement()
+                            }
                         }
-                        xw.endElement()
                     }
+                    
                     xw.startElement("STATES")
                     for (s of n.children[2].children) {
                         xw.startElement("STATE")
@@ -938,21 +945,29 @@
             .writeAttribute("sort_order", r.data.sort_order)
             .writeAttribute("name", r.title)
             .writeAttribute("name_korean", r.data.title_korean)
-            //console.log(r.title)
-            if (r.children[0].children != undefined) {
-                xw.startElement("REGION_STATES")
-                for (st of r.children[0].children) {
-                    xw.startElement("REGION_STATE")
-                      .writeAttribute("id", st.data.id)
+            if (r.data.cities.length > 0) {
+                xw.startElement("REGION_CITIES")
+                for (st of r.data.cities) {
+                    xw.startElement("REGION_CITY")
+                      .writeAttribute("id", st.id)
                     .endElement()
                 }
                 xw.endElement()
             }
-            if (r.children[1].children != undefined) {
+            if (r.data.states.length > 0) {
+                xw.startElement("REGION_STATES")
+                for (st of r.data.states) {
+                    xw.startElement("REGION_STATE")
+                      .writeAttribute("id", st.id)
+                    .endElement()
+                }
+                xw.endElement()
+            }
+            if (r.data.nations.length) {
                 xw.startElement("REGION_NATIONS")
-                for (st of r.children[1].children) {
+                for (st of r.data.nations) {
                     xw.startElement("REGION_NATION")
-                      .writeAttribute("id", st.data.id)
+                      .writeAttribute("id", st.id)
                     .endElement()
                 }
                 xw.endElement()
@@ -1438,7 +1453,6 @@
                             }
                             html += "</tbody></table></div>\n"
                             $("#infoPanel").html(html)
-                            sortTable(document.getElementById("sntb"), 0, true)
                             $('#secondNationsTable').DataTable({ ordering: true });
                             rightDivContent("#infoPanel")
                             break;
@@ -1455,8 +1469,7 @@
                             }
                             html += "</tbody></table></div>"
                             $("#infoPanel").html(html)
-                            //sortTable(document.getElementById("sntb"), 0, true)
-                            $('#nationEthnicityTable').DataTable({ ordering: true, order: [[1, 'desc']] });
+                            $('#nationEthnicityTable').DataTable({ order: [[1, 'desc']] });
                             rightDivContent("#infoPanel")
                             break;
                         case "region":
