@@ -109,7 +109,7 @@
                         </tr>
                         <tr>
                             <td class="left">Hispanic:</td>
-                            <td class="right"><input type='number' style="width:95%;" class='newEthPct' min='0' max='1000' d='newEthnicityHispanic' value="0"></td>
+                            <td class="right"><input type='number' style="width:95%;" class='newEthPct' min='0' max='1000' id='newEthnicityHispanic' value="0"></td>
                         </tr>
                         <tr>
                             <td class="left">Total:</td>
@@ -119,7 +119,7 @@
                     </table>
                     <br>
                 <div style="text-align:center;">
-                    <input type="submit" id="newEthnicitySubmit" value="Add Continent">
+                    <input type="submit" id="newEthnicitySubmit" value="Add Ethnicity">
                 </div>
                 </form>
             </div>
@@ -1294,16 +1294,15 @@
                     var html = ""
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
-                            //var count = node.countChildren(false)topie
                             $("#dataTable").html(node.countChildren(false)+" Ethnicities found")
                             break;
                         case "ethnicity":
                             html = "<div id='pieChart'>\n"
-                                 + "<div data-lcolor='#313c42'>"+node.data.african/10+"<span>African</span></div>\n"
-                                 + "<div data-lcolor='#ef8e39'>"+node.data.asian/10+"<span>Asian</span></div>\n"
-                                 + "<div data-lcolor='#005ce6'>"+node.data.east_indian/10+"<span>East Indian</span></div>\n"
-                                 + "<div data-lcolor='#de2821'>"+node.data.caucasian/10+"<span>Caucasian</span></div>\n"
-                                 + "<div data-lcolor='#de2821'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
+                                 + "<div data-lcolor='#623A17'>"+node.data.african/10+"<span>African</span></div>\n"
+                                 + "<div data-lcolor='#F7E2AB'>"+node.data.asian/10+"<span>Asian</span></div>\n"
+                                 + "<div data-lcolor='#CB9662'>"+node.data.east_indian/10+"<span>East Indian</span></div>\n"
+                                 + "<div data-lcolor='#F6DCC3'>"+node.data.caucasian/10+"<span>Caucasian</span></div>\n"
+                                 + "<div data-lcolor='#EFC794'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
                                  + "</div>\n"
                                  + "<h4 style='text-align: center;'><b>"+node.title+"</b></h4>\n"
                                  + "<div class='result_list'></div>"
@@ -1731,6 +1730,12 @@
             var world = tree.findFirst("CONTINENT")
             world.sortChildren(null, true);
 
+            var ethnicities = tree.findFirst("ETHNICITIES")
+            ethnicities.sortChildren(null, true);
+
+            var regions = tree.findFirst("REGIONS")
+            regions.sortChildren(null, true);
+
             $.each(nations_by_id, function(key, value) {
                 $('#multi_d')
                     .append($('<option>', { value : key })
@@ -2069,51 +2074,32 @@
         $("#newEthnicityTotal").val(sum)
     })
 
-    // $("#editContinentForm").validate({
-    //     submitHandler: function() { 
-    //         var tree = $.ui.fancytree.getTree("#xmlOutput")
-    //         var node = tree.getActiveNode();
-    //         console.log(node)
-    //     }
-        
-    //     //debug: true,
-        
-    //     /* errorClass: "invalid",
-    //     submitHandler: function() { 
-    //         continent_count++
-    //         continents_by_id[$("#newContinentID").val()] = $("#newContinentName").val()
-    //         var continent_obj = {}
-    //         continent_obj.type = 'continent'
-    //         continent_obj.folder = true
-    //         continent_obj.icon = './images/earth-americas-solid.svg'
-    //         continent_obj.id = $("#newContinentID").val()
-    //         continent_obj.title = $("#newContinentName").val()
-    //         continent_obj.title_korean = $("#newContinentNameK").val()
-    //         continent_obj.pop = $("#newContinentPop").val()
-    //         continent_obj.etid = $("#newContinentEtid").val()
-    //         continent_obj.abbr = $("#newContinentAbbr").val()
-    //         continent_obj.dem = $("#newContinentDem").val()
-    //         continent_obj.abbr_korean =  $("#newContinentAbbrK").val()
-    //         continent_obj.dem_korean = $("#newContinentDemK").val()
-    //         if (parseInt($("#newContinentID").val()) > max_continent_id) { max_continent_id = parseInt($("#newContinentID").val()) }
-    //         $("#max_continent_id").text(max_continent_id)
-    //         $("#continent_count").text(continent_count)
-    //         var tree = $.ui.fancytree.getTree("#xmlOutput")
-    //         var world = tree.findFirst("CONTINENT")
-    //         world.addChildren(continent_obj)
-    //         world.sortChildren(null, true);
-    //         var continent = world.findFirst($("#newContinentName").val())
-    //         world.setExpanded()
-    //         continent.setFocus()
-    //         continent.setActive()
-    // 
-    //     } */
-    // })
-
     $("#newEthnicityForm").on("submit", function(e) {
         e.preventDefault()
+        
+        ethnicity_count++;
+        var ethnicity_obj = {}
+        ethnicity_obj.type = 'ethnicity'
+        ethnicity_obj.folder = false
+        ethnicity_obj.icon = './images/user-group-solid.svg'
+        ethnicity_obj.title = $("#newEthnicityName").val()
+        ethnicity_obj.name_korean = $("#newEthnicityNameK").val()
+        ethnicity_obj.id = $("#newEthnicityID").val()
+        ethnicity_obj.african = $("#newEthnicityAfrican").val()
+        ethnicity_obj.asian = $("#newEthnicityAsian").val()
+        ethnicity_obj.east_indian = $("#newEthnicityEastIndian").val()
+        ethnicity_obj.caucasian = $("#newEthnicityCaucasian").val()
+        ethnicity_obj.hispanic = $("#newEthnicityHispanic").val()
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("ETHNICITIES")
+        world.addChildren(ethnicity_obj)
+        world.sortChildren(null, true);
+        var ethnicity = world.findFirst($("#newEthnicityName").val())
+        world.setExpanded()
+        ethnicity.setFocus()
+        ethnicity.setActive()
+        ethnicity.makeVisible({scrollIntoView: true});
     })
-
 
     $("#newContinentForm").on("submit", function(e) {
         e.preventDefault()
