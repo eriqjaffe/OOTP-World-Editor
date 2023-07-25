@@ -76,14 +76,16 @@
             <div id="addEthnicity" class="rightDiv">
                 <h2 style="text-align:center;">Add Ethnicity</h2>
                 <form id="newEthnicityForm" action="">
-                    <table style="width: 80%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input type='text' style="display:none;" id='newEthnicityID' class="centerText" readonly><span id="newCEthnicityDisplay">0</span></td>
+                            <td class="right"><input type='text' style="display:none;" id='newEthnicityID' class="centerText" readonly><span id="newEthnicityIdDisplay">0</span></td>
                         </tr>
                         <tr>
                             <td class="left">Name:</td>
-                            <td class="right"><input type='text' style="width:95%;" id='newEthnicityName' class="centerText toKorean"></td>
+                            <td class="right"><input type='text' style="width:95%;" id='newEthnicityName' class="centerText toKorean" required></td>
                         </tr>
                         <tr>
                             <td class="left">Name (Korean):</td>
@@ -111,8 +113,9 @@
                         </tr>
                         <tr>
                             <td class="left">Total:</td>
-                            <td class="right" id="newEthnicityTotal" style="text-align:center;"></td>
+                            <td class="right"><input type='number' min='1000' max='1000' class="readonly centerText" style="width:95%;" id='newEthnicityTotal' class="centerText" pattern="1000"></td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                 <div style="text-align:center;">
@@ -123,7 +126,9 @@
             <div id="addContinent" class="rightDiv">
                 <h2 style="text-align:center;">Add Continent</h2>
                 <form id="newContinentForm" action="">
-                    <table style="width: 80%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
                             <td class="right"><input style="display:none;" type='text' name='newContinentID' id='newContinentID' class="centerText"><span id="newContinentIDDisplay">0</span></td>
@@ -160,6 +165,7 @@
                             <td class="left">Demonym (Korean):</td>
                             <td class="left"><input style="width:95%;" type="text" class="centerText" name="newContinentDemK" id="newContinentDemK" value=""></td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                     <div style="text-align:center;">
@@ -170,10 +176,12 @@
             <div id="addNation" class="rightDiv">
                 <h2 style="text-align:center;">Add Nation</h2>
                 <form id="newNationForm">
-                    <table style="width:95%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:95%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input style="display:none;" type='text' id='newNationID' class="centerText" readonly><span id="newNationIDDisplay">0</span></td>
+                            <td class="right"><input style="display:none;" type='text' id='newNationID' class="centerText"><span id="newNationIDDisplay">0</span></td>
                         </tr>
                         <tr>
                             <td class="left">Continent:</td>
@@ -270,6 +278,7 @@
                                 </select>
                             </td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                     <div style="text-align:center;">
@@ -280,10 +289,12 @@
             <div id="addState" class="rightDiv">
                 <h2 style="text-align:center;">Add State</h2>
                 <form id="newStateForm">
-                    <table style="width:80%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input style="display:none;" type='text' id='newStateId' class="centerText" readonly><span id="newStateIDDisplay">0</span></td>
+                            <td class="right"><input style="display:none;" type='text' id='newStateId' class="centerText"><span id="newStateIDDisplay">0</span></td>
                         </tr>
                         <tr>
                             <td class="left">Continent:</td>
@@ -326,11 +337,11 @@
                         </tr>
                         <tr>
                             <td class="left">Latitude:</td>
-                            <td class="right"><input type="text" style="width:96%;" id="newStateLatitude" value="0"></td>
+                            <td class="right"><input type="text" style="width:96%;" id="newStateLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
                         </tr>
                         <tr>
                             <td class="left">Longitude:</td>
-                            <td class="right"><input type="text" style="width:96%;" id="newStateLongitude" value="0"></td>
+                            <td class="right"><input type="text" style="width:96%;" id="newStateLongitude" value="00.00000 pattern="-?\d{1,3}\.\d+"></td>
                         </tr>
                         <tr>
                             <td class="left">Name (Korean):</td>
@@ -340,6 +351,7 @@
                             <td class="left">Abbreviation (Korean):</td>
                             <td class="right"><input type="text" style="width:96%;" id="newStateAbbrK" value="0"></td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                     <div style="text-align:center;">
@@ -350,10 +362,12 @@
             <div id="addCity" class="rightDiv">
                 <h2 style="text-align:center;">Add City</h2>
                 <form id="newCityForm">
-                    <table style="width:80%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input style="display:none;" type='text' id='newCityId' class="centerText" readonly><span id="newCityIDDisplay">0</span></td>
+                            <td class="right"><input style="display:none;" type='text' id='newCityId' class="centerText"><span id="newCityIDDisplay">0</span></td>
                         </tr>
                         <tr>
                             <td class="left">Continent:</td>
@@ -403,11 +417,11 @@
                         </tr>
                         <tr>
                             <td class="left">Latitude:</td>
-                            <td class="right"><input type="text" style="width:97%;" id="newCityLatitude" value="0"></td>
+                            <td class="right"><input type="text" style="width:97%;" id="newCityLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
                         </tr>
                         <tr>
                             <td class="left">Longitude:</td>
-                            <td><input type="text" style="width:97%;" id="newCityLongitude" value="0"></td>
+                            <td><input type="text" style="width:97%;" id="newCityLongitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
                         </tr>
                         <tr>
                             <td class="left">Altitude:</td>
@@ -431,6 +445,7 @@
                             <td class="left">Abbreviation (Korean):</td>
                             <td class="right"><input type="text" style="width:97%;" id="newCityAbbrK" value="0"></td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                     <div style="text-align:center;">
@@ -441,19 +456,22 @@
             <div id="addRegion" class="rightDiv">
                 <h2 style="text-align:center;">Add Region</h2>
                 <form id="newRegionForm">
-                <table style="width:95%; margin:0 auto;">
-                    <tr>
-                        <td class="left">ID:</td>
-                        <td class="right"><input type='text' name='newRegionID' id='newRegionID' class="centerText" readonly></td>
-                    </tr>
-                    <tr>
-                        <td class="left">Name:</td>
-                        <td class="right"><input type="text" class="centerText toKorean" name="newRegionName" id="newRegionName" required></td>
-                    </tr>
-                    <tr>
-                        <td class="left">Name (Korean):</td>
-                        <td class="right"><input type="text" class="centerText" name="newRegionNameK" id="newRegionNameK" required></td>
-                    </tr>
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td class="left">ID:</td>
+                            <td class="right"><input type='text' style="display:none;" name='newRegionID' id='newRegionID' class="centerText"><span id="newREgionIdDisplay"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name:</td>
+                            <td class="right"><input type="text" class="centerText toKorean" name="newRegionName" id="newRegionName" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name (Korean):</td>
+                            <td class="right"><input type="text" class="centerText" name="newRegionNameK" id="newRegionNameK" required></td>
+                        </tr>
+                        </tbody>
                 </table>
                 <br/>
                 <div class="row">
@@ -753,8 +771,15 @@
             }
         });
 
+        
+
+        $(".headlessTable").dataTable({ordering: false, scrollY: "auto"})
         ipcRenderer.send('menu-reset', null)
     })
+
+    $(".readonly").on('keydown paste focus mousedown', function(e){
+        e.preventDefault();
+    });
 
     $("#loadXML").on("click",function(e) {
         $("#overlay").css("display","inline-block")
@@ -1734,12 +1759,21 @@
                     $(this).val(0);
                 });
                 $("#newEthnicityTotal").css("color","red")
-                $("#newEthnicityTotal").html("0")
+                $("#newEthnicityTotal").val("0")
             }
         }
 	}); */
 
     $("#addEthnicityTrigger").on("click", function(e) {
+        $("#newEthnicityName").val("")
+        $("#newEthnicityNameK").val("")
+        $("#newEthnicityID").val(max_ethnicity_id+1)
+        $("#newEthnicityIdDisplay").html(max_ethnicity_id+1)
+        $(".newEthPct").each(function(){
+            $(this).val(0);
+        });
+        $("#newEthnicityTotal").css("color","red")
+        $("#newEthnicityTotal").val("0")
         rightDivContent("#addEthnicity")
         //$("#addEthnicity").css("display","inline-block")
     })
@@ -1857,8 +1891,8 @@
         $("#newStateTimeZone").val(n.data.time_zone)
         //$("#newStateTimeZone :nth-child(30)").prop('selected', true);
         $("#newStateDST :nth-child(1)").prop('selected', true);
-        $("#newStateLatitude").val()
-        $("#newStateLongitude").val()
+        $("#newStateLatitude").val("00.00000")
+        $("#newStateLongitude").val("00.00000")
         rightDivContent("#addState")
     }
 
@@ -1958,8 +1992,8 @@
         } else {
             $("#newCityDST").val(s.data.observes_dst)
         }
-        $("#newCityLatitude").val(0)
-        $("#newCityLongitude").val(0)
+        $("#newCityLatitude").val("00.00000")
+        $("#newCityLongitude").val("00.00000")
         $("#newCityAltitude").val("0")
         $("#newCityNameK").val("")
         $("#newCityAbbrK").val("")
@@ -2032,7 +2066,7 @@
         } else {
             $("#newEthnicityTotal").css("color","green")
         }
-        $("#newEthnicityTotal").html(sum)
+        $("#newEthnicityTotal").val(sum)
     })
 
     // $("#editContinentForm").validate({
@@ -2075,6 +2109,10 @@
     // 
     //     } */
     // })
+
+    $("#newEthnicityForm").on("submit", function(e) {
+        e.preventDefault()
+    })
 
 
     $("#newContinentForm").on("submit", function(e) {
@@ -2177,6 +2215,10 @@
 
     $("#newStateForm").on("submit", function(e) {
         e.preventDefault()
+/*         if (isValidLatitude($("#newStateLatitude").val().trim()) == false) {
+            alert("Invalid Latitude!")
+            return false;
+        } */
         states_by_id[$("#newStateId").val()] = $("#newStateName").val()
         state_count++;
         var state_obj = {}
@@ -2191,8 +2233,8 @@
         state_obj.abbr_korean = $("#newStateAbbrK").val()
         state_obj.time_zone = $("#newStateTimeZone").val()
         state_obj.observes_dst = $("#newStateDST").val()
-        state_obj.lat = $("#newStateLatitude").val()
-        state_obj.long = $("#newStateLongitude").val()
+        state_obj.lat = $("#newStateLatitude").val().trim()
+        state_obj.long = $("#newStateLongitude").val().trim()
         if (parseInt($("#newStateId").val()) > max_state_id) { max_state_id = parseInt($("#newStateId").val()) }
         $("#max_state_id").text(max_state_id)
         $("#state_count").text(state_count)
@@ -2204,9 +2246,7 @@
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
-        console.log(states_by_nation[$("#newStateNation").val()])
         states_by_nation[$("#newStateNation").val()].push(state_obj)
-        console.log(states_by_nation[$("#newStateNation").val()])
     })
 
     $("#newCityForm").on("submit", function(e) {
@@ -2282,6 +2322,16 @@
         } else {
             return val.title + " ("+val.id+")"
         }
+    }
+
+    function isValidLatitude(input) {
+        // Latitude should be in the range of -90 to 90
+        return /^-?([0-9]|[1-8][0-9]|90)(\.\d+)?$/.test(input);
+    }
+
+    function isValidLongitude(input) {
+        // Longitude should be in the range of -180 to 180
+        return /^-?([0-9]|[1-9][0-9]|1[0-7][0-9]|180)(\.\d+)?$/.test(input);
     }
 
     </script>
