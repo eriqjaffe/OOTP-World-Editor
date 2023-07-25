@@ -9,7 +9,7 @@ ipcRenderer.on('save-xml', (event, data) => {
 })
 
 ipcRenderer.on('add-ethnicity', (event, data) => {
-    rightDivContent("#addEthnicity")
+    $("#addEthnicityTrigger").trigger("click")
 });
 
 ipcRenderer.on('add-continent', (event, data) => {
