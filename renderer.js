@@ -13,7 +13,7 @@ ipcRenderer.on('add-ethnicity', (event, data) => {
 });
 
 ipcRenderer.on('add-continent', (event, data) => {
-    rightDivContent("#addContinent")
+    $("#addContinentTrigger").trigger("click")
 });
 
 ipcRenderer.on('add-nation', (event, data) => {
