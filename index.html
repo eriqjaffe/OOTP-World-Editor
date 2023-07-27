@@ -51,6 +51,7 @@
         var regions_by_id = {}
         var nations_by_continent = {}
         var states_by_nation = {}
+        var cities_by_state = {}
         const time_zones = [{ tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-8.00", loc: "(GMT-08:00) Tijuana, Baja California" }, { tz: "-7.00", loc: "(GMT-07:00) Arizona" }, { tz: "-7.00", loc: "(GMT-07:00) Chihuahua, La Paz, Mazatlan" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central America" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Guadalajara, Mexico City, Monterrey" }, { tz: "-6.00", loc: "(GMT-06:00) Saskatchewan" }, { tz: "-5.00", loc: "(GMT-05:00) Bogota, Lima, Quito, Rio Branco" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Indiana (East)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Caracas, La Paz" }, { tz: "-4.00", loc: "(GMT-04:00) Manaus" }, { tz: "-4.00", loc: "(GMT-04:00) Santiago" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-3.00", loc: "(GMT-03:00) Buenos Aires, Georgetown" }, { tz: "-3.00", loc: "(GMT-03:00) Greenland" }, { tz: "-3.00", loc: "(GMT-03:00) Montevideo" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." }, { tz: "-1.00", loc: "(GMT-01:00) Azores" }, { tz: "0.00", loc: "(GMT+00:00) Casablanca, Monrovia, Reykjavik" }, { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" }, { tz: "1.00", loc: "(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague" }, { tz: "1.00", loc: "(GMT+01:00) Brussels, Copenhagen, Madrid, Paris" }, { tz: "1.00", loc: "(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb" }, { tz: "1.00", loc: "(GMT+01:00) West Central Africa" }, { tz: "2.00", loc: "(GMT+02:00) Amman" }, { tz: "2.00", loc: "(GMT+02:00) Athens, Bucharest, Istanbul" }, { tz: "2.00", loc: "(GMT+02:00) Beirut" }, { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "2.00", loc: "(GMT+02:00) Harare, Pretoria" }, { tz: "2.00", loc: "(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius" }, { tz: "2.00", loc: "(GMT+02:00) Jerusalem" }, { tz: "2.00", loc: "(GMT+02:00) Minsk" }, { tz: "2.00", loc: "(GMT+02:00) Windhoek" }, { tz: "3.00", loc: "(GMT+03:00) Kuwait, Riyadh, Baghdad" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.00", loc: "(GMT+03:00) Nairobi" }, { tz: "3.00", loc: "(GMT+03:00) Tbilisi" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" }, { tz: "4.00", loc: "(GMT+04:00) Baku" }, { tz: "4.00", loc: "(GMT+04:00) Yerevan" }, { tz: "4.50", loc: "(GMT+04:30) Kabul" }, { tz: "5.00", loc: "(GMT+05:00) Yekaterinburg" }, { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Sri Jayawardenapura" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.00", loc: "(GMT+06:00) Astana, Dhaka" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "7.00", loc: "(GMT+07:00) Krasnoyarsk" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" }, { tz: "8.00", loc: "(GMT+08:00) Kuala Lumpur, Singapore" }, { tz: "8.00", loc: "(GMT+08:00) Irkutsk, Ulaan Bataar" }, { tz: "8.00", loc: "(GMT+08:00) Perth" }, { tz: "8.00", loc: "(GMT+08:00) Taipei" }, { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.00", loc: "(GMT+09:00) Seoul" }, { tz: "9.00", loc: "(GMT+09:00) Yakutsk" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide" }, { tz: "9.50", loc: "(GMT+09:30) Darwin" }, { tz: "10.00", loc: "(GMT+10:00) Brisbane" }, { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "10.00", loc: "(GMT+10:00) Hobart" }, { tz: "10.00", loc: "(GMT+10:00) Guam, Port Moresby" }, { tz: "10.00", loc: "(GMT+10:00) Vladivostok" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }, { tz: "12.00", loc: "(GMT+12:00) Fiji, Kamchatka, Marshall Is." }]
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
@@ -483,10 +484,16 @@
                                 </select>
                             </td>
                         </tr>
-                        tr>
+                        <tr>
                             <td class="left"><span id="filterLabel">Nations</span> From:</td>
                             <td class="right">
                                 <select id="newRegionFilter" style="width:100%;"></select>
+                            </td>
+                        </tr>
+                        <tr id="sourceStateRow" style="display:none;">
+                            <td class="left">Source State:</td>
+                            <td class="right">
+                                <select id="newRegionSubFilter" style="width:100%;"></select>
                             </td>
                         </tr>
                         </tbody>
@@ -856,6 +863,7 @@
         $('#multi_d').empty()
         switch ($("#newRegionSource").val()) {
             case ("Nations"):
+                $("#sourceStateRow").css("display","none")
                 for (x of nations_by_continent[$(this).val()]) {
                     $('#multi_d')
                         .append($('<option>', { value : x.id })
@@ -863,6 +871,7 @@
                 }
                 break;
             case ("States"):
+                $("#sourceStateRow").css("display","none")
                 for (x of states_by_nation[$(this).val()]) {
                     $('#multi_d')
                         .append($('<option>', { value : x.id })
@@ -870,34 +879,32 @@
                 }
                 break;
             case ("Cities"):
-                var src_nation = null
-                var tree = $.ui.fancytree.getTree("#xmlOutput")
-                var world = tree.findFirst("CONTINENTS")
-                var arr = world.findAll($("#newRegionFilter option:selected").text()) 
-                for (n of arr) {
-                    if (n.type == "nation") {
-                        if (n.title == $("#newRegionFilter option:selected").text()) {
-                            var src_nation = n
-                            break;
-                        }
-                    }
+                $("#newRegionSubFilter").empty()
+                for (x of states_by_nation[$(this).val()]) {
+                    $('#newRegionSubFilter')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
                 }
-                //console.log(src_nation)
-                var states = src_nation.findFirst("States")
-                console.log(states)
-                // have to figure that out still
+                sortDropdown("#newRegionSubFilter")
+                for (x of cities_by_state[$("#newRegionSubFilter").val()]) {
+                    $('#multi_d')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
+                }
+                $("#sourceStateRow").css("display","table-row")
                 break;
         }
-
-        
-
         sortDropdown("#multi_d")
+    })
 
-/*         $.each(src, function(key, value) {
+    $("#newRegionSubFilter").on("change",function() {
+        $('#multi_d').empty()
+        for (x of cities_by_state[$(this).val()]) {
             $('#multi_d')
-                .append($('<option>', { value : key })
-                .text(value));
-        }); */
+                .append($('<option>', { value : x.id })
+                .text(x.title));
+        }
+        sortDropdown("#multi_d")
     })
 
     $("#saveXML").on("click",function(e) {
@@ -1301,6 +1308,7 @@
                         }
                         state_obj.children = city_arr
                         state_arr.push(state_obj)
+                        cities_by_state[state.$.id] = city_arr
                     }
                     states_obj.children = (state_arr)
                     nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
@@ -2280,7 +2288,6 @@
         }
         states_by_nation[$("#newNationID").val()] = []
         nations_by_continent[$("#newNationContinent").val()].push(nation_obj)
-        console.log(states_by_nation)
     })
 
     $("#newStateForm").on("submit", function(e) {
@@ -2344,7 +2351,7 @@
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
-
+        cities_by_state[$("#newCityState").val()].push(city_obj)
     })
 
     $("#newRegionForm").on("submit", function(e) {
@@ -2483,6 +2490,7 @@
             var textY = latinize($(y).text().toLowerCase());
             return textX < textY ? -1 : 1;
         }));
+        $(dropdown+" :nth-child(1)").prop('selected', true);
     }
     </script>
 </html>
