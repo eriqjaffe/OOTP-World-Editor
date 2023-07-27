@@ -1789,12 +1789,12 @@
                                     }
                                     break;
                                 case "city":
-                                    confirm("Are you sure you want to delete "+node.title+"?")
+                                    confirm("Are you sure you want to delete "+node.title+"?\nThis may have unintended effects!")
                                     break;
                                 case "ethnicity":
                                     switch (key) {
                                         case "delete":
-                                            console.log("You chose to delete "+node.title)
+                                            deleteNode(node)
                                             break;
                                         case "edit":
                                             editEthnicity(node)
@@ -1919,6 +1919,14 @@
         $("#newRegionSource").trigger("change")
         rightDivContent("#addRegion")
 	});
+
+    function deleteNode(node) {
+        if (confirm("Are you sure you want to delete "+node.title+"?\n\nnThis may have unintended effects!")) {
+            console.log("You asked for it")
+        } else {
+            console.log("You clearly thought better of it")
+        }
+    }
 
     function editEthnicity(node) {
         node_to_edit = node
