@@ -122,6 +122,7 @@
                     </table>
                     <br>
                 <div style="text-align:center;">
+                    <input type="button" value="Reset" class="resetButton" data-trigger="#addEthnicityTrigger">
                     <input type="submit" id="newEthnicitySubmit" value="Add Ethnicity">
                 </div>
                 </form>
@@ -172,6 +173,7 @@
                     </table>
                     <br>
                     <div style="text-align:center;">
+                        <input type="button" value="Reset" class="resetButton" data-trigger="#addContinentTrigger">
                         <input type="submit" id="newContinentSubmit" value="Add Continent">
                     </div>
                 </form>
@@ -285,6 +287,7 @@
                     </table>
                     <br>
                     <div style="text-align:center;">
+                        <input type="button" value="Reset" class="resetButton" data-trigger="#addNationTrigger">
                         <input type="submit" id="newNationSubmit" value="Add Nation">
                     </div>
                 </form>   
@@ -358,6 +361,7 @@
                     </table>
                     <br>
                     <div style="text-align:center;">
+                        <input type="button" value="Reset" class="resetButton" data-trigger="#addStateTrigger">
                         <input type="submit" id="newStateSubmit" value="Add State">
                     </div>
                 </form>
@@ -452,6 +456,7 @@
                     </table>
                     <br>
                     <div style="text-align:center;">
+                        <input type="button" value="Reset" class="resetButton" data-trigger="#addCityTrigger">
                         <input type="submit" id="newCitySubmit" value="Add City">
                     </div>
                 </form>
@@ -529,6 +534,7 @@
                     </div>
                 </div>
                 <div style="text-align:center; margin-top:10px;">
+                    <input type="button" value="Reset" class="resetButton" data-trigger="#addRegionTrigger">
                     <input type="submit" id="newRegionSubmit" value="Add Region">
                 </div>
                 </form>
@@ -1905,13 +1911,32 @@
         rightDivContent("#addContinent")
     })
 
+    $("#addNationTrigger").on("click", function(e) {
+        addNation(null)
+    })
+
+    $("#addStateTrigger").on("click", function(e) {
+        addState(null, null)
+    })
+
+    $("#addCityTrigger").on("click", function(e) {
+        addCity(null, null, null)
+    })
+
     $("#addRegionTrigger").on("click", function(e) {
 		$("#newRegionID").val(max_region_id+1)
         $("#newRegionIdDisplay").html(max_region_id+1)
+        $("#newRegionName").val("")
+        $("#newRegionNameK").val("")
+        $("#multi_d_to_3").empty()
+        $("#multi_d_to_2").empty()
+        $("#multi_d_to").empty()
         $("#newRegionSource").val("Nations")
         $("#newRegionSource").trigger("change")
         rightDivContent("#addRegion")
 	});
+
+
 
     function editEthnicity(node) {
         const t = parseInt(node.data.african) 
@@ -2365,6 +2390,10 @@
         node.setActive()
         node.makeVisible({scrollIntoView: true});
         cities_by_state[$("#newCityState").val()].push(city_obj)
+    })
+
+    $(".resetButton").on("click", function() {
+        $($(this).data("trigger")).trigger("click")
     })
 
     $("#newRegionForm").on("submit", function(e) {

@@ -71,6 +71,10 @@ input[type="submit"] {
     font-weight: bold;
 } 
 
+input[type="button"] {
+    font-weight: bold;
+}
+
 /*  SECTIONS  */
 .section {
     clear: both;
