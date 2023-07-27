@@ -28,6 +28,7 @@
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
         const XMLWriter = require('xml-writer');
+        var node_to_edit = null;
         var max_world_id = 0
         var max_continent_id = 0
         var max_nation_id = 0
@@ -544,14 +545,16 @@
             <div id="editEthnicity" class="rightDiv">
                 <h2 style="text-align:center;">Edit Ethnicity</h2>
                 <form id="editEthnicityForm" action="">
-                    <table style="width: 80%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input type='text' style="display:none;" id='editEthnicityID' class="centerText" readonly><span id="newCEthnicityDisplay">0</span></td>
+                            <td class="right"><input type='text' style="display:none;" id='editEthnicityID' class="centerText" readonly><span id="editEthnicityDisplay">0</span></td>
                         </tr>
                         <tr>
                             <td class="left">Name:</td>
-                            <td class="right"><input type='text' style="width:95%;" id='editEthnicityName' class="centerText toKorean"></td>
+                            <td class="right"><input type='text' style="width:95%;" id='editEthnicityName' class="centerText toKorean" required></td>
                         </tr>
                         <tr>
                             <td class="left">Name (Korean):</td>
@@ -579,12 +582,13 @@
                         </tr>
                         <tr>
                             <td class="left">Total:</td>
-                            <td class="right" id="editEthnicityTotal" style="text-align:center;"></td>
+                            <td class="right"><input type='number' min='1000' max='1000' class="readonly centerText" style="width:95%;" id='editEthnicityTotal' class="centerText" pattern="1000"></td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                 <div style="text-align:center;">
-                    <input type="submit" id="editEthnicitySubmit" value="Add Continent">
+                    <input type="submit" id="editEthnicitySubmit" value="Submit Changes">
                 </div>
                 </form>
             </div>
@@ -1863,26 +1867,6 @@
         }
     });
 
-    /* $("#addEthnicityTrigger").magnificPopup({
-        closeOnBgClick: false,
-		items: {
-			src: '#addEthnicity',
-			type: 'inline'
-		},
-        callbacks: {
-            beforeOpen: function() {
-                $("#newEthnicityName").val("")
-                $("#newEthnicityNameK").val("")
-                $("#newEthnicityID").val(max_ethnicity_id+1)
-                $(".newEthPct").each(function(){
-                    $(this).val(0);
-                });
-                $("#newEthnicityTotal").css("color","red")
-                $("#newEthnicityTotal").val("0")
-            }
-        }
-	}); */
-
     $("#addEthnicityTrigger").on("click", function(e) {
         $("#newEthnicityName").val("")
         $("#newEthnicityNameK").val("")
@@ -1936,9 +1920,8 @@
         rightDivContent("#addRegion")
 	});
 
-
-
     function editEthnicity(node) {
+        node_to_edit = node
         const t = parseInt(node.data.african) 
                 + parseInt(node.data.asian) 
                 + parseInt(node.data.east_indian) 
@@ -1947,13 +1930,14 @@
         $("#editEthnicityName").val(node.title)
         $("#editEthnicityNameK").val(node.data.name_korean)
         $("#editEthnicityID").val(max_ethnicity_id+1)
+        $("#editEthnicityDisplay").html(max_ethnicity_id+1)
         $("#editEthnicityAfrican").val(node.data.african)
         $("#editEthnicityAsian").val(node.data.asian)
         $("#editEthnicityEastIndian").val(node.data.east_indian)
         $("#editEthnicityCaucasian").val(node.data.caucasian)
         $("#editEthnicityHispanic").val(node.data.hispanic)
         $("#editEthnicityTotal").css("color",(t == 1000) ? "green" : "red")
-        $("#editEthnicityTotal").html(t)
+        $("#editEthnicityTotal").val(t)
         rightDivContent("#editEthnicity")
     }
 
@@ -2203,6 +2187,19 @@
         $("#newEthnicityTotal").val(sum)
     })
 
+    $(".editEthPct").on("change",function() {
+        var sum = 0;
+        $(".editEthPct").each(function(){
+            sum += +$(this).val();
+        });
+        if (sum !== 1000) {
+            $("#editEthnicityTotal").css("color","red")
+        } else {
+            $("#editEthnicityTotal").css("color","green")
+        }
+        $("#editEthnicityTotal").val(sum)
+    })
+
     $("#newEthnicityForm").on("submit", function(e) {
         e.preventDefault()
         ethnicity_count++;
@@ -2392,6 +2389,18 @@
         cities_by_state[$("#newCityState").val()].push(city_obj)
     })
 
+    $("#editEthnicityForm").on("submit", function(e) {
+        e.preventDefault()
+        node_to_edit.setTitle($("#editEthnicityName").val())    
+        node_to_edit.data.name_korean = $("#editEthnicityNameK").val()
+        node_to_edit.data.african = $("#editEthnicityAfrican").val()
+        node_to_edit.data.asian = $("#editEthnicityAsian").val()
+        node_to_edit.data.east_indian = $("#editEthnicityEastIndian").val()
+        node_to_edit.data.caucasian = $("#editEthnicityCaucasian").val()
+        node_to_edit.data.hispanic = $("#editEthnicityHispanic").val()
+        scrollToEditedNode("ETHNICITIES")
+    })
+
     $(".resetButton").on("click", function() {
         $($(this).data("trigger")).trigger("click")
     })
@@ -2533,6 +2542,16 @@
             return textX < textY ? -1 : 1;
         }));
         $(dropdown+" :nth-child(1)").prop('selected', true);
+    }
+
+    function scrollToEditedNode(toSort) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var node_to_sort = tree.findFirst(toSort)
+        node_to_sort.sortChildren(null, true);
+        node_to_sort.setExpanded()
+        node_to_edit.setFocus()
+        node_to_edit.setActive()
+        node_to_edit.makeVisible({scrollIntoView: true});
     }
     </script>
 </html>
