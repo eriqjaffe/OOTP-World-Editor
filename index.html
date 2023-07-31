@@ -53,8 +53,12 @@
         var nations_by_continent = {}
         var states_by_nation = {}
         var cities_by_state = {}
+        var cities_by_nation = {}
         const time_zones = [ { tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." },  { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" },  { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" },  { tz: "4.50", loc: "(GMT+04:30) Kabul" },  { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" },  { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide, Darwin" },  { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }]
+        const tzDisplay = { "-12.00": "(GMT-12:00) International Date Line West", "-11.00": "(GMT-11:00) Midway Island, Samoa", "-10.00": "(GMT-10:00) Hawaii", "-9.00": "(GMT-09:00) Alaska", "-8.00": "(GMT-08:00) Pacific Time (US &amp; Canada)", "-7.00": "(GMT-07:00) Mountain Time (US &amp; Canada)", "-6.00": "(GMT-06:00) Central Time (US &amp; Canada)", "-5.00": "(GMT-05:00) Eastern Time (US &amp; Canada)", "-4.00": "(GMT-04:00) Atlantic Time (Canada)", "-3.50": "(GMT-03:30) Newfoundland", "-3.00": "(GMT-03:00) Brasilia", "-2.00": "(GMT-02:00) Mid-Atlantic", "-1.00": "(GMT-01:00) Cape Verde Is." , "0.00": "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London", "1.00": "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" , "2.00": "(GMT+02:00) Cairo", "3.00": "(GMT+03:00) Moscow, St. Petersburg, Volgograd", "3.50": "(GMT+03:30) Tehran", "4.00": "(GMT+04:00) Abu Dhabi, Muscat" , "4.50": "(GMT+04:30) Kabul" , "5.00": "(GMT+05:00) Islamabad, Karachi, Tashkent", "5.50": "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi", "5.75": "(GMT+05:45) Kathmandu", "6.00": "(GMT+06:00) Almaty, Novosibirsk", "6.50": "(GMT+06:30) Yangon (Rangoon)", "7.00": "(GMT+07:00) Bangkok, Hanoi, Jakarta", "8.00": "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" , "9.00": "(GMT+09:00) Osaka, Sapporo, Tokyo", "9.50": "(GMT+09:30) Adelaide, Darwin" , "10.00": "(GMT+10:00) Canberra, Melbourne, Sydney", "11.00": "(GMT+11:00) Magadan, Solomon Is., New Caledonia", "12.00": "(GMT+12:00) Auckland, Wellington" }
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
+        const usa = { 0: "No", 1: "Yes" }
+        const gender = { 0: "Male", 1: "Female" }
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
 
         $.extend( $.fn.dataTable.defaults, {
@@ -215,10 +219,6 @@
                         <tr>
                             <td class="left">ETID:</td>
                             <td class="right"><input type="number" id="newNationEtid" value="0"></td>
-                        </tr>
-                        <tr>
-                            <td class="left">LID:</td>
-                            <td class="right"><input type="number" id="newNationLid" value="0"></td>
                         </tr>
                         <tr>
                             <td class="left">Gender:</td>
@@ -644,66 +644,110 @@
             </div>
             <div id="editNation" class="rightDiv">
                 <h2 style="text-align:center;">Edit Nation</h2>
-                <form id="editNationForm" action="">
-                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                <form id="editNationForm">
+                    <table class="headlessTable cell-border compact stripe" style="width:95%; margin:0 auto;">
                         <thead style="display:none;"><tr><td></td><td></td></tr></thead>
                         <tbody>
                         <tr>
                             <td class="left">ID:</td>
-                            <td class="right"><input style="display:none;" type='text' name='editNationID' id='editNationID' class="centerText"><span id="editNationIDDisplay">0</span></td>
+                            <td class="right"><input style="display:none;" type='text' id='editNationID' class="centerText"><span id="editNationIDDisplay">0</span></td>
                         </tr>
                         <tr>
                             <td class="left">Name:</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editNationName" id="editNationName" required></td>
+                            <td class="right"><input type="text" class="centerText toKorean" id="editNationName" value="" required></td>
                         </tr>
                         <tr>
                             <td class="left">Abbreviation:</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editNationAbbr" id="editNationAbbr" required></td>
-                        </tr>
-                        <tr>
-                            <td class="left">Demonym:</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editNationDem" id="editNationDem" required></td>
-                        </tr>
-                        <tr>
-                            <td class="left">Population:</td>
-                            <td class="left"><input style="width:95%;" type="number" class="centerText" name="editNationPop" id="editNationPop" value="0"></td>
+                            <td class="right"><input type="text" class="centerText toKorean" id="editNationAbbr" value="" required></td>
                         </tr>
                         <tr>
                             <td class="left">Capitol:</td>
-                            <td class="left"><select id="editNationCap"></select></td>
+                            <td class="right">
+                                <div style="position:relative; width:50%; float:left; text-align:left;">
+                                    <label for="editNationCapitolState">State:</label><br>
+                                    <select id="editNationCapitolState" style="width:100%;"></select>
+                                </div>
+                                <div style="position:relative; width:50%; float:right; text-align:left;">
+                                    <label for="editNationCapitol">City:</label><br>
+                                    <select id="editNationCapitol" style="width:100%;"></select>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td class="left">Time Zone:</td>
-                            <td class="left"><select class="tzSelect" id="editNationTimeZone" style="width:100%;">
-                                </select></td>
+                            <td class="left">Demonym:</td>
+                            <td class="right"><input type="text" class="centerText toKorean" id="editNationDem" value="" required></td>
                         </tr>
                         <tr>
-                            <td class="left">Ethnicity ID:</td>
-                            <td class="left"><input style="width:95%;" type="number" class="centerText" name="editNationEtid" id="editNationEtid" value="0"></td>
+                            <td class="left">Population:</td>
+                            <td class="right"><input type="number" id="editNationPopulation" value="0"></td>
                         </tr>
                         <tr>
-                            <td class="left">Baseball Quality:</td>
-                            <td class="left"><select id="editNationBBQual"></select></td>
+                            <td class="left">ETID:</td>
+                            <td class="right"><input type="number" id="editNationEtid" value="0"></td>
                         </tr>
                         <tr>
                             <td class="left">Gender:</td>
-                            <td class="left"><select id="editNationGender"></select></td>
+                            <td class="right">
+                                <select id="editNationGender" style="width:99%;">
+                                    <option value="0">0: Male</option>
+                                    <option value="1">1: Female</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Baseball Quality:</td>
+                            <td class="right">
+                                <select id="editNationBbqual" style="width:99%;">
+                                    <option value="5">5: Excellent</option>
+                                    <option value="4">4: Good</option>
+                                    <option value="3" selected>3: Average</option>
+                                    <option value="2">2: Fair</option>
+                                    <option value="1">1: Poor</option>
+                                    <option value="0">0: Non-Existent</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Observes DST:</td>
+                            <td class="right">
+                                <select id="editNationDST" style="width:99%;">
+                                    <option value="0">0: No</option>
+                                    <option value="1">1: Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Modern USA?</td>
+                            <td class="right">
+                                <select id="editNationUSA" style="width:99%;">
+                                    <option value="0">0: No</option>
+                                    <option value="1">1: Yes</option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <td class="left">Name (Korean):</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationNameK" id="editNationNameK" value=""></td>
+                            <td class="right"><input type="text" class="centerText" id="editNationNameK" value=""></td>
                         </tr>
                         <tr>
                             <td class="left">Short (Korean):</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationShortK" id="editNationShortK" value=""></td>
+                            <td class="right"><input type="text" class="centerText" id="editNationShortK" value=""></td>
                         </tr>
                         <tr>
-                            <td class="left">Abbreviation (Korean):</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationAbbrK" id="editNationAbbrK" value=""></td>
+                            <td class="left">Abbr. (Korean):</td>
+                            <td class="right"><input type="text" class="centerText" id="editNationAbbrK" value=""></td>
+                        
                         </tr>
-                        <tr>
+                        <tr>    
                             <td class="left">Demonym (Korean):</td>
-                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationDemK" id="editNationDemK" value=""></td>
+                            <td class="right"><input type="text" class="centerText" id="editNationDemK" value=""></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Time Zone:</td>
+                            <td class="right">
+                                <select class="tzSelect" id="editNationTimeZone" style="width:100%;">
+                                </select>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -711,6 +755,250 @@
                     <div style="text-align:center;">
                         <input type="submit" id="editNationSubmit" value="Submit Changes">
                     </div>
+                </form>   
+            </div>
+            <div id="editState" class="rightDiv">
+                <h2 style="text-align:center;">Edit State</h2>
+                <form id="editStateForm">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td class="left">ID:</td>
+                            <td class="right"><input style="display:none;" type='text' id='editStateId' class="centerText"><span id="editStateIDDisplay">0</span></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Continent:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="editStateContinent">
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Nation:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="editStateNation">
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name:</td>
+                            <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="editStateName" value="" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Abbreviation:</td>
+                            <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="editStateAbbr" value="" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Population:</td>
+                            <td class="right"><input type="number" style="width:96%;"id="editStatePopulation" value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Time Zone:</td>
+                            <td class="right"><select class="tzSelect" id="editStateTimeZone" style="width:99%;"></select></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Observes DST:</td>
+                            <td class="right">
+                                <select id="editStateDST" style="width:99%;">
+                                    <option value="0">0: No</option>
+                                    <option value="1">1: Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Latitude:</td>
+                            <td class="right"><input type="text" style="width:96%;" id="editStateLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Longitude:</td>
+                            <td class="right"><input type="text" style="width:96%;" id="editStateLongitude" value="00.00000 pattern="-?\d{1,3}\.\d+"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name (Korean):</td>
+                            <td class="right"><input type="text" style="width:96%;"id="editStateNameK" value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Abbreviation (Korean):</td>
+                            <td class="right"><input type="text" style="width:96%;" id="editStateAbbrK" value="0"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div style="text-align:center;">
+                        <input type="submit" id="editStateSubmit" value="Submit Changes">
+                    </div>
+                </form>
+            </div>
+            <div id="editCity" class="rightDiv">
+                <h2 style="text-align:center;">Edit City</h2>
+                <form id="editCityForm">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td class="left">ID:</td>
+                            <td class="right"><input style="display:none;" type='text' id='editCityId' class="centerText"><span id="editCityIDDisplay">0</span></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Continent:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="editCityContinent">
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Nation:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="editCityNation">
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">State:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="editCityState">
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name:</td>
+                            <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="editCityName" value="" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Abbreviation:</td>
+                            <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="editCityAbbr" value="" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Population:</td>
+                            <td class="right"><input type="number" style="width:97%;" id="editCityPopulation" value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Time Zone:</td>
+                            <td class="right"><select class="tzSelect" id="editCityTimeZone" style="width:99%;"></select></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Observes DST:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="editCityDST" style="width:99%;">
+                                    <option value="0">0: No</option>
+                                    <option value="1">1: Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Latitude:</td>
+                            <td class="right"><input type="text" style="width:97%;" id="editCityLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Longitude:</td>
+                            <td><input type="text" style="width:97%;" id="editCityLongitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Altitude:</td>
+                            <td class="right">
+                                <select style="width:99%;" id='editCityAltitude'> 
+                                    <option value='0'>0: ~0 m</option>
+                                    <option value='1'>1: ~500 m</option>
+                                    <option value='2'>2: ~1000 m</option>
+                                    <option value='3'>3: ~1500 m</option>
+                                    <option value='4'>4: ~2000 m</option>
+                                    <option value='5'>5: ~2500 m</option>
+                                    <option value='6'>6: ~3000 m</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name (Korean):</td>
+                            <td class="right"><input type="text" style="width:97%;" id="editCityNameK" value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Abbreviation (Korean):</td>
+                            <td class="right"><input type="text" style="width:97%;" id="editCityAbbrK" value="0"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div style="text-align:center;">
+                        <input type="submit" id="editCitySubmit" value="Submit Changes">
+                    </div>
+                </form>
+            </div>
+            <div id="editRegion" class="rightDiv">
+                <h2 style="text-align:center;">Add Region</h2>
+                <form id="editRegionForm">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td class="left">ID:</td>
+                            <td class="right"><input type='text' style="display:none;" name='editRegionID' id='editRegionID' class="centerText"><span id="editRegionIdDisplay"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name:</td>
+                            <td class="right"><input type="text" class="centerText toKorean" name="editRegionName" id="editRegionName" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name (Korean):</td>
+                            <td class="right"><input type="text" class="centerText" name="editRegionNameK" id="editRegionNameK"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Region Source:</td>
+                            <td class="right">
+                                <select id="editRegionSource" style="width:100%;">
+                                    <option val="nations">Nations</option>
+                                    <option val="states">States</option>
+                                    <option val="cities">Cities</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left"><span id="filterLabel">Nations</span> From:</td>
+                            <td class="right">
+                                <select id="editRegionFilter" style="width:100%;"></select>
+                            </td>
+                        </tr>
+                        <tr id="sourceStateRow" style="display:none;">
+                            <td class="left">Source State:</td>
+                            <td class="right">
+                                <select id="editRegionSubFilter" style="width:100%;"></select>
+                            </td>
+                        </tr>
+                        </tbody>
+                </table>
+                <br/>
+                <div class="row">
+                    <div class="col-xs-5">
+                        <select name="from[]" id="multi_d" class="form-control" size="26" multiple="multiple" style="height:500px;">
+                            
+                        </select>
+                    </div>
+                    
+                    <div class="col-xs-2">
+                        <button type="button" id="multi_d_rightAll" class="btn btn-default btn-block" style="margin-top: 265px;"><i class="glyphicon glyphicon-forward"></i></button>
+                        <button type="button" id="multi_d_rightSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
+                        <button type="button" id="multi_d_leftSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
+                        <button type="button" id="multi_d_leftAll" class="btn btn-default btn-block"><i class="glyphicon glyphicon-backward"></i></button>
+                    </div>
+                    
+                    <div class="col-xs-5">
+                        <b>Nations</b>
+                        <fieldset id="editRegionFields" required>
+                        <select name="to[]" id="multi_d_to" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+                        
+                        
+                        <b>States</b>
+                        <select name="to_2[]" id="multi_d_to_2" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+
+                        
+                        <b>Cities</b>
+                        <select name="to_2[]" id="multi_d_to_3" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+                        </fieldset>
+                    </div>
+                </div>
+                <div style="text-align:center; margin-top:10px;">
+                    <input type="submit" id="editRegionSubmit" value="Submit Changes">
+                </div>
                 </form>
             </div>
 
@@ -757,6 +1045,7 @@
     var treeGlobal = "hello world"
 
     $(document).ready(function() {
+
         ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
             $('#newNationTimeZone')
@@ -768,9 +1057,13 @@
             $('#newCityTimeZone')
                 .append($('<option>', { value : z.tz })
                 .text(z.loc));
+            $('#editNationTimeZone')
+                .append($('<option>', { value : z.tz })
+                .text(z.loc));
         }
+
         $(".tzSelect").each(function() {
-            $(this).children(':nth-child(30)').prop('selected', true);
+            $(this).children(':nth-child(14)').prop('selected', true);
         })
 
         $('#multi_d').multiselect({
@@ -1311,7 +1604,7 @@
                     nation_obj.short_korean = (nation.$.short_korean != undefined) ? nation.$.short_korean : ""
                     nation_obj.pop = nation.$.pop
                     nation_obj.etid = (nation.$.etid != undefined) ? nation.$.etid : ""
-                    nation_obj.lid = nation.$.lid = (nation.$.lid != undefined) ? nation.$.lid : ""
+                    /* nation_obj.lid = nation.$.lid = (nation.$.lid != undefined) ? nation.$.lid : "" */
                     nation_obj.capid = (nation.$.capid != undefined) ? nation.$.capid : ""
                     nation_obj.gender = nation.$.gender
                     nation_obj.bbqual = nation.$.bbqual
@@ -1361,6 +1654,7 @@
                     states_obj.icon = './images/landmark-dome-solid.svg'
                     states_obj.type = "STATES_PARENT"
                     var state_arr = []
+                    var cities_bn_arr = []
                     for (state of nation.STATES[0].STATE) {
                         states_by_id[state.$.id] = state.$.name
                         state_count++;
@@ -1385,6 +1679,7 @@
                                 cities_by_id[city.$.id] = city.$.name
                                 city_count++;
                                 var city_obj = {}
+                                var city_bn_obj = {}
                                 city_obj.type = 'city'
                                 city_obj.folder = false
                                 city_obj.icon = './images/city-solid.svg'
@@ -1399,8 +1694,15 @@
                                 city_obj.abbr_korean = (city.$.abbr_korean != undefined) ? city.$.abbr_korean : ""
                                 city_obj.time_zone = (city.$.time_zone != undefined) ? parseFloat(city.$.time_zone).toFixed(2).toString() : parseFloat(nation.$.time_zone).toFixed(2).toString()
                                 city_obj.observes_dst = (city.$.observes_dst != undefined) ? city.$.observes_dst : "0"
+                                city_obj.state = state.$.id
+                                city_obj.nation = nation.$.id
                                 city_arr.push(city_obj)
                                 if (parseInt(city.$.id) > max_city_id) { max_city_id = parseInt(city.$.id) }
+                                city_bn_obj.id = city.$.id
+                                city_bn_obj.title = city.$.name
+                                city_bn_obj.state = state.$.id
+                                city_bn_obj.nation = nation.$.id
+                                cities_bn_arr.push(city_bn_obj)
                             }
                         }
                         state_obj.children = city_arr
@@ -1411,6 +1713,7 @@
                     nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
                     nation_arr.push(nation_obj)
                     states_by_nation[nation.$.id] = state_arr
+                    cities_by_nation[nation.$.id] = cities_bn_arr
                 }
                 nations_by_continent[continent.$.id] = nation_arr
                 continent_obj.children = nation_arr
@@ -1585,6 +1888,7 @@
                                 }
                             })
                             var cap = (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") ? "<span style='color:red;'>None Set</span>" : cities_by_id[node.data.capid]
+                            //var usa = (node.data.this_is_the_usa == "1") ? "Yes" : "No"
                             html = '<h2 style="text-align:center;">'+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
@@ -1594,10 +1898,11 @@
                                  + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+node.data.time_zone+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+node.data.gender+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">This is the USA:</td><td class="right_float" >'+usa[node.data.this_is_the_usa]+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+gender[node.data.gender]+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
@@ -1626,7 +1931,7 @@
                                  + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+node.data.time_zone+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+node.data.observes_dst+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
@@ -1648,7 +1953,7 @@
                                  + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Altitude:</td><td class="right_float">'+altitudes[alt]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+node.data.time_zone+'</td></tr>\n'
+                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+node.data.observes_dst+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
@@ -1721,7 +2026,6 @@
                 selector: "#xmlOutput span.fancytree-title",
                 build: function($trigger, e) {
                     var node = $.ui.fancytree.getNode($trigger);
-                    console.log(node.type)
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
                             cmItems = {
@@ -1836,6 +2140,7 @@
                                 case "nation":
                                     switch (key) {
                                         case "edit":
+                                            console.log("editing nation")
                                             editNation(node)
                                             break;
                                         case "addState":
@@ -2044,8 +2349,9 @@
     }
 
     function editNation(node) {
-        console.log(node.data)
         node_to_edit = node
+        //console.log(node)
+        $("#editNationCapitolState").empty()
         $("#editNationID").val(node.data.id)
         $("#editNationIDDisplay").text(node.data.id)
         $("#editNationName").val(node.title)
@@ -2055,11 +2361,44 @@
         $("#editNationShortK").val(node.data.short_korean)
         $("#editNationDem").val(node.data.dem)
         $("#editNationDemK").val(node.data.dem_korean)
-        $("#editNationPop").val(node.data.pop)
+        $("#editNationPopulation").val(node.data.pop)
         $("#editNationEtid").val(node.data.etid)
         $("#editNationTimeZone").val(node.data.time_zone)
+        for (x of states_by_nation[node.data.id]) {
+            $('#editNationCapitolState')
+                .append($('<option>', { value : x.id })
+                .text(x.title));
+        }
+        console.log(cities_by_nation)
+        var city = cities_by_nation[node.data.id].find( function( city ){
+            return city.id === node.data.capid;
+        } );
+        if (city == null) {
+            console.log("No cities yet!")
+        }
+        sortDropdown("#editNationCapitolState")
+        if (parseInt(node.data.capid) > 0) {
+            $('#editNationCapitolState').val(city.state)
+            $('#editNationCapitolState').trigger("change")
+            $('#editNationCapitol').val(node.data.capid)
+        } else {
+            $('#editNationCapitolState').val("0")
+        }
+        
         rightDivContent("#editNation")
     }
+
+    $("#editNationCapitolState").on("change", function(e) {
+        $('#editNationCapitol').empty()
+        if ($(this).val() > 0) {
+            for (x of cities_by_state[$(this).val()]) {
+                $('#editNationCapitol')
+                    .append($('<option>', { value : x.id })
+                    .text(x.title));
+            }
+            sortDropdown("#editNationCapitol")
+        }
+    })
 
     function addNation(continent) {
         $("#newNationContinent").empty()
@@ -2090,7 +2429,7 @@
         $("#newNationIDDisplay").text(max_nation_id+1)
         $("#newNationGender :nth-child(1)").prop('selected', true);
         $("#newNationBbqual :nth-child(3)").prop('selected', true);
-        $("#newNationTimeZone :nth-child(30)").prop('selected', true);
+        $("#newNationTimeZone :nth-child(14)").prop('selected', true);
         $("#newNationDST :nth-child(1)").prop('selected', true);
         $("#newNationUSA :nth-child(1)").prop('selected', true);
 
@@ -2379,7 +2718,7 @@
         nation_obj.short_korean = $("#newNationShortK").val()
         nation_obj.pop = $("#newNationPopulation").val()
         nation_obj.etid = $("#newNationEtid").val()
-        nation_obj.lid = $("#newNationLid").val()
+        /* nation_obj.lid = $("#newNationLid").val() */
         nation_obj.capid = '0'
         nation_obj.gender = $("#newNationGender").val()
         nation_obj.bbqual = $("#newNationBbqual").val()
@@ -2427,6 +2766,7 @@
                 break;
             }
         }
+        cities_by_nation[$("#newNationID").val()] = []
         states_by_nation[$("#newNationID").val()] = []
         nations_by_continent[$("#newNationContinent").val()].push(nation_obj)
     })
@@ -2482,6 +2822,8 @@
         city_obj.abbr_korean = $("#newCityAbbrK").val()
         city_obj.time_zone = $("#newCityTimeZone").val()
         city_obj.observes_dst = $("#newCityDST").val()
+        city_obj.state = $("#newCityState").val()
+        city_obj.nation = $("#newCityNation").val()
         if (parseInt($("#newCityId").val()) > max_city_id) { max_city_id = parseInt($("#newCityId").val()) }
         $("#max_city_id").text(max_city_id)
         $("#city_count").text(city_count)
@@ -2509,7 +2851,6 @@
 
     $("#editContinentForm").on("submit",function(e) {
         e.preventDefault()
-        console.log(node_to_edit)
         node_to_edit.setTitle($("#editContinentName").val())
         node_to_edit.data.abbr = $("#editContinentAbbr").val()
         node_to_edit.data.abbr_korean = $("#editContinentAbbrK").val()
@@ -2518,6 +2859,26 @@
         node_to_edit.data.etid = $("#editContinentEtid").val()
         node_to_edit.data.pop = $("#editContinentPop").val()
         node_to_edit.data.title_korean = $("#editContinentNameK").val()
+        scrollToEditedNode("CONTINENTS")
+    })
+
+    $("#editNationForm").on("submit",function(e) {
+        e.preventDefault()
+        node_to_edit.setTitle($("#editNationName").val())
+        node_to_edit.data.abbr = $("#editNationAbbr").val()
+        node_to_edit.data.abbr_korean = $("#editNationAbbrK").val()
+        node_to_edit.data.bbqual = $("#editNationBbqual").val()
+        node_to_edit.data.capid = "0" // TBD
+        node_to_edit.data.dem = $("#editNationDem").val()
+        node_to_edit.data.dem_korean = $("#editNationDemK").val()
+        node_to_edit.data.etid = $("#editNationEtid").val()
+        node_to_edit.data.gender = $("#editNationGender").val()
+        node_to_edit.data.observes_dst = $("#editNationDST").val()
+        node_to_edit.data.pop = $("#editNationPop").val()
+        node_to_edit.data.short_korean = $("#editNationShortK").val()
+        node_to_edit.data.this_is_the_usa = $("#editNationUSA").val()
+        node_to_edit.time_zone = $("#editNationTimeZone").val()
+        node_to_edit.data.title_korean = $("#editNationNameK").val()
         scrollToEditedNode("CONTINENTS")
     })
 
