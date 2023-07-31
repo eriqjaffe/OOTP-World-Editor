@@ -595,7 +595,9 @@
             <div id="editContinent" class="rightDiv">
                 <h2 style="text-align:center;">Edit Continent</h2>
                 <form id="editContinentForm" action="">
-                    <table style="width: 80%; margin:0 auto;">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
                         <tr>
                             <td class="left">ID:</td>
                             <td class="right"><input style="display:none;" type='text' name='editContinentID' id='editContinentID' class="centerText"><span id="editContinentIDDisplay">0</span></td>
@@ -632,10 +634,82 @@
                             <td class="left">Demonym (Korean):</td>
                             <td class="left"><input style="width:95%;" type="text" class="centerText" name="editContinentDemK" id="editContinentDemK" value=""></td>
                         </tr>
+                        </tbody>
                     </table>
                     <br>
                     <div style="text-align:center;">
                         <input type="submit" id="editContinentSubmit" value="Submit Changes">
+                    </div>
+                </form>
+            </div>
+            <div id="editNation" class="rightDiv">
+                <h2 style="text-align:center;">Edit Nation</h2>
+                <form id="editNationForm" action="">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td class="left">ID:</td>
+                            <td class="right"><input style="display:none;" type='text' name='editNationID' id='editNationID' class="centerText"><span id="editNationIDDisplay">0</span></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name:</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editNationName" id="editNationName" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Abbreviation:</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editNationAbbr" id="editNationAbbr" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Demonym:</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="editNationDem" id="editNationDem" required></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Population:</td>
+                            <td class="left"><input style="width:95%;" type="number" class="centerText" name="editNationPop" id="editNationPop" value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Capitol:</td>
+                            <td class="left"><select id="editNationCap"></select></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Time Zone:</td>
+                            <td class="left"><select class="tzSelect" id="editNationTimeZone" style="width:100%;">
+                                </select></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Ethnicity ID:</td>
+                            <td class="left"><input style="width:95%;" type="number" class="centerText" name="editNationEtid" id="editNationEtid" value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Baseball Quality:</td>
+                            <td class="left"><select id="editNationBBQual"></select></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Gender:</td>
+                            <td class="left"><select id="editNationGender"></select></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name (Korean):</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationNameK" id="editNationNameK" value=""></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Short (Korean):</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationShortK" id="editNationShortK" value=""></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Abbreviation (Korean):</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationAbbrK" id="editNationAbbrK" value=""></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Demonym (Korean):</td>
+                            <td class="left"><input style="width:95%;" type="text" class="centerText" name="editNationDemK" id="editNationDemK" value=""></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div style="text-align:center;">
+                        <input type="submit" id="editNationSubmit" value="Submit Changes">
                     </div>
                 </form>
             </div>
@@ -1675,10 +1749,12 @@
                             break;
                         case "nation":
                             cmItems = {
+                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                                "sep1": "----",
                                 "addState": {name: "Add State", icon: 'add'},
                                 "addSecondNation": {name: "Add Second Nation", icon: 'add'},
                                 "addEthnicity": {name: "Add Ethnicity", icon: 'add'},
-                                "sep1": "----",
+                                "sep2": "----",
                                 "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                             }
                             break;
@@ -1759,6 +1835,9 @@
                                     break;
                                 case "nation":
                                     switch (key) {
+                                        case "edit":
+                                            editNation(node)
+                                            break;
                                         case "addState":
                                             addState(node.parent.data.id,node.data.id)
                                             //$("#addStateTrigger").click()
@@ -1950,6 +2029,7 @@
     }
 
     function editContinent(node) {
+        node_to_edit = node
         $("#editContinentName").val(node.title)
         $("#editContinentNameK").val(node.data.title_korean)
         $("#editContinentAbbr").val(node.data.abbr)
@@ -1961,6 +2041,24 @@
         $("#editContinentID").val(node.data.id)
         $("#editContinentIDDisplay").text(node.data.id)
         rightDivContent("#editContinent")
+    }
+
+    function editNation(node) {
+        console.log(node.data)
+        node_to_edit = node
+        $("#editNationID").val(node.data.id)
+        $("#editNationIDDisplay").text(node.data.id)
+        $("#editNationName").val(node.title)
+        $("#editNationNameK").val(node.data.title_korean)
+        $("#editNationAbbr").val(node.data.abbr)
+        $("#editNationAbbrK").val(node.data.abbr_korean)
+        $("#editNationShortK").val(node.data.short_korean)
+        $("#editNationDem").val(node.data.dem)
+        $("#editNationDemK").val(node.data.dem_korean)
+        $("#editNationPop").val(node.data.pop)
+        $("#editNationEtid").val(node.data.etid)
+        $("#editNationTimeZone").val(node.data.time_zone)
+        rightDivContent("#editNation")
     }
 
     function addNation(continent) {
@@ -2407,6 +2505,20 @@
         node_to_edit.data.caucasian = $("#editEthnicityCaucasian").val()
         node_to_edit.data.hispanic = $("#editEthnicityHispanic").val()
         scrollToEditedNode("ETHNICITIES")
+    })
+
+    $("#editContinentForm").on("submit",function(e) {
+        e.preventDefault()
+        console.log(node_to_edit)
+        node_to_edit.setTitle($("#editContinentName").val())
+        node_to_edit.data.abbr = $("#editContinentAbbr").val()
+        node_to_edit.data.abbr_korean = $("#editContinentAbbrK").val()
+        node_to_edit.data.dem = $("#editContinentDem").val()
+        node_to_edit.data.dem_korean = $("#editContinentDemK").val()
+        node_to_edit.data.etid = $("#editContinentEtid").val()
+        node_to_edit.data.pop = $("#editContinentPop").val()
+        node_to_edit.data.title_korean = $("#editContinentNameK").val()
+        scrollToEditedNode("CONTINENTS")
     })
 
     $(".resetButton").on("click", function() {
