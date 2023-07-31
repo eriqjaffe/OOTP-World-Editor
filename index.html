@@ -415,6 +415,15 @@
                             <td class="right"><select class="tzSelect" id="newCityTimeZone" style="width:99%;"></select></td>
                         </tr>
                         <tr>
+                            <td class="left">National Capitol:</td>
+                            <td class="right">
+                                <select style="width:99%;" id="newCityCapitol" style="width:99%;">
+                                    <option value="0">0: No</option>
+                                    <option value="1">1: Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="left">Observes DST:</td>
                             <td class="right">
                                 <select style="width:99%;" id="newCityDST" style="width:99%;">
@@ -2801,6 +2810,7 @@
         node.setActive()
         node.makeVisible({scrollIntoView: true});
         states_by_nation[$("#newStateNation").val()].push(state_obj)
+        cities_by_state[$("#newStateId").val()] = []
     })
 
     $("#newCityForm").on("submit", function(e) {
@@ -2808,6 +2818,7 @@
         cities_by_id[$("#newCityId").val()] = $("#newCityName").val()
         city_count++;
         var city_obj = {}
+        var city_bn_obj = {}
         city_obj.type = 'city'
         city_obj.folder = false
         city_obj.icon = './images/city-solid.svg'
@@ -2835,6 +2846,8 @@
         node.setActive()
         node.makeVisible({scrollIntoView: true});
         cities_by_state[$("#newCityState").val()].push(city_obj)
+        cities_by_nation[$("#newCityNation").val()].push(city_bn_obj)
+        console.log(cities_by_state[$("#newCityState").val()])
     })
 
     $("#editEthnicityForm").on("submit", function(e) {
