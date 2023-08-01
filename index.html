@@ -23,6 +23,7 @@
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/datatables.min.js"></script>
     <script type="text/javascript" src="./scripts/latinize.js"></script>
+    <script type="text/javascript" src="./scripts/chroma.min.js"></script>
 
     <script>
         const { ipcRenderer } = require('electron');
@@ -1863,8 +1864,19 @@
                                         break;
                                 }
                             })
-                            var cap = (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") ? "<span style='color:red;'>None Set</span>" : cities_by_id[node.data.capid]
-                            //var usa = (node.data.this_is_the_usa == "1") ? "Yes" : "No"
+
+                            var cap
+                            if (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") {
+                                cap = "<span style='color:red;'>None Set</span>" 
+                            } else {
+                                var city = cities_by_nation[node.data.id].find( function( city ){
+                                    return city.id === node.data.capid;
+                                } );
+                                if (city != null) {
+                                    cap = city.title+",&nbsp;"+states_by_id[city.state]
+                                }
+                            } 
+
                             html = '<h2 style="text-align:center;">'+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
@@ -1890,6 +1902,51 @@
                                  + '</table></div>'
                                  $("#infoPanel").html(html)
                                  rightDivContent("#infoPanel")
+                            break;
+                        case "STATES_PARENT":
+                            html = '<h2 style="text-align:center;">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+
+                            var totalPop = 0;
+                            var stateCount = 0;
+
+                            html += "<div id='statePieChart'>\n"
+
+                            node.visit(function(n) {
+                                switch (n.type) {
+                                    case "state":
+                                        totalPop += parseInt(n.data.pop)
+                                        stateCount++
+                                        html += "<div data-lcolor='"+chroma.random()+"'>"+n.data.pop+"<span>: "+n.title+"</span></div>\n"
+                                        break;
+                                }
+                            })
+
+                            html += "</div>"
+                                  + "<h4 style='text-align: center; font-weight:bold;'>"+stateCount+" States<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
+
+                            $("#infoPanel").html(html)
+
+                            $("#statePieChart").listtopie({
+                                size:'auto',  
+                                strokeWidth:2,
+                                hoverEvent:false,
+                                hoverBorderColor:'#585858',
+                                hoverWidth:2,
+                                textSize:'16',
+                                marginCenter:30,
+                                listVal:false,
+                                strokeColor:'#fff',
+                                listValMouseOver: true,
+                                infoText:true,
+                                setValues:false,
+                                listValInsertClass:'result_list',
+                                backColorOpacity: '0.8',
+                                hoverSectorColor:true,
+                                usePercent:false,
+                                speedDraw:50
+                            });
+
+                            rightDivContent("#infoPanel")
                             break;
                         case "state":
                             var cty = 0;
@@ -2360,7 +2417,6 @@
                 .append($('<option>', { value : x.id })
                 .text(x.title));
         }
-        console.log(cities_by_nation)
         var city = cities_by_nation[node.data.id].find( function( city ){
             return city.id === node.data.capid;
         } );
@@ -2921,7 +2977,6 @@
 
     $("#editStateForm").on("submit", function(e) {
         e.preventDefault()
-        console.log(node_to_edit)
         node_to_edit.setTitle($("#editStateName").val())
         node_to_edit.data.abbr = $("#editStateAbbr").val()
         node_to_edit.data.abbr_korean = $("#editStateAbbrK").val()
@@ -2932,7 +2987,24 @@
         node_to_edit.data.time_zone = $("#editStateTimeZone").val()
         node_to_edit.data.title_korean = $("#editStateNameK").val()
         scrollToEditedNode("CONTINENTS")
-        console.log(node_to_edit)
+    })
+
+    $("#editCityForm").on("submit", function(e) {
+        e.preventDefault()
+        node_to_edit.setTitle($("#editCityName").val())
+        node_to_edit.data.abbr = $("#editCityAbbr").val()
+        node_to_edit.data.abbr_korean = $("#editCityAbbrK").val()
+        node_to_edit.altitude = $("#editCityAltitude").val()
+        node_to_edit.lat = $("#editCityLatitude").val()
+        node_to_edit.long = $("#editCityLongitude").val()
+        node_to_edit.observes_dst = $("#editCityDST").val()
+        node_to_edit.pop = $("#editCityPopulation").val()
+        node_to_edit.time_zone = $("#editCityPopulation").val()
+        node_to_edit.title_korean = $("#editCityNameK").val()
+        if ($("#editCityCapitol").val() == "1") {
+            node_to_edit.parent.parent.parent.data.capid = $("#editCityId").val()
+        }
+        scrollToEditedNode("CONTINENTS")
     })
 
     $(".resetButton").on("click", function() {
