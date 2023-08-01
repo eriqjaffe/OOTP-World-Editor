@@ -29,7 +29,7 @@
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
         const XMLWriter = require('xml-writer');
-        var node_to_edit = null;
+        var nodeToEdit = null;
         var max_world_id = 0
         var max_continent_id = 0
         var max_nation_id = 0
@@ -938,12 +938,12 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="left"><span id="filterLabel">Nations</span> From:</td>
+                            <td class="left"><span id="editFilterLabel">Nations</span> From:</td>
                             <td class="right">
                                 <select id="editRegionFilter" style="width:100%;"></select>
                             </td>
                         </tr>
-                        <tr id="sourceStateRow" style="display:none;">
+                        <tr id="editSourceStateRow" style="display:none;">
                             <td class="left">Source State:</td>
                             <td class="right">
                                 <select id="editRegionSubFilter" style="width:100%;"></select>
@@ -954,30 +954,30 @@
                 <br/>
                 <div class="row">
                     <div class="col-xs-5">
-                        <select name="from[]" id="multi_d" class="form-control" size="26" multiple="multiple" style="height:500px;">
+                        <select name="from[]" id="edit_multi_d" class="form-control" size="26" multiple="multiple" style="height:500px;">
                             
                         </select>
                     </div>
                     
                     <div class="col-xs-2">
-                        <button type="button" id="multi_d_rightAll" class="btn btn-default btn-block" style="margin-top: 265px;"><i class="glyphicon glyphicon-forward"></i></button>
-                        <button type="button" id="multi_d_rightSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
-                        <button type="button" id="multi_d_leftSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
-                        <button type="button" id="multi_d_leftAll" class="btn btn-default btn-block"><i class="glyphicon glyphicon-backward"></i></button>
+                        <button type="button" id="edit_multi_d_rightAll" class="btn btn-default btn-block" style="margin-top: 265px;"><i class="glyphicon glyphicon-forward"></i></button>
+                        <button type="button" id="edit_multi_d_rightSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
+                        <button type="button" id="edit_multi_d_leftSelected" class="btn btn-default btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
+                        <button type="button" id="edit_multi_d_leftAll" class="btn btn-default btn-block"><i class="glyphicon glyphicon-backward"></i></button>
                     </div>
                     
                     <div class="col-xs-5">
                         <b>Nations</b>
                         <fieldset id="editRegionFields" required>
-                        <select name="to[]" id="multi_d_to" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+                        <select name="to[]" id="edit_multi_d_to" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
                         
                         
                         <b>States</b>
-                        <select name="to_2[]" id="multi_d_to_2" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+                        <select name="to_2[]" id="edit_multi_d_to_2" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
 
                         
                         <b>Cities</b>
-                        <select name="to_2[]" id="multi_d_to_3" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
+                        <select name="to_2[]" id="edit_multi_d_to_3" class="form-control nrTarget" size="8" multiple="multiple" style="height:157px;" required oninvalid="this.setCustomValidity('At least one Nation, State, or City must be chosen')" oninput="this.setCustomValidity('')"></select>
                         </fieldset>
                     </div>
                 </div>
@@ -1164,6 +1164,127 @@
             }
         });
 
+        $('#edit_multi_d').multiselect({
+            right: '#edit_multi_d_to, #edit_multi_d_to_2, #edit_multi_d_to_3',
+            rightSelected: '#edit_multi_d_rightSelected',
+            leftSelected: '#edit_multi_d_leftSelected',
+            rightAll: '#edit_multi_d_rightAll',
+            leftAll: '#edit_multi_d_leftAll',
+    
+            search: {
+                left: '<input type="text" name="q" class="form-control" placeholder="Search..." />'
+            },
+
+            
+    
+            moveToRight: function(Multiselect, $options, event, silent, skipStack) {
+                var destination = null;
+                var target = null;
+                var button = $(event.currentTarget).attr('id');
+                
+                switch ($("#editRegionSource").val()) {
+                    case ("Nations"):
+                        destination = Multiselect.$right.eq(0)
+                        target = "edit_multi_d_to"
+                        break;
+                    case ("States"):
+                        destination = Multiselect.$right.eq(1)
+                        target = "edit_multi_d_to2"
+                        break;
+                    case ("Cities"):
+                        destination = Multiselect.$right.eq(2)
+                        target = "edit_multi_d_to3"
+                        break;
+                }
+    
+                if (button == 'edit_multi_d_rightSelected') {
+                    var $left_options = Multiselect.$left.find('> option:selected');
+
+                    destination.append($left_options);
+
+                    var usedNames = {};
+                    $("#"+target+" > option").each(function () {
+                        if(usedNames[this.text]) {
+                            $(this).remove();
+                        } else {
+                            usedNames[this.text] = this.value;
+                        }
+                    });
+    
+                    if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
+                        destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
+                    }
+                    
+                } else if (button == 'edit_multi_d_rightAll') {
+                    var $left_options = Multiselect.$left.children(':visible');
+                    destination.append($left_options);
+    
+                    var usedNames = {};
+                    $("#edit_multi_d > option").each(function () {
+                        if(usedNames[this.text]) {
+                            $(this).remove();
+                        } else {
+                            usedNames[this.text] = this.value;
+                        }
+                    });
+
+                    if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
+                        destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
+                    }
+                }
+                //#multi_d_to, #multi_d_to_2, #multi_d_to_3
+                //console.log($('#multi_d_to option').length)
+
+                var req = ($('#edit_multi_d_to option').length + $('#edit_multi_d_to_2 option').length + $('#edit_multi_d_to_3 option').length == 0) ? true : false
+
+                $(".nrTarget").each(function() {
+                    $(this).prop('required',req);
+                })
+
+
+                $("#editRegionSource").trigger("change")
+            },
+
+            moveToLeft: function(Multiselect, $options, event, silent, skipStack) {
+                var button = $(event.currentTarget).attr('id');
+                var src = null;
+                
+                switch ($("#editRegionSource").val()) {
+                    case ("Nations"):
+                        src = Multiselect.$right.eq(0)
+                        break;
+                    case ("States"):
+                        src = Multiselect.$right.eq(1)
+                        break;
+                    case ("Cities"):
+                        src = Multiselect.$right.eq(2)
+                        break;
+                }
+
+                var src_id = $(src[0]).attr("id")
+
+                if (button == 'edit_multi_d_leftSelected') {
+                    $("#"+$(src[0]).attr("id")+" > option:selected").each(function() {
+                        $(this).remove()
+                    })
+                } else if (button == 'edit_multi_d_leftAll') {
+                    $("#"+$(src[0]).attr("id")+" > option:visible").each(function() {
+                        $(this).remove()
+                    })
+                }
+
+                $("#"+$(src[0]).attr("id")).html($('#'+$(src[0]).attr("id")+' option').sort(function(x, y) {
+                    return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+                }))
+
+                var req = ($('#edit_multi_d_to option').length + $('#edit_multi_d_to_2 option').length + $('#edit_multi_d_to_3 option').length == 0) ? true : false
+
+                $(".nrTarget").each(function() {
+                    $(this).prop('required',req);
+                })
+            }
+        });
+
         $(".headlessTable").dataTable({ordering: false, scrollY: "auto"})
 
         ipcRenderer.send('menu-reset', null)
@@ -1218,6 +1339,40 @@
         
     })
 
+    $("#editRegionSource").on("change",function(e) {
+        $('#edit_multi_d').empty()
+        $('#editRegionFilter').empty()
+        $("#editFilterLabel").html($(this).val())
+        var src = null;
+        switch ($(this).val()) {
+            case ("Nations"):
+                src = continents_by_id
+                break;
+            case ("States"):
+                src = nations_by_id
+                break;
+            case ("Cities"):
+                src = nations_by_id
+                break;
+        }
+
+        $.each(src, function(key, value) {
+            $('#editRegionFilter')
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+
+        sortDropdown("#editRegionFilter")
+
+        if ($(this).val() == "Nations") {
+            $("#editRegionFilter option").eq(0).before($("<option></option>").val("all").text("Entire World"));
+        }
+        
+        $("#editRegionFilter :nth-child(1)").prop('selected', true);
+        $("#editRegionFilter").trigger("change")
+        
+    })
+
     $("#newRegionFilter").on("change", function(e) {
         $('#multi_d').empty()
         switch ($("#newRegionSource").val()) {
@@ -1264,6 +1419,52 @@
         sortDropdown("#multi_d")
     })
 
+    $("#editRegionFilter").on("change", function(e) {
+        $('#edit_multi_d').empty()
+        switch ($("#editRegionSource").val()) {
+            case ("Nations"):
+                $("#editSourceStateRow").css("display","none")
+                if ($(this).val() != "all") {
+                    for (x of nations_by_continent[$(this).val()]) {
+                        $('#edit_multi_d')
+                            .append($('<option>', { value : x.id })
+                            .text(x.title));
+                    }
+                } else {
+                    $.each(nations_by_id, function(key, value) {
+                        $('#edit_multi_d')
+                            .append($('<option>', { value : key })
+                            .text(value));
+                    });
+                }
+                break;
+            case ("States"):
+                $("#editSourceStateRow").css("display","none")
+                for (x of states_by_nation[$(this).val()]) {
+                    $('#edit_multi_d')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
+                }
+                break;
+            case ("Cities"):
+                $("#editRegionSubFilter").empty()
+                for (x of states_by_nation[$(this).val()]) {
+                    $('#editRegionSubFilter')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
+                }
+                sortDropdown("#editRegionSubFilter")
+                for (x of cities_by_state[$("#editRegionSubFilter").val()]) {
+                    $('#edit_multi_d')
+                        .append($('<option>', { value : x.id })
+                        .text(x.title));
+                }
+                $("#editStateRow").css("display","table-row")
+                break;
+        }
+        sortDropdown("#edit_multi_d")
+    })
+
     $("#newRegionSubFilter").on("change",function() {
         $('#multi_d').empty()
         for (x of cities_by_state[$(this).val()]) {
@@ -1272,6 +1473,16 @@
                 .text(x.title));
         }
         sortDropdown("#multi_d")
+    })
+
+    $("#editRegionSubFilter").on("change",function() {
+        $('#edit_multi_d').empty()
+        for (x of cities_by_state[$(this).val()]) {
+            $('#edit_multi_d')
+                .append($('<option>', { value : x.id })
+                .text(x.title));
+        }
+        sortDropdown("#edit_multi_d")
     })
 
     $("#saveXML").on("click",function(e) {
@@ -1766,7 +1977,57 @@
                     var html = ""
                     switch (node.type) {
                         case "ETHNICITIES_PARENT":
-                            $("#dataTable").html(node.countChildren(false)+" Ethnicities found")
+                            html = '<h2 style="text-align:center;">'+node.countChildren(false)+' Ethnicities found</h2>\n'
+
+                            var african = 0
+                            var asian = 0
+                            var east_indian = 0
+                            var caucasian = 0
+                            var hispanic = 0
+                            
+                            for (child of node.getChildren()) {
+                                african += parseInt(child.data.african)
+                                asian += parseInt(child.data.asian)
+                                east_indian += parseInt(child.data.east_indian)
+                                caucasian += parseInt(child.data.caucasian)
+                                hispanic += parseInt(child.data.hispanic)
+                            }
+
+                            var sum = african + asian + east_indian + caucasian + hispanic
+
+                            html += "<div id='pieChartP'>\n"
+                                 + "<div data-lcolor='#623A17'>"+((african/sum)*100).toFixed(3)+"<span>African</span></div>\n"
+                                 + "<div data-lcolor='#F7E2AB'>"+((asian/sum)*100).toFixed(3)+"<span>Asian</span></div>\n"
+                                 + "<div data-lcolor='#CB9662'>"+((east_indian/sum)*100).toFixed(3)+"<span>East Indian</span></div>\n"
+                                 + "<div data-lcolor='#F6DCC3'>"+((caucasian/sum)*100).toFixed(3)+"<span>Caucasian</span></div>\n"
+                                 + "<div data-lcolor='#EFC794'>"+((hispanic/sum)*100).toFixed(3)+"<span>Hispanic</span></div>\n"
+                                 + "</div>\n"
+                                 + "<h4 style='text-align: center;'><b>Approximate Percentages</b></h4>\n"
+                                 + "<div class='result_list'></div>"
+
+                            $("#infoPanel").html(html)
+
+                            rightDivContent("#infoPanel")
+
+                            $("#pieChartP").listtopie({
+                                size:'auto',  
+                                strokeWidth:2,
+                                hoverEvent:false,
+                                hoverBorderColor:'#585858',
+                                hoverWidth:2,
+                                textSize:'16',
+                                marginCenter:30,
+                                listVal:true,
+                                strokeColor:'#fff',
+                                listValMouseOver: true,
+                                infoText:true,
+                                setValues:false,
+                                listValInsertClass:'result_list',
+                                backColorOpacity: '0.8',
+                                hoverSectorColor:true,
+                                usePercent:true,
+                                speedDraw:50
+                            });
                             break;
                         case "ethnicity":
                             html = "<div id='pieChart'>\n"
@@ -1802,6 +2063,47 @@
                                 usePercent:true,
                                 speedDraw:50
                             });
+                            break;
+                        case "CONTINENTS_PARENT":
+                            html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
+
+                            var totalPop = 0;
+                            var continentCount = 0;
+
+                            html += "<div id='continentPieChart'>\n"
+
+                            for (child of node.getChildren()) {
+                                totalPop += parseInt(child.data.pop)
+                                continentCount++
+                                html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
+                            }
+
+                            html += "</div>"
+                                  + "<h4 style='text-align: center; font-weight:bold;'>"+continentCount+" Continents<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
+
+                            $("#infoPanel").html(html)
+
+                            $("#continentPieChart").listtopie({
+                                size:'auto',  
+                                strokeWidth:2,
+                                hoverEvent:false,
+                                hoverBorderColor:'#585858',
+                                hoverWidth:2,
+                                textSize:'16',
+                                marginCenter:30,
+                                listVal:false,
+                                strokeColor:'#fff',
+                                listValMouseOver: true,
+                                infoText:false,
+                                setValues:false,
+                                listValInsertClass:'result_list',
+                                backColorOpacity: '0.8',
+                                hoverSectorColor:true,
+                                usePercent:false,
+                                speedDraw:50
+                            });
+
+                            rightDivContent("#infoPanel")
                             break;
                         case "continent":
                             var nat = 0;
@@ -1911,15 +2213,11 @@
 
                             html += "<div id='statePieChart'>\n"
 
-                            node.visit(function(n) {
-                                switch (n.type) {
-                                    case "state":
-                                        totalPop += parseInt(n.data.pop)
-                                        stateCount++
-                                        html += "<div data-lcolor='"+chroma.random()+"'>"+n.data.pop+"<span>: "+n.title+"</span></div>\n"
-                                        break;
-                                }
-                            })
+                            for (child of node.getChildren()) {
+                                totalPop += parseInt(child.data.pop)
+                                stateCount++
+                                html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
+                            }
 
                             html += "</div>"
                                   + "<h4 style='text-align: center; font-weight:bold;'>"+stateCount+" States<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
@@ -2028,6 +2326,54 @@
                             $('#nationEthnicityTable').DataTable({ order: [[1, 'desc']] });
                             rightDivContent("#infoPanel")
                             break;
+                        case "REGIONS_PARENT":
+                            html = '<h2 style="text-align:center;">'+node.countChildren(false)+' Regions found</h2>\n'
+                            
+                            var nation_count = 0
+                            var state_count = 0
+                            var city_count = 0
+
+                            for (child of node.getChildren()) {
+                                nation_count += child.data.nations.length
+                                state_count += child.data.states.length
+                                city_count += child.data.cities.length
+                            }
+
+                            var sum = nation_count + state_count + city_count
+
+                            html += "<div id='pieChartRP'>\n"
+                                 + "<div data-lcolor='"+chroma.random()+"'>"+nation_count+"<span>Nations</span></div>\n"
+                                 + "<div data-lcolor='"+chroma.random()+"'>"+state_count+"<span>States</span></div>\n"
+                                 + "<div data-lcolor='"+chroma.random()+"'>"+city_count+"<span>Cities</span></div>\n"
+                                 + "</div>\n"
+                                 + "<h4 style='text-align: center;'><b>Approximate Percentages</b></h4>\n"
+                                 + "<div class='result_list'></div>"
+
+                            $("#infoPanel").html(html)
+
+                            rightDivContent("#infoPanel")
+
+                            $("#pieChartRP").listtopie({
+                                size:'auto',  
+                                strokeWidth:2,
+                                hoverEvent:false,
+                                hoverBorderColor:'#585858',
+                                hoverWidth:2,
+                                textSize:'16',
+                                marginCenter:30,
+                                listVal:true,
+                                strokeColor:'#fff',
+                                listValMouseOver: true,
+                                infoText:true,
+                                setValues:false,
+                                listValInsertClass:'result_list',
+                                backColorOpacity: '0.8',
+                                hoverSectorColor:true,
+                                usePercent: false,
+                                speedDraw:50
+                            });
+                        
+                            break;
                         case "region":
                             const n_arr = node.data.nations.sort(sortByKey('title'))
                             const s_arr = node.data.states.sort(sortByKey('title'))
@@ -2119,6 +2465,14 @@
                             }
                             break;
                         case "ethnicity": {
+                            cmItems = {
+                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                                "sep1": "----",
+                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                            }
+                            break;
+                        }
+                        case "region": {
                             cmItems = {
                                 "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
                                 "sep1": "----",
@@ -2230,6 +2584,16 @@
                                             break;
                                         case "edit":
                                             editEthnicity(node)
+                                            break;
+                                    }
+                                    break;
+                                case "region":
+                                    switch (key) {
+                                        case "delete":
+                                            deleteNode(node)
+                                            break;
+                                        case "edit":
+                                            editRegion(node)
                                             break;
                                     }
                                     break;
@@ -2361,7 +2725,7 @@
     }
 
     function editEthnicity(node) {
-        node_to_edit = node
+        nodeToEdit = node
         const t = parseInt(node.data.african) 
                 + parseInt(node.data.asian) 
                 + parseInt(node.data.east_indian) 
@@ -2382,7 +2746,7 @@
     }
 
     function editContinent(node) {
-        node_to_edit = node
+        nodeToEdit = node
         $("#editContinentName").val(node.title)
         $("#editContinentNameK").val(node.data.title_korean)
         $("#editContinentAbbr").val(node.data.abbr)
@@ -2397,7 +2761,7 @@
     }
 
     function editNation(node) {
-        node_to_edit = node
+        nodeToEdit = node
         //console.log(node)
         $("#editNationCapitolState").empty()
         $("#editNationID").val(node.data.id)
@@ -2448,7 +2812,7 @@
     })
 
     function editState(node) {
-        node_to_edit = node
+        nodeToEdit = node
         var lat = (node.data.lat != 0) ? node.data.lat : "00.00000"
         var long = (node.data.long != 0) ? node.data.long : "00.00000"
         $("#editStateId").val(node.data.id)
@@ -2466,7 +2830,7 @@
     }
 
     function editCity(node) {
-        node_to_edit = node
+        nodeToEdit = node
         var lat = (node.data.lat != 0) ? node.data.lat : "00.00000"
         var long = (node.data.long != 0) ? node.data.long : "00.00000"
         var cap = (node.parent.parent.parent.data.capid == node.data.id) ? 1 : 0
@@ -2484,6 +2848,38 @@
         $("#editCityNameK").val(node.data.title_korean)
         $("#editCityAbbrK").val(node.data.abbr_korean)
         rightDivContent("#editCity")
+    }
+
+    function editRegion(node) {
+        nodeToEdit = node
+        console.log(node)
+        $("#editRegionName").val(node.title)
+        $("#editRegionNameK").val(node.data.name_korean)
+        $("#edit_multi_d").empty()
+        $("#edit_multi_d_to").empty()
+        $("#edit_multi_d_to_2").empty()
+        $("#edit_multi_d_to_3").empty()
+        for (child of node.data.nations) {
+            $("#edit_multi_d_to")
+                .append($('<option>', { value : child.id })
+                .text(child.title));
+        }
+        for (child of node.data.states) {
+            $("#edit_multi_d_to_2")
+                .append($('<option>', { value : child.id })
+                .text(child.title));
+        }
+        for (child of node.data.cities) {
+            $("#edit_multi_d_to_3")
+                .append($('<option>', { value : child.id })
+                .text(child.title));
+        }
+        sortDropdown("#edit_multi_d_to")
+        sortDropdown("#edit_multi_d_to_2")
+        sortDropdown("#edit_multi_d_to_3")
+        console.log($("#editRegionSource").val())
+        $("#editRegionSource").trigger("change")
+        rightDivContent("#editRegion")
     }
 
     function addNation(continent) {
@@ -2932,77 +3328,77 @@
 
     $("#editEthnicityForm").on("submit", function(e) {
         e.preventDefault()
-        node_to_edit.setTitle($("#editEthnicityName").val())    
-        node_to_edit.data.name_korean = $("#editEthnicityNameK").val()
-        node_to_edit.data.african = $("#editEthnicityAfrican").val()
-        node_to_edit.data.asian = $("#editEthnicityAsian").val()
-        node_to_edit.data.east_indian = $("#editEthnicityEastIndian").val()
-        node_to_edit.data.caucasian = $("#editEthnicityCaucasian").val()
-        node_to_edit.data.hispanic = $("#editEthnicityHispanic").val()
+        nodeToEdit.setTitle($("#editEthnicityName").val())    
+        nodeToEdit.data.name_korean = $("#editEthnicityNameK").val()
+        nodeToEdit.data.african = $("#editEthnicityAfrican").val()
+        nodeToEdit.data.asian = $("#editEthnicityAsian").val()
+        nodeToEdit.data.east_indian = $("#editEthnicityEastIndian").val()
+        nodeToEdit.data.caucasian = $("#editEthnicityCaucasian").val()
+        nodeToEdit.data.hispanic = $("#editEthnicityHispanic").val()
         scrollToEditedNode("ETHNICITIES")
     })
 
     $("#editContinentForm").on("submit", function(e) {
         e.preventDefault()
-        node_to_edit.setTitle($("#editContinentName").val())
-        node_to_edit.data.abbr = $("#editContinentAbbr").val()
-        node_to_edit.data.abbr_korean = $("#editContinentAbbrK").val()
-        node_to_edit.data.dem = $("#editContinentDem").val()
-        node_to_edit.data.dem_korean = $("#editContinentDemK").val()
-        node_to_edit.data.etid = $("#editContinentEtid").val()
-        node_to_edit.data.pop = $("#editContinentPop").val()
-        node_to_edit.data.title_korean = $("#editContinentNameK").val()
+        nodeToEdit.setTitle($("#editContinentName").val())
+        nodeToEdit.data.abbr = $("#editContinentAbbr").val()
+        nodeToEdit.data.abbr_korean = $("#editContinentAbbrK").val()
+        nodeToEdit.data.dem = $("#editContinentDem").val()
+        nodeToEdit.data.dem_korean = $("#editContinentDemK").val()
+        nodeToEdit.data.etid = $("#editContinentEtid").val()
+        nodeToEdit.data.pop = $("#editContinentPop").val()
+        nodeToEdit.data.title_korean = $("#editContinentNameK").val()
         scrollToEditedNode("CONTINENTS")
     })
 
     $("#editNationForm").on("submit", function(e) {
         e.preventDefault()
-        node_to_edit.setTitle($("#editNationName").val())
-        node_to_edit.data.abbr = $("#editNationAbbr").val()
-        node_to_edit.data.abbr_korean = $("#editNationAbbrK").val()
-        node_to_edit.data.bbqual = $("#editNationBbqual").val()
-        node_to_edit.data.capid = "0" // TBD
-        node_to_edit.data.dem = $("#editNationDem").val()
-        node_to_edit.data.dem_korean = $("#editNationDemK").val()
-        node_to_edit.data.etid = $("#editNationEtid").val()
-        node_to_edit.data.gender = $("#editNationGender").val()
-        node_to_edit.data.observes_dst = $("#editNationDST").val()
-        node_to_edit.data.pop = $("#editNationPop").val()
-        node_to_edit.data.short_korean = $("#editNationShortK").val()
-        node_to_edit.data.this_is_the_usa = $("#editNationUSA").val()
-        node_to_edit.time_zone = $("#editNationTimeZone").val()
-        node_to_edit.data.title_korean = $("#editNationNameK").val()
+        nodeToEdit.setTitle($("#editNationName").val())
+        nodeToEdit.data.abbr = $("#editNationAbbr").val()
+        nodeToEdit.data.abbr_korean = $("#editNationAbbrK").val()
+        nodeToEdit.data.bbqual = $("#editNationBbqual").val()
+        nodeToEdit.data.capid = "0" // TBD
+        nodeToEdit.data.dem = $("#editNationDem").val()
+        nodeToEdit.data.dem_korean = $("#editNationDemK").val()
+        nodeToEdit.data.etid = $("#editNationEtid").val()
+        nodeToEdit.data.gender = $("#editNationGender").val()
+        nodeToEdit.data.observes_dst = $("#editNationDST").val()
+        nodeToEdit.data.pop = $("#editNationPop").val()
+        nodeToEdit.data.short_korean = $("#editNationShortK").val()
+        nodeToEdit.data.this_is_the_usa = $("#editNationUSA").val()
+        nodeToEdit.time_zone = $("#editNationTimeZone").val()
+        nodeToEdit.data.title_korean = $("#editNationNameK").val()
         scrollToEditedNode("CONTINENTS")
     })
 
     $("#editStateForm").on("submit", function(e) {
         e.preventDefault()
-        node_to_edit.setTitle($("#editStateName").val())
-        node_to_edit.data.abbr = $("#editStateAbbr").val()
-        node_to_edit.data.abbr_korean = $("#editStateAbbrK").val()
-        node_to_edit.data.lat = $("#editStateLatitude").val()
-        node_to_edit.data.long = $("#editStateLongitude").val()
-        node_to_edit.data.observes_dst = $("#editStateDST").val()
-        node_to_edit.data.pop = $("#editStatePopulation").val()
-        node_to_edit.data.time_zone = $("#editStateTimeZone").val()
-        node_to_edit.data.title_korean = $("#editStateNameK").val()
+        nodeToEdit.setTitle($("#editStateName").val())
+        nodeToEdit.data.abbr = $("#editStateAbbr").val()
+        nodeToEdit.data.abbr_korean = $("#editStateAbbrK").val()
+        nodeToEdit.data.lat = $("#editStateLatitude").val()
+        nodeToEdit.data.long = $("#editStateLongitude").val()
+        nodeToEdit.data.observes_dst = $("#editStateDST").val()
+        nodeToEdit.data.pop = $("#editStatePopulation").val()
+        nodeToEdit.data.time_zone = $("#editStateTimeZone").val()
+        nodeToEdit.data.title_korean = $("#editStateNameK").val()
         scrollToEditedNode("CONTINENTS")
     })
 
     $("#editCityForm").on("submit", function(e) {
         e.preventDefault()
-        node_to_edit.setTitle($("#editCityName").val())
-        node_to_edit.data.abbr = $("#editCityAbbr").val()
-        node_to_edit.data.abbr_korean = $("#editCityAbbrK").val()
-        node_to_edit.altitude = $("#editCityAltitude").val()
-        node_to_edit.lat = $("#editCityLatitude").val()
-        node_to_edit.long = $("#editCityLongitude").val()
-        node_to_edit.observes_dst = $("#editCityDST").val()
-        node_to_edit.pop = $("#editCityPopulation").val()
-        node_to_edit.time_zone = $("#editCityPopulation").val()
-        node_to_edit.title_korean = $("#editCityNameK").val()
+        nodeToEdit.setTitle($("#editCityName").val())
+        nodeToEdit.data.abbr = $("#editCityAbbr").val()
+        nodeToEdit.data.abbr_korean = $("#editCityAbbrK").val()
+        nodeToEdit.altitude = $("#editCityAltitude").val()
+        nodeToEdit.lat = $("#editCityLatitude").val()
+        nodeToEdit.long = $("#editCityLongitude").val()
+        nodeToEdit.observes_dst = $("#editCityDST").val()
+        nodeToEdit.pop = $("#editCityPopulation").val()
+        nodeToEdit.time_zone = $("#editCityPopulation").val()
+        nodeToEdit.title_korean = $("#editCityNameK").val()
         if ($("#editCityCapitol").val() == "1") {
-            node_to_edit.parent.parent.parent.data.capid = $("#editCityId").val()
+            nodeToEdit.parent.parent.parent.data.capid = $("#editCityId").val()
         }
         scrollToEditedNode("CONTINENTS")
     })
@@ -3155,9 +3551,9 @@
         var node_to_sort = tree.findFirst(toSort)
         node_to_sort.sortChildren(null, true);
         node_to_sort.setExpanded()
-        node_to_edit.setFocus()
-        node_to_edit.setActive()
-        node_to_edit.makeVisible({scrollIntoView: true});
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
+        nodeToEdit.makeVisible({scrollIntoView: true});
     }
     </script>
 </html>
