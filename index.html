@@ -1111,8 +1111,6 @@
                         destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
                     }
                 }
-                //#multi_d_to, #multi_d_to_2, #multi_d_to_3
-                //console.log($('#multi_d_to option').length)
 
                 var req = ($('#multi_d_to option').length + $('#multi_d_to_2 option').length + $('#multi_d_to_3 option').length == 0) ? true : false
 
@@ -1120,8 +1118,12 @@
                     $(this).prop('required',req);
                 })
 
-
-                $("#newRegionSource").trigger("change")
+                if ($("#newRegionSource").val() == "Cities") {
+                    $("#newRegionSubFilter").trigger("change")
+                } else {
+                    $("#newRegionFilter").trigger("change")
+                }
+                
             },
 
             moveToLeft: function(Multiselect, $options, event, silent, skipStack) {
@@ -1175,8 +1177,6 @@
                 left: '<input type="text" name="q" class="form-control" placeholder="Search..." />'
             },
 
-            
-    
             moveToRight: function(Multiselect, $options, event, silent, skipStack) {
                 var destination = null;
                 var target = null;
@@ -1232,8 +1232,6 @@
                         destination.find('> option').sort(Multiselect.callbacks.sort).appendTo(destination);
                     }
                 }
-                //#multi_d_to, #multi_d_to_2, #multi_d_to_3
-                //console.log($('#multi_d_to option').length)
 
                 var req = ($('#edit_multi_d_to option').length + $('#edit_multi_d_to_2 option').length + $('#edit_multi_d_to_3 option').length == 0) ? true : false
 
@@ -1241,8 +1239,11 @@
                     $(this).prop('required',req);
                 })
 
-
-                $("#editRegionSource").trigger("change")
+                if ($("#editRegionSource").val() == "Cities") {
+                    $("#editRegionSubFilter").trigger("change")
+                } else {
+                    $("#editRegionFilter").trigger("change")
+                }
             },
 
             moveToLeft: function(Multiselect, $options, event, silent, skipStack) {
@@ -1459,7 +1460,7 @@
                         .append($('<option>', { value : x.id })
                         .text(x.title));
                 }
-                $("#editStateRow").css("display","table-row")
+                $("#editSourceStateRow").css("display","table-row")
                 break;
         }
         sortDropdown("#edit_multi_d")
@@ -2515,6 +2516,8 @@
                                     }
                                     break;  
                                 case "REGIONS_PARENT":
+                                    $("#newRegionSource").trigger("change")
+                                    $("#newRegionFilter").trigger("change")
                                     rightDivContent("#addRegion")
                                     break;
                                 case "continent":
