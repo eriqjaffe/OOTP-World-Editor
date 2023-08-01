@@ -68,7 +68,7 @@
             ordering:  true,
             paging: false, 
             info: false,
-            scrollY: 750
+            scrollY: 700
         } );
     </script>
 
@@ -550,6 +550,9 @@
                     <input type="submit" id="newRegionSubmit" value="Add Region">
                 </div>
                 </form>
+            </div>
+            <div id="addSecondNation" class="rightDiv">
+                SECOND NATION ADDING HERE
             </div>
 
             <!--DIVS FOR EDITING-->
@@ -2031,7 +2034,8 @@
                             });
                             break;
                         case "ethnicity":
-                            html = "<div id='pieChart'>\n"
+                            html = '<h2 style="text-align:center;"><img src="./images/people-group-solid.svg">Ethhnicities&nbsp;&rarr;&nbsp;<img src="./images/user-group-solid.svg">'+node.title+'</h2>\n'
+                                 + "<div id='pieChart'>\n"
                                  + "<div data-lcolor='#623A17'>"+node.data.african/10+"<span>African</span></div>\n"
                                  + "<div data-lcolor='#F7E2AB'>"+node.data.asian/10+"<span>Asian</span></div>\n"
                                  + "<div data-lcolor='#CB9662'>"+node.data.east_indian/10+"<span>East Indian</span></div>\n"
@@ -2039,7 +2043,9 @@
                                  + "<div data-lcolor='#EFC794'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
                                  + "</div>\n"
                                  + "<h4 style='text-align: center;'><b>"+node.title+"</b></h4>\n"
-                                 + "<div class='result_list'></div>"
+                                 + "<div class='result_list'></div><br>\n"
+                                 + "<div style='width:100%; text-align:center;'><input type='button' id='editEthnicityButton' class='submit' value='Edit Ethnicity'></div>"
+                                 
 
                             $("#infoPanel").html(html)
 
@@ -2064,9 +2070,13 @@
                                 usePercent:true,
                                 speedDraw:50
                             });
+
+                            $("#editEthnicityButton").on("click", function(e) {
+                                editEthnicity(node)
+                            })
                             break;
                         case "CONTINENTS_PARENT":
-                            html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/globe-solid.svg">Continents</h2>\n'
 
                             var totalPop = 0;
                             var continentCount = 0;
@@ -2105,6 +2115,8 @@
                             });
 
                             rightDivContent("#infoPanel")
+
+
                             break;
                         case "continent":
                             var nat = 0;
@@ -2125,7 +2137,7 @@
                                         break;
                                 }
                             })
-                            html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
@@ -2140,9 +2152,14 @@
                                  + "<tr class='blank'><td class='left_float'>Nations:</td><td class='right_float'>"+nat+"</td><tr>\n"
                                  + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
                                  + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
-                                 + '</table></div>'
-                                 $("#infoPanel").html(html)
-                                 rightDivContent("#infoPanel")
+                                 + "</table><br>\n"
+                                 + "<input type='button' id='editContinentButton' class='submit' value='Edit Continent'>"
+                                 + "</div>\n" 
+                            $("#infoPanel").html(html)
+                            rightDivContent("#infoPanel")
+                            $("#editContinentButton").on("click", function(e) {
+                                editContinent(node)
+                            })
                             break;
                         case "nation":
                             var stt = 0;
@@ -2180,7 +2197,7 @@
                                 }
                             } 
 
-                            html = '<h2 style="text-align:center;">'+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
@@ -2202,12 +2219,17 @@
                                  + "<tr class='blank'><td class='left_float'>Second Nations:</td><td class='right_float'>"+sec+"</td><tr>\n"
                                  + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
                                  + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
-                                 + '</table></div>'
-                                 $("#infoPanel").html(html)
-                                 rightDivContent("#infoPanel")
+                                 + "</table><br>\n"
+                                 + "<input type='button' id='editNationButton' class='submit' value='Edit Nation'>"
+                                 + "</div>\n" 
+                            $("#infoPanel").html(html)
+                            rightDivContent("#infoPanel")
+                            $("#editNationButton").on("click", function(e) {
+                                editNation(node)
+                            })
                             break;
                         case "STATES_PARENT":
-                            html = '<h2 style="text-align:center;">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-dome-solid.svg'>"+node.title+'</h2>\n'
 
                             var totalPop = 0;
                             var stateCount = 0;
@@ -2254,7 +2276,7 @@
                             })
                             var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
                             var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
-                            html = '<h2 style="text-align:center;">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
@@ -2268,15 +2290,21 @@
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
                                  + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
-                                 $("#infoPanel").html(html)
-                                 rightDivContent("#infoPanel")
+                                 + "</table><br>\n"
+                                 + "<input type='button' id='editStateButton' class='submit' value='Edit State'>"
+                                 + "</div>\n" 
+                            $("#infoPanel").html(html)
+                            rightDivContent("#infoPanel")
+                            $("#editStateButton").on("click", function(e) {
+                                editState(node)
+                            })
                             break;
                         case "city":
                             var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
                             var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
                             var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
                             var capitol = (node.data.id == node.parent.parent.parent.data.capid) ? "Yes" : "No"
-                            html = '<h2 style="text-align:center;">'+node.parent.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+"&nbsp;&rarr;&nbsp;"+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/city-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + '<table class="blank" style="width:100%;">\n'
                                  + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
@@ -2291,11 +2319,17 @@
                                  + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+dst[node.data.observes_dst]+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
                                  + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
+                                 + "</table><br>\n"
+                                 + "<input type='button' id='editCityButton' class='submit' value='Edit City'>"
+                                 + "</div>\n" 
                             $("#infoPanel").html(html)
                             rightDivContent("#infoPanel")
+                            $("#editCityButton").on("click", function(e) {
+                                editCity(node)
+                            })
                             break;
                         case "second_nations":
-                            html = '<h2 style="text-align:center;">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/circle-plus-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + "<table id='secondNationsTable' class='cell-border compact stripe' style='width:100%;'>\n"
                                  + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Nation</td><td class='dt-head-center'>Percent</td><td class='dt-head-center'>Use Name</td></tr></thead>\n"
@@ -2306,13 +2340,18 @@
                                     html += "<tr><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
                                 }
                             }
-                            html += "</tbody></table></div>\n"
+                            html += "</tbody></table><br>"
+                            //html += "<input type='button' id='editSecondNationsButton' class='submit' value='Edit Second Nations'>"
+                            html += "</div>\n" 
                             $("#infoPanel").html(html)
                             $('#secondNationsTable').DataTable({ ordering: true });
                             rightDivContent("#infoPanel")
+/*                             $("#editSecondNationsButton").on("click", function(e) {
+                                editSecondNations(node)
+                            }) */                            
                             break;
                         case "nation_ethnicity":
-                            html = '<h2 style="text-align:center;">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;"+node.parent.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/user-group-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + "<table id='nationEthnicityTable' class='cell-border compact stripe' style='width:100%;'>\n"
                                  + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Ethnicity</td><td class='dt-head-center'>Percent</td></tr></thead>\n"
@@ -2322,13 +2361,18 @@
                                     html += "<tr><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
                                 }
                             }
-                            html += "</tbody></table></div>"
+                            html += "</tbody></table><br>"
+                            //html += "<input type='button' id='editEthnicitiesButton' class='submit' value='Edit Ethnicities'>"
+                            html += "</div>\n" 
                             $("#infoPanel").html(html)
                             $('#nationEthnicityTable').DataTable({ order: [[1, 'desc']] });
                             rightDivContent("#infoPanel")
+/*                             $("#editEthnicitiesButton").on("click", function(e) {
+                                editEthnicity(node)
+                            }) */
                             break;
                         case "REGIONS_PARENT":
-                            html = '<h2 style="text-align:center;">'+node.countChildren(false)+' Regions found</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/map-solid.svg">'+node.countChildren(false)+' Regions found</h2>\n'
                             
                             var nation_count = 0
                             var state_count = 0
@@ -2380,7 +2424,7 @@
                             const s_arr = node.data.states.sort(sortByKey('title'))
                             const c_arr = node.data.cities.sort(sortByKey('title'))
                             var longest = findLargestArray(n_arr, s_arr, c_arr)
-                            html = '<h2 style="text-align:center;">'+node.title+'</h2>\n'
+                            html = '<h2 style="text-align:center;"><img src="./images/map-location-dot-solid.svg">'+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + "<table id='regionInfoTable' style='width:100%;' class='cell-border compact stripe'>"
                                  + "<thead><tr style='font-weight:bold;'><td style='width:33%;' class='dt-head-center'>Nations</td><td style='width:33%;' class='dt-head-center'>States</td><td style='width:33%;' class='dt-head-center'>Cities</td></tr></thead>\n"
@@ -2388,11 +2432,15 @@
                             for (i = 0; i < longest.length; i++) {
                                 html += "<tr><td>"+formatValue(n_arr[i])+"</td><td>"+formatValue(s_arr[i])+"</td><td>"+formatValue(c_arr[i])+"</td></tr>"
                             }
-                            html += "</tbody></table>"
+                            html += "</tbody></table><br>"
+                            html += "<input type='button' id='editRegionButton' class='submit' value='Edit Region'>"
                             html += "</div>\n" 
                             $("#infoPanel").html(html)
                             $('#regionInfoTable').DataTable({});
                             rightDivContent("#infoPanel")
+                            $("#editRegionButton").on("click", function(e) {
+                                editRegion(node)
+                            })
                             break;
                         default:
                             html += node.title + " - " + node.type + "<br>";
@@ -2543,7 +2591,7 @@
                                             //$("#addStateTrigger").click()
                                             break;
                                         case "addSecondNation":
-                                            console.log("add second nation TBD")
+                                            addSecondNation(node.id)
                                             break;
                                         case "addEthnicity":
                                             console.log("add ethnicity TBD")
@@ -2973,6 +3021,11 @@
         n = findNation($("#newStateContinent option:selected").text(), $("#newStateNation option:selected" ).text())
         $("#newStateTimeZone").val(n.data.time_zone)
     })
+
+    function addSecondNation(nation) {
+        console.log(nation)
+        console.log(nations_by_id[nation])
+    }
 
     function findContinent(continent) {
         var tree = $.ui.fancytree.getTree("#xmlOutput")

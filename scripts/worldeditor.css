@@ -24,6 +24,16 @@ input[type='number']::-webkit-outer-spin-button {
     opacity: 1;
 }
 
+h2 {
+    margin-bottom: 75px;
+}
+
+h2 img {
+    height: 25px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+}
+
 
 .blank {
     border:none;
