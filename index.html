@@ -17,11 +17,17 @@
     <link href="./scripts/bootstrap.css" rel="stylesheet">
     <link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <link href="./scripts/jquery.contextMenu.css" rel="stylesheet" type='text/css'/>
-    <link href="./scripts/datatables.min.css" rel="stylesheet" type='text/css'/>
+    <link href="./scripts/DataTables-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/Buttons-2.4.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/Select-1.7.0/css/select.dataTables.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
-    <script type="text/javascript" src="./scripts/datatables.min.js"></script>
+    <script src="./scripts/DataTables-1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="./scripts/Buttons-2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="./scripts/FixedHeader-3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="./scripts/Select-1.7.0/js/dataTables.select.min.js"></script>
     <script type="text/javascript" src="./scripts/latinize.js"></script>
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
 
@@ -68,7 +74,8 @@
             ordering:  true,
             paging: false, 
             info: false,
-            scrollY: 700
+            scrollY: 700,
+            scrollCollapse: true
         } );
     </script>
 
@@ -2340,11 +2347,24 @@
                                     html += "<tr><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
                                 }
                             }
-                            html += "</tbody></table><br>"
-                            //html += "<input type='button' id='editSecondNationsButton' class='submit' value='Edit Second Nations'>"
+                            html += "</tbody></table>"
+                            html += "<div id='buttonHolder' style='width:100%; text-align:center;'>hello world</div>"
                             html += "</div>\n" 
                             $("#infoPanel").html(html)
-                            $('#secondNationsTable').DataTable({ ordering: true });
+                            $('#secondNationsTable').DataTable({ 
+                                fixedHeader: true,
+                                ordering: true,
+                                dom: 'Bfrtip',
+                                buttons: [
+                                    {
+                                        text: 'Reload',
+                                        action: function ( e, dt, node, config ) {
+                                            dt.ajax.reload();
+                                        }
+                                    }
+                                ],
+                                select: true
+                             });
                             rightDivContent("#infoPanel")
 /*                             $("#editSecondNationsButton").on("click", function(e) {
                                 editSecondNations(node)
