@@ -2772,11 +2772,10 @@
                             break;
                         }
                         case "second_nations": {
-                            cmItems = {
-                                "add": {name: "Add Second Nation", icon: 'add'},
-                                "sep1": "----",
-                                "edit": {name: "Edit Second Nations for \""+node.parent.title +"\"", icon: 'edit'},
-                            }
+                            console.log("OK")
+                             cmItems = {
+                                "view": {name: "View/Edit Second Nations", icon: 'edit'}
+                             }
                             break;
                         }
                         default: 
@@ -2893,14 +2892,7 @@
                                     }
                                     break;
                                 case "second_nations":
-                                    switch (key) {
-                                        case "add":
-                                            console.log("add second nations to "+node.parent.title)
-                                            break;
-                                        case "edit":
-                                            console.log("edit second nations for "+node.parent.title)
-                                            break;
-                                    }
+                                    node.setActive(true)
                                     break;
                                 default: 
                                     break;
