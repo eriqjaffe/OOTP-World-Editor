@@ -30,7 +30,6 @@
     <script src="./scripts/Select-1.7.0/js/dataTables.select.min.js"></script>
     <script type="text/javascript" src="./scripts/latinize.js"></script>
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
-
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
@@ -2336,35 +2335,250 @@
                             })
                             break;
                         case "second_nations":
+                            nodeToEdit = node
                             html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/circle-plus-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + "<table id='secondNationsTable' class='cell-border compact stripe' style='width:100%;'>\n"
-                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Nation</td><td class='dt-head-center'>Percent</td><td class='dt-head-center'>Use Name</td></tr></thead>\n"
+                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>ID</td><td class='dt-head-center'>Nation</td><td class='dt-head-center'>Percent</td><td class='dt-head-center'>Use Name</td></tr></thead>\n"
                                  + "<tbody id='sntb'>\n"
                             if (node.data.subdata != undefined) {        
                                 for (sn of node.data.subdata) {
                                     var un = (sn.use_name == "1") ? "Yes": "No"
-                                    html += "<tr><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
+                                    html += "<tr><td>"+sn.id+"</td><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
                                 }
                             }
                             html += "</tbody></table>"
-                            html += "<div id='buttonHolder' style='width:100%; text-align:center;'>hello world</div>"
-                            html += "</div>\n" 
+                                  + "<div id='buttonHolder' style='width:100%; text-align:center; margin-top:10px;'></div>\n"
+
+                                  <!-- ADD DIV HERE -->
+                                  + "<div id='addSNDiv' style='display:none; width:100%;'>\n"
+                                  + "<form id='addNewSNForm' action=''>\n"
+                                  + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Nation</th><th style='text-align:center; width:25%;'>Percent</th><th style='text-align:center; width:25%;'>Use Name</th></tr></thead>\n"
+                                  + "<tbody>\n"
+                                  + "<tr>\n"
+                                  + "<td><select id='addNewSNNation' class='sNationSelect'></select></td>\n"
+                                  + "<td><input type='number' step='0.01' min='0.01' max='100' style='width:100px;' id='addNewSNPercent'/></td>\n"
+                                  + "<td><select id='addNewSNUseName'>\n"
+                                  + "<option value=1>Yes</option>\n"
+                                  + "<option value=0>No</option>\n"
+                                  + "</select></td>\n"
+                                  + "</tr>\n"
+                                  + "</tbody></table><br>\n"
+                                  + "<b>Total:</b>&nbsp;<input id='addNewSNTotal' type='number' step='0.01' min='0.01' max='100' style='width:100px; margin-right:10px;' value='0'>"
+                                  + "<input type='submit' class='submit' value='Add Second Nation'></form>\n"
+                                  + "</div>\n"
+
+                                  <!-- EDIT DIV HERE -->
+                                  + "<div id='editSNDiv' style='display:none;'>\n"
+                                  + "<form id='editSNForm' action=''>\n"
+                                  + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Nation</th><th style='text-align:center; width:25%;'>Percent</th><th style='text-align:center; width:25%;'>Use Name</th></tr></thead>\n"
+                                  + "<tbody>\n"
+                                  + "<tr>\n"
+                                  + "<td><select id='editSNNation' class='sNationSelect'></select></td>\n"
+                                  + "<td><input type='number' step='0.01' min='0.01' max='100' style='width:100px;' id='editSNPercent'/></td>\n"
+                                  + "<td><select id='editSNUseName'>\n"
+                                  + "<option value=1>Yes</option>\n"
+                                  + "<option value=0>No</option>\n"
+                                  + "</select></td>\n"
+                                  + "</tr>\n"
+                                  + "</tbody></table><br>\n"
+                                  + "<b>Total:</b>&nbsp;<input id='editSNTotal' type='number' step='0.01' min='0.01' max='100' style='width:100px; margin-right:10px;' value='0'>"
+                                  + "<input type='submit' class='submit' value='Submit Changes'></form>\n"
+                                  + "</div>\n"
+                                  + "</div>\n"
                             $("#infoPanel").html(html)
-                            $('#secondNationsTable').DataTable({ 
+                            $("#addNewSNTotal").on('keydown paste focus mousedown', function(e){
+                                e.preventDefault();
+                            });
+                            sortDropdown("#addNewSNNation")
+                            sortDropdown("#editSNNation")
+                            let table = $('#secondNationsTable').DataTable({ 
                                 fixedHeader: true,
-                                ordering: true,
-                                dom: 'Bfrtip',
+                                order: ( [ 1, 'asc' ] ),
                                 buttons: [
                                     {
-                                        text: 'Reload',
+                                        text: 'Add',
                                         action: function ( e, dt, node, config ) {
-                                            dt.ajax.reload();
+                                            var total = 0
+                                            var alreadyThere = []
+                                            table.rows().every(function(){
+                                                total += parseFloat(this.data()[2]);
+                                                alreadyThere.push(this.data()[0])
+                                            });
+                                            total = total.toFixed(2)
+                                            $("#addNewSNNation").empty()
+                                            $.each(nations_by_id, function(key, value) {
+                                                if (!alreadyThere.includes(key)) {
+                                                    $("#addNewSNNation")
+                                                        .append($('<option>', { value : key })
+                                                        .text(value));
+                                                }
+                                            });
+                                            sortDropdown("#addNewSNNation")
+                                            $("#addNewSNTotal").val(total)
+                                            $("#editSNDiv").css("display","none")
+                                            $("#addSNDiv").css("display","inline-block")
                                         }
+                                    },
+                                    {
+                                        text: 'Edit',
+                                        action: function ( e, dt, node, config ) {
+                                            var total = 0
+                                            var alreadyThere = []
+                                            table.rows().every(function(){
+                                                total += parseFloat(this.data()[2]);
+                                                alreadyThere.push(this.data()[0])
+                                            });
+                                            
+                                            $("#editSNNation").empty()
+
+                                            // create dropdown, fitering out nations that are already second nations
+                                            $.each(nations_by_id, function(key, value) {
+                                                if (!alreadyThere.includes(key)) {
+                                                    $("#editSNNation")
+                                                        .append($('<option>', { value : key })
+                                                        .text(value));
+                                                }
+                                            });
+                                            
+                                            var row = table.rows( { selected: true } )
+
+                                            // put select row's value back into the dropdown
+                                            $("#editSNNation")
+                                                .append($('<option>', { value : row.data()[0][0] })
+                                                .text(row.data()[0][1]));
+                                            sortDropdown("#editSNNation")
+
+                                            total = total.toFixed(2)
+
+                                            var un = (row.data()[0][3] == "Yes") ? 1 : 0;
+                                            $("#editSNNation").val(row.data()[0][0])
+                                            $("#editSNPercent").val(row.data()[0][2])
+                                            $("#editSNUseName").val(un)
+                                            $("#editSNTotal").val(total)
+                                            $("#editSNDiv").css("display","inline-block")
+                                            $("#addSNDiv").css("display","none")
+                                        },
+                                        enabled: false
+                                    },
+                                    {
+                                        text: 'Delete',
+                                        action: function ( e, dt, node, config ) {
+                                            $("#editSNDiv").css("display","none")
+                                            $("#addSNDiv").css("display","none")
+                                            var row = table.rows( { selected: true } )
+                                            if (confirm("Are you sure you want to delete "+row.data()[0][1]+"?")) {
+                                                table.rows( { selected: true } ).remove().draw(false);
+                                            }
+                                            var newData = []
+                                            table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                                var obj = {}
+                                                var data = this.data();
+                                                obj.id = data[0]
+                                                obj.pct = data[2]
+                                                obj.use_name = (data[3] == "Yes") ? 1 : 0
+                                                newData.push(obj)
+                                            } );
+                                            nodeToEdit.data.subdata = newData
+                                            table.button(1).disable()
+                                            table.button(2).disable()
+                                        },
+                                        enabled: false
                                     }
                                 ],
-                                select: true
-                             });
+                                select: true,
+                                
+                            }).on( 'select', function ( e, dt, type, indexes ) {
+                                $("#editSNDiv").css("display","none")
+                                $("#addSNDiv").css("display","none")
+                                table.button(1).enable()
+                                table.button(2).enable()
+                            }).on( 'deselect', function ( e, dt, type, indexes ) {
+                                $("#editSNDiv").css("display","none")
+                                $("#addSNDiv").css("display","none")
+                                table.button(1).disable()
+                                table.button(2).disable()
+                            });
+                            table.column(0).visible(false)
+                            table.buttons().container().appendTo( $('#buttonHolder' ) );
+                            $("#addNewSNPercent").on("change", function(e) {
+                                var total = 0
+                                table.rows().every(function(){
+                                    total += parseFloat(this.data()[2]);
+                                });
+                                total += parseFloat($(this).val())
+                                total = total.toFixed(2)
+                                $("#addNewSNTotal").val(total)
+                            })
+
+                            $("#editSNPercent").on("change", function(e) {
+                                var total = 0
+                                var selRow = table.rows( { selected: true } )
+                                table.rows().every(function() {
+                                    if (this.data()[0] != selRow.data()[0][0]) {
+                                        total += parseFloat(this.data()[2]);
+                                    }
+                                })
+                                total += parseFloat($(this).val())
+                                total = total.toFixed(2)
+                                $("#editSNTotal").val(total)
+                            })
+
+                            $("#addNewSNForm").on("submit",function(e) {
+                                e.preventDefault()
+                                table.row
+                                .add([
+                                    $("#addNewSNNation").val(),
+                                    $("#addNewSNNation option:selected" ).text(),
+                                    $("#addNewSNPercent").val(),
+                                    $("#addNewSNUseName option:selected" ).text()
+                                ])
+                                .draw(false);
+                                $("#addSNDiv").css("display","none")
+                                $("#addNewSNNation").empty()
+                                $("#addNewSNPercent").val(0)
+                                var newData = []
+                                table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                    var obj = {}
+                                    var data = this.data();
+                                    obj.id = data[0]
+                                    obj.pct = data[2]
+                                    obj.use_name = (data[3] == "Yes") ? 1 : 0
+                                    newData.push(obj)
+                                } );
+                                nodeToEdit.data.subdata = newData
+                                table.button(1).disable()
+                                table.button(2).disable()
+                            })
+
+                            $("#editSNForm").on("submit",function(e) {
+                                e.preventDefault()
+                                table.rows( { selected: true } ).remove().draw(false);
+                                table.row
+                                .add([
+                                    $("#editSNNation").val(),
+                                    $("#editSNNation option:selected" ).text(),
+                                    $("#editSNPercent").val(),
+                                    $("#editSNUseName option:selected" ).text()
+                                ])
+                                .draw(false);
+                                $("#editSNDiv").css("display","none")
+                                $("#editSNNation").empty()
+                                $("#editSNPercent").val(0)
+                                var newData = []
+                                table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                    var obj = {}
+                                    var data = this.data();
+                                    obj.id = data[0]
+                                    obj.pct = data[2]
+                                    obj.use_name = (data[3] == "Yes") ? 1 : 0
+                                    newData.push(obj)
+                                } );
+                                nodeToEdit.data.subdata = newData
+                                table.button(1).disable()
+                                table.button(2).disable()
+                            })
+
                             rightDivContent("#infoPanel")
 /*                             $("#editSecondNationsButton").on("click", function(e) {
                                 editSecondNations(node)
