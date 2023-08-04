@@ -30,6 +30,7 @@
     <script src="./scripts/Select-1.7.0/js/dataTables.select.min.js"></script>
     <script type="text/javascript" src="./scripts/latinize.js"></script>
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
+    
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
@@ -2765,17 +2766,14 @@
                         }
                         case "nation_ethnicity": {
                             cmItems = {
-                                "add": {name: "Add Ethnicity", icon: 'add'},
-                                "sep1": "----",
-                                "edit": {name: "Edit Ethnicities for \""+node.parent.title +"\"", icon: 'edit'},
+                                "view": {name: "View/Edit Ethnicities", icon: 'edit'}
                             }
                             break;
                         }
                         case "second_nations": {
-                            console.log("OK")
-                             cmItems = {
+                            cmItems = {
                                 "view": {name: "View/Edit Second Nations", icon: 'edit'}
-                             }
+                            }
                             break;
                         }
                         default: 
@@ -2882,14 +2880,7 @@
                                     }
                                     break;
                                 case "nation_ethnicity":
-                                    switch (key) {
-                                        case "add":
-                                            console.log("add nation ethnicity to "+node.parent.title)
-                                            break;
-                                        case "edit":
-                                            console.log("edit nation ethnicities for "+node.parent.title)
-                                            break;
-                                    }
+                                    node.setActive(true)
                                     break;
                                 case "second_nations":
                                     node.setActive(true)
