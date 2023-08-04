@@ -2366,7 +2366,7 @@
                                   + "</tr>\n"
                                   + "</tbody></table><br>\n"
                                   + "<b>Total:</b>&nbsp;<input id='addNewSNTotal' type='number' step='0.01' min='0.01' max='100' style='width:100px; margin-right:10px;' value='0'>"
-                                  + "<input type='submit' class='submit' value='Add Second Nation'></form>\n"
+                                  + "<input type='submit' class='submit' value='Add Second Nation'><input type='button' style='margin-left:10px;' class='submit' id='cancelNewSN' value='Cancel'></form>\n"
                                   + "</div>\n"
 
                                   <!-- EDIT DIV HERE -->
@@ -2384,7 +2384,7 @@
                                   + "</tr>\n"
                                   + "</tbody></table><br>\n"
                                   + "<b>Total:</b>&nbsp;<input id='editSNTotal' type='number' step='0.01' min='0.01' max='100' style='width:100px; margin-right:10px;' value='0'>"
-                                  + "<input type='submit' class='submit' value='Submit Changes'></form>\n"
+                                  + "<input type='submit' class='submit' value='Submit Changes'><input type='button' style='margin-left:10px;' class='submit' id='cancelEditSN' value='Cancel'></form>\n"
                                   + "</div>\n"
                                   + "</div>\n"
                             $("#infoPanel").html(html)
@@ -2400,6 +2400,9 @@
                                     {
                                         text: 'Add',
                                         action: function ( e, dt, node, config ) {
+                                            table.button(0).disable()
+                                            table.button(1).disable()
+                                            table.button(2).disable()
                                             var total = 0
                                             var alreadyThere = []
                                             table.rows().every(function(){
@@ -2416,6 +2419,8 @@
                                                 }
                                             });
                                             sortDropdown("#addNewSNNation")
+                                            $("#addNewSNPercent").val(0)
+                                            $("#addNewSNUseName").val(1)
                                             $("#addNewSNTotal").val(total)
                                             $("#editSNDiv").css("display","none")
                                             $("#addSNDiv").css("display","inline-block")
@@ -2424,6 +2429,9 @@
                                     {
                                         text: 'Edit',
                                         action: function ( e, dt, node, config ) {
+                                            table.button(0).disable()
+                                            table.button(1).disable()
+                                            table.button(2).disable()
                                             var total = 0
                                             var alreadyThere = []
                                             table.rows().every(function(){
@@ -2502,6 +2510,18 @@
                             });
                             table.column(0).visible(false)
                             table.buttons().container().appendTo( $('#buttonHolder' ) );
+
+                            $("#cancelNewSN").on("click", function(e) {
+                                table.buttons(0).enable()
+                                $("#addSNDiv").css("display","none")
+                            })
+
+                            $("#cancelEditSN").on("click", function(e) {
+                                table.rows( { selected: true } ).deselect()
+                                table.buttons(0).enable()
+                                $("#editSNDiv").css("display","none")
+                            })
+
                             $("#addNewSNPercent").on("change", function(e) {
                                 var total = 0
                                 table.rows().every(function(){
@@ -2548,6 +2568,7 @@
                                     newData.push(obj)
                                 } );
                                 nodeToEdit.data.subdata = newData
+                                table.button(0).enable()
                                 table.button(1).disable()
                                 table.button(2).disable()
                             })
@@ -2576,6 +2597,7 @@
                                     newData.push(obj)
                                 } );
                                 nodeToEdit.data.subdata = newData
+                                table.button(0).enable()
                                 table.button(1).disable()
                                 table.button(2).disable()
                             })
@@ -2586,25 +2608,255 @@
                             }) */                            
                             break;
                         case "nation_ethnicity":
+                            nodeToEdit = node;
                             html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/user-group-solid.svg'>"+node.title+'</h2>\n'
                                  + '<div style="width:100%; text-align:center;">\n'
                                  + "<table id='nationEthnicityTable' class='cell-border compact stripe' style='width:100%;'>\n"
-                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Ethnicity</td><td class='dt-head-center'>Percent</td></tr></thead>\n"
+                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>ID</td><td class='dt-head-center'>Ethnicity</td><td class='dt-head-center'>Percent</td></tr></thead>\n"
                                  + "<tbody id='sntb'>\n"
                             if (node.data.subdata != undefined) {
                                 for (sn of node.data.subdata) {
-                                    html += "<tr><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
+                                    html += "<tr><td>"+sn.etid+"</td><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
                                 }
                             }
                             html += "</tbody></table><br>"
-                            //html += "<input type='button' id='editEthnicitiesButton' class='submit' value='Edit Ethnicities'>"
+                                  + "<div id='buttonHolder2' style='width:100%; text-align:center; margin-top:10px;'></div>\n"
+                            
+                            
+                            <!-- ADD DIV HERE -->
+                                  + "<div id='addNEDiv' style='display:none; width:100%;'>\n"
+                                  + "<form id='addNewNEForm' action=''>\n"
+                                  + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Ethnicity</th><th style='text-align:center; width:40%;'>Percent</th></tr></thead>\n"
+                                  + "<tbody>\n"
+                                  + "<tr>\n"
+                                  + "<td><select id='addNewNEthnicity' class='nEthSelect'></select></td>\n"
+                                  + "<td><input type='number' step='1' style='width:100px;' id='addNewNEPercent'/></td>\n"
+                                  + "</tr>\n"
+                                  + "</tbody></table><br>\n"
+                                  + "<b>Total:</b>&nbsp;<input id='addNewNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
+                                  + "<input type='submit' class='submit' value='Add Nation Ethnicity'><input type='button' style='margin-left:10px;' class='submit' id='cancelAddNE' value='Cancel'></form>\n"
+                                  + "</div>\n"
+
+                            <!-- EDIT DIV HERE -->
+                                  + "<div id='editNEDiv' style='display:none;'>\n"
+                                  + "<form id='editNEForm' action=''>\n"
+                                  + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Ethnicity<th><th style='text-align:center; width:40%;'>Percent</th></tr></thead>\n"
+                                  + "<tbody>\n"
+                                  + "<tr>\n"
+                                  + "<td><select id='editNEthnicity' class='nEthSelect'></select></td>\n"
+                                  + "<td><input type='number' style='width:100px;' id='editNEPercent'/></td>\n"
+                                  + "</tr>\n"
+                                  + "</tbody></table><br>\n"
+                                  + "<b>Total:</b>&nbsp;<input id='editNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
+                                  + "<input type='submit' class='submit' value='Submit Changes'><input type='button' style='margin-left:10px;' class='submit' id='cancelEditNE' value='Cancel'></form>\n"
+                                  + "</div>\n"
+
                             html += "</div>\n" 
                             $("#infoPanel").html(html)
-                            $('#nationEthnicityTable').DataTable({ order: [[1, 'desc']] });
+
+                            let table2 = $('#nationEthnicityTable').DataTable({ 
+                                fixedHeader: true,
+                                scrollY: 550,
+                                scrollCollapse: true,
+                                order: ( [ 1, 'asc' ] ),
+                                buttons: [
+                                    {
+                                        text: 'Add',
+                                        action: function ( e, dt, node, config ) {
+                                            table2.button(0).disable()
+                                            table2.button(1).disable()
+                                            table2.button(2).disable()
+                                            var total = 0
+                                            var alreadyThere = []
+                                            table2.rows().every(function(){
+                                                total += parseInt(this.data()[2]);
+                                                alreadyThere.push(this.data()[0])
+                                            });
+                                            $("#addNewNEthnicity").empty()
+                                            $.each(ethnicities_by_id, function(key, value) {
+                                                if (!alreadyThere.includes(key)) {
+                                                    $("#addNewNEthnicity")
+                                                        .append($('<option>', { value : key })
+                                                        .text(value));
+                                                }
+                                            });
+                                            sortDropdown("#addNewNEthnicity")
+                                            $("#addNewNEPercent").val(0)
+                                            $("#addNewNETotal").val(total)
+                                            $("#editNEDiv").css("display","none")
+                                            $("#addNEDiv").css("display","inline-block")
+                                        }
+                                    },
+                                    {
+                                        text: 'Edit',
+                                        action: function ( e, dt, node, config ) {
+                                            table2.button(0).disable()
+                                            table2.button(1).disable()
+                                            table2.button(2).disable()
+                                            var total = 0
+                                            var alreadyThere = []
+                                            table2.rows().every(function(){
+                                                total += parseInt(this.data()[2]);
+                                                alreadyThere.push(this.data()[0])
+                                            });
+                                            
+                                            console.log(alreadyThere)
+
+                                            $("#editNEthnicity").empty()
+
+                                            // create dropdown, fitering out nations that are already second nations
+                                            $.each(ethnicities_by_id, function(key, value) {
+                                                if (!alreadyThere.includes(key)) {
+                                                    $("#editNEthnicity")
+                                                        .append($('<option>', { value : key })
+                                                        .text(value));
+                                                } 
+                                            });
+
+            
+                                            var row = table2.rows( { selected: true } )
+
+                                            // put select row's value back into the dropdown
+                                            $("#editNEthnicity")
+                                                .append($('<option>', { value : row.data()[0][0] })
+                                                .text(row.data()[0][1]));
+                                            sortDropdown("#editNEthnicity")
+
+                                            $("#editNEthnicity").val(row.data()[0][0])
+                                            $("#editNEPercent").val(row.data()[0][2])
+                                            $("#editNETotal").val(total)
+                                            $("#editNEDiv").css("display","inline-block")
+                                            $("#addNEDiv").css("display","none")
+                                        },
+                                        enabled: false
+                                    },
+                                    {
+                                        text: 'Delete',
+                                        action: function ( e, dt, node, config ) {
+                                            $("#editNEDiv").css("display","none")
+                                            $("#addNEDiv").css("display","none")
+                                            var row = table2.rows( { selected: true } )
+                                            if (confirm("Are you sure you want to delete "+row.data()[0][1]+"?")) {
+                                                table2.rows( { selected: true } ).remove().draw(false);
+                                            }
+                                            var newData = []
+                                            table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                                var obj = {}
+                                                var data = this.data();
+                                                obj.etid = data[0]
+                                                obj.pct = data[2]
+                                                newData.push(obj)
+                                            } );
+                                            nodeToEdit.data.subdata = newData
+                                            table2.button(1).disable()
+                                            table2.button(2).disable()
+                                        },
+                                        enabled: false
+                                    }
+                                ],
+                                select: true,
+                                
+                            }).on( 'select', function ( e, dt, type, indexes ) {
+                                $("#editNEDiv").css("display","none")
+                                $("#addNEDiv").css("display","none")
+                                table2.button(1).enable()
+                                table2.button(2).enable()
+                            }).on( 'deselect', function ( e, dt, type, indexes ) {
+                                $("#editNEDiv").css("display","none")
+                                $("#addNEDiv").css("display","none")
+                                table2.button(1).disable()
+                                table2.button(2).disable()
+                            });
+                            table2.column(0).visible(false)
+                            table2.buttons().container().appendTo( $('#buttonHolder2' ) );
+
+                            $("#cancelAddNE").on("click", function(e) {
+                                table2.buttons(0).enable()
+                                $("#addNEDiv").css("display","none")
+                            })
+
+                            $("#cancelEditNE").on("click", function(e) {
+                                table2.rows( { selected: true } ).deselect()
+                                table2.buttons(0).enable()
+                                $("#editNEDiv").css("display","none")
+                            })
+
+                            $("#addNewNEPercent").on("change", function(e) {
+                                var total = 0
+                                table2.rows().every(function(){
+                                    total += parseInt(this.data()[2]);
+                                });
+                                total += parseInt($(this).val())
+                                $("#addNewNETotal").val(total)
+                            })
+
+                            $("#editNEPercent").on("change", function(e) {
+                                var total = 0
+                                var selRow = table2.rows( { selected: true } )
+                                table2.rows().every(function() {
+                                    if (this.data()[0] != selRow.data()[0][0]) {
+                                        total += parseInt(this.data()[2]);
+                                    }
+                                })
+                                total += parseInt($(this).val())
+                                $("#editNETotal").val(total)
+                            })
+
+                            $("#addNewNEForm").on("submit",function(e) {
+                                e.preventDefault()
+                                table2.row
+                                .add([
+                                    $("#addNewNEthnicity").val(),
+                                    $("#addNewNEthnicity option:selected" ).text(),
+                                    $("#addNewNEPercent").val()
+                                ])
+                                .draw(false);
+                                $("#addNEDiv").css("display","none")
+                                $("#addNewNENation").empty()
+                                $("#addNewNEPercent").val(0)
+                                var newData = []
+                                table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                    var obj = {}
+                                    var data = this.data();
+                                    obj.etid = data[0]
+                                    obj.pct = data[2]
+                                    newData.push(obj)
+                                } );
+                                nodeToEdit.data.subdata = newData
+                                table2.button(0).enable()
+                                table2.button(1).disable()
+                                table2.button(2).disable()
+                            })
+
+                            $("#editNEForm").on("submit",function(e) {
+                                e.preventDefault()
+                                table2.rows( { selected: true } ).remove().draw(false);
+                                table2.row
+                                .add([
+                                    $("#editNEthnicity").val(),
+                                    $("#editNEthnicity option:selected" ).text(),
+                                    $("#editNEPercent").val()
+                                ])
+                                .draw(false);
+                                $("#editNEDiv").css("display","none")
+                                $("#editNENation").empty()
+                                $("#editNEPercent").val(0)
+                                var newData = []
+                                table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                    var obj = {}
+                                    var data = this.data();
+                                    obj.etid = data[0]
+                                    obj.pct = data[2]
+                                    newData.push(obj)
+                                } );
+                                nodeToEdit.data.subdata = newData
+                                table2.button(0).enable()
+                                table2.button(1).disable()
+                                table2.button(2).disable()
+                            })
+
                             rightDivContent("#infoPanel")
-/*                             $("#editEthnicitiesButton").on("click", function(e) {
-                                editEthnicity(node)
-                            }) */
+
                             break;
                         case "REGIONS_PARENT":
                             html = '<h2 style="text-align:center;"><img src="./images/map-solid.svg">'+node.countChildren(false)+' Regions found</h2>\n'
