@@ -2630,10 +2630,10 @@
                                   + "<tbody>\n"
                                   + "<tr>\n"
                                   + "<td><select id='addNewNEthnicity' class='nEthSelect'></select></td>\n"
-                                  + "<td><input type='number' step='1' style='width:100px;' id='addNewNEPercent'/></td>\n"
+                                  + "<td><input type='number' min='0'  style='width:100px;' id='addNewNEPercent'/></td>\n"
                                   + "</tr>\n"
                                   + "</tbody></table><br>\n"
-                                  + "<b>Total:</b>&nbsp;<input id='addNewNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
+                                  //+ "<b>Total:</b>&nbsp;<input id='addNewNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
                                   + "<input type='submit' class='submit' value='Add Nation Ethnicity'><input type='button' style='margin-left:10px;' class='submit' id='cancelAddNE' value='Cancel'></form>\n"
                                   + "</div>\n"
 
@@ -2644,10 +2644,10 @@
                                   + "<tbody>\n"
                                   + "<tr>\n"
                                   + "<td><select id='editNEthnicity' class='nEthSelect'></select></td>\n"
-                                  + "<td><input type='number' style='width:100px;' id='editNEPercent'/></td>\n"
+                                  + "<td><input type='number' min='0' style='width:100px;' id='editNEPercent'/></td>\n"
                                   + "</tr>\n"
                                   + "</tbody></table><br>\n"
-                                  + "<b>Total:</b>&nbsp;<input id='editNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
+                                  //+ "<b>Total:</b>&nbsp;<input id='editNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
                                   + "<input type='submit' class='submit' value='Submit Changes'><input type='button' style='margin-left:10px;' class='submit' id='cancelEditNE' value='Cancel'></form>\n"
                                   + "</div>\n"
 
@@ -2666,10 +2666,10 @@
                                             table2.button(0).disable()
                                             table2.button(1).disable()
                                             table2.button(2).disable()
-                                            var total = 0
+                                            //var total = 0
                                             var alreadyThere = []
                                             table2.rows().every(function(){
-                                                total += parseInt(this.data()[2]);
+                                                //total += parseInt(this.data()[2]);
                                                 alreadyThere.push(this.data()[0])
                                             });
                                             $("#addNewNEthnicity").empty()
@@ -2682,7 +2682,7 @@
                                             });
                                             sortDropdown("#addNewNEthnicity")
                                             $("#addNewNEPercent").val(0)
-                                            $("#addNewNETotal").val(total)
+                                            //$("#addNewNETotal").val(total)
                                             $("#editNEDiv").css("display","none")
                                             $("#addNEDiv").css("display","inline-block")
                                         }
@@ -2693,14 +2693,12 @@
                                             table2.button(0).disable()
                                             table2.button(1).disable()
                                             table2.button(2).disable()
-                                            var total = 0
+                                            //var total = 0
                                             var alreadyThere = []
                                             table2.rows().every(function(){
-                                                total += parseInt(this.data()[2]);
+                                                //total += parseInt(this.data()[2]);
                                                 alreadyThere.push(this.data()[0])
                                             });
-                                            
-                                            console.log(alreadyThere)
 
                                             $("#editNEthnicity").empty()
 
@@ -2724,7 +2722,7 @@
 
                                             $("#editNEthnicity").val(row.data()[0][0])
                                             $("#editNEPercent").val(row.data()[0][2])
-                                            $("#editNETotal").val(total)
+                                            //$("#editNETotal").val(total)
                                             $("#editNEDiv").css("display","inline-block")
                                             $("#addNEDiv").css("display","none")
                                         },
@@ -2781,7 +2779,7 @@
                                 $("#editNEDiv").css("display","none")
                             })
 
-                            $("#addNewNEPercent").on("change", function(e) {
+                            /* $("#addNewNEPercent").on("change", function(e) {
                                 var total = 0
                                 table2.rows().every(function(){
                                     total += parseInt(this.data()[2]);
@@ -2800,7 +2798,7 @@
                                 })
                                 total += parseInt($(this).val())
                                 $("#editNETotal").val(total)
-                            })
+                            }) */
 
                             $("#addNewNEForm").on("submit",function(e) {
                                 e.preventDefault()
