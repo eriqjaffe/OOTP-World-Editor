@@ -3390,10 +3390,12 @@
         rightDivContent("#editRegion")
     }
 
-    $(".defineUSA").on("change", function() {
-        var usa = findUSA()
+/*     $(".defineUSA").on("change", function() {
+        //var el = "#"+$(this).attr("id")
+        //var newUSA = ($(this).attr("id") == "newNationUSA") ? $("#newNationID").val() : $("#editNationID").val()
+        //var usa = findUSA()
         if ($(this).val() == 1) {
-            if (countUSA() == 1 && findUSA != null) {
+            if (findUSA != null) {
                 if (confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
                     var oldUSA = findNationFromScratch(usa)
                     oldUSA.data.this_is_the_usa = 0
@@ -3402,7 +3404,7 @@
         } else {
             console.log("you set it to not be the usa")
         }
-    })
+    }) */
 
     function addNation(continent) {
         $("#newNationContinent").empty()
@@ -3727,6 +3729,16 @@
 
     $("#newNationForm").on("submit", function(e) {
         e.preventDefault()
+        var usa = findUSA()
+        if ($("#newNationUSA").val() == 1) {
+            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
+                return false
+            } else {
+                var oldUSA = findNationFromScratch(usa)
+                console.log(oldUSA)
+                oldUSA.data.this_is_the_usa = 0
+            }
+        }
         nations_by_id[$("#newNationID").val()] = $("#newNationName").val()
         nation_count++;
         var nation_obj = {}
@@ -3920,6 +3932,16 @@
 
     $("#editNationForm").on("submit", function(e) {
         e.preventDefault()
+        var usa = findUSA()
+        if ($("#editNationUSA").val() == 1) {
+            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
+                return false
+            } else {
+                var oldUSA = findNationFromScratch(usa)
+                console.log(oldUSA)
+                oldUSA.data.this_is_the_usa = 0
+            }
+        }
         nodeToEdit.setTitle($("#editNationName").val())
         nodeToEdit.data.abbr = $("#editNationAbbr").val()
         nodeToEdit.data.abbr_korean = $("#editNationAbbrK").val()
