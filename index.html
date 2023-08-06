@@ -36,21 +36,7 @@
         const { translate } = require('bing-translate-api');
         const XMLWriter = require('xml-writer');
         var nodeToEdit = null;
-        var max_world_id = 0
-        var max_continent_id = 0
-        var max_nation_id = 0
-        var max_state_id = 0
-        var max_city_id = 0
-        var max_ethnicity_id = 0
-        var max_region_id = 0
-        var max_region_sort_order = 0
-        var world_count = 0
-        var continent_count = 0
-        var nation_count = 0
-        var state_count = 0
-        var city_count = 0
-        var ethnicity_count = 0
-        var region_count = 0
+        var max_world_id = max_continent_id = max_nation_id = max_state_id = max_city_id = max_ethnicity_id = max_region_id = max_region_sort_order = world_count = continent_count = nation_count = state_count = city_count = ethnicity_count = region_count = 0
         var ethnicities_by_id = {}
         var cities_by_id = {}
         var states_by_id = {}
@@ -61,6 +47,7 @@
         var states_by_nation = {}
         var cities_by_state = {}
         var cities_by_nation = {}
+        var usa_defined = []
         const time_zones = [ { tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." },  { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" },  { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" },  { tz: "4.50", loc: "(GMT+04:30) Kabul" },  { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" },  { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide, Darwin" },  { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }]
         const tzDisplay = { "-12.00": "(GMT-12:00) International Date Line West", "-11.00": "(GMT-11:00) Midway Island, Samoa", "-10.00": "(GMT-10:00) Hawaii", "-9.00": "(GMT-09:00) Alaska", "-8.00": "(GMT-08:00) Pacific Time (US &amp; Canada)", "-7.00": "(GMT-07:00) Mountain Time (US &amp; Canada)", "-6.00": "(GMT-06:00) Central Time (US &amp; Canada)", "-5.00": "(GMT-05:00) Eastern Time (US &amp; Canada)", "-4.00": "(GMT-04:00) Atlantic Time (Canada)", "-3.50": "(GMT-03:30) Newfoundland", "-3.00": "(GMT-03:00) Brasilia", "-2.00": "(GMT-02:00) Mid-Atlantic", "-1.00": "(GMT-01:00) Cape Verde Is." , "0.00": "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London", "1.00": "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" , "2.00": "(GMT+02:00) Cairo", "3.00": "(GMT+03:00) Moscow, St. Petersburg, Volgograd", "3.50": "(GMT+03:30) Tehran", "4.00": "(GMT+04:00) Abu Dhabi, Muscat" , "4.50": "(GMT+04:30) Kabul" , "5.00": "(GMT+05:00) Islamabad, Karachi, Tashkent", "5.50": "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi", "5.75": "(GMT+05:45) Kathmandu", "6.00": "(GMT+06:00) Almaty, Novosibirsk", "6.50": "(GMT+06:30) Yangon (Rangoon)", "7.00": "(GMT+07:00) Bangkok, Hanoi, Jakarta", "8.00": "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" , "9.00": "(GMT+09:00) Osaka, Sapporo, Tokyo", "9.50": "(GMT+09:30) Adelaide, Darwin" , "10.00": "(GMT+10:00) Canberra, Melbourne, Sydney", "11.00": "(GMT+11:00) Magadan, Solomon Is., New Caledonia", "12.00": "(GMT+12:00) Auckland, Wellington" }
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
@@ -263,7 +250,7 @@
                         <tr>
                             <td class="left">Modern USA?</td>
                             <td class="right">
-                                <select id="newNationUSA" style="width:99%;">
+                                <select id="newNationUSA" class="defineUSA" style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -740,7 +727,7 @@
                         <tr>
                             <td class="left">Modern USA?</td>
                             <td class="right">
-                                <select id="editNationUSA" style="width:99%;">
+                                <select id="editNationUSA" class="defineUSA" style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -1012,6 +999,7 @@
                 <td>CITIES: <span id="city_count">0</span></td>
                 <td>ETHNICITIES: <span id="ethnicity_count">0</span></td>
                 <td>REGIONS: <span id="region_count">0</span></td>
+                <td>USA DEFINED: <span id="usa_defined_count">0</span></td>
             </tr>
             <tr>
                 <td>MAX_CONTINENT_ID: <span id="max_continent_id">0</span></td>
@@ -1020,6 +1008,7 @@
                 <td>MAX_CITY_ID: <span id="max_city_id">0</span></td>
                 <td>MAX_ETHNICITY_ID: <span id="max_ethnicity_id">0</span></td>
                 <td>MAX_REGION_ID: <span id="max_region_id">0</span></td>
+                <td></td>
             </tr>
         </table>    
     </div>
@@ -1037,7 +1026,6 @@
     require('./renderer.js')
 
     var fancyTreeReady = false;
-    var treeGlobal = "hello world"
 
     $(document).ready(function() {
 
@@ -1727,6 +1715,7 @@
             $("#city_count").text(city_count)
             $("#ethnicity_count").text(ethnicity_count)
             $("#region_count").text(region_count)
+            $("#usa_defined_count").text(usa_defined.length)
             $("#max_continent_id").text(max_continent_id)
             $("#max_nation_id").text(max_nation_id)
             $("#max_state_id").text(max_state_id)
@@ -1813,7 +1802,8 @@
                     nation_obj.dem_korean = (nation.$.dem_korean != undefined) ? nation.$.dem_korean : ""
                     nation_obj.time_zone = parseFloat(nation.$.time_zone).toFixed(2).toString()
                     nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
-                    nation_obj.this_is_the_usa = (usa != undefined) ? '1' : "0"
+                    nation_obj.this_is_the_usa = (usa != undefined) ? 1 : 0
+                    if (nation_obj.this_is_the_usa == 1) { usa_defined.push(nation_obj.id) }
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
                     var second_nations_obj = {}
                     second_nations_obj.title = "Second Nations"
@@ -3144,13 +3134,13 @@
                 }
             });
 
-
             $("#continent_count").text(continent_count)
             $("#nation_count").text(nation_count)
             $("#state_count").text(state_count)
             $("#city_count").text(city_count)
             $("#ethnicity_count").text(ethnicity_count)
             $("#region_count").text(region_count)
+            $("#usa_defined_count").text(usa_defined.length)
             $("#max_continent_id").text(max_continent_id)
             $("#max_nation_id").text(max_nation_id)
             $("#max_state_id").text(max_state_id)
@@ -3400,6 +3390,20 @@
         rightDivContent("#editRegion")
     }
 
+    $(".defineUSA").on("change", function() {
+        var usa = findUSA()
+        if ($(this).val() == 1) {
+            if (countUSA() == 1 && findUSA != null) {
+                if (confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
+                    var oldUSA = findNationFromScratch(usa)
+                    oldUSA.data.this_is_the_usa = 0
+                }
+            }
+        } else {
+            console.log("you set it to not be the usa")
+        }
+    })
+
     function addNation(continent) {
         $("#newNationContinent").empty()
         $.each(continents_by_id, function(key, value) {
@@ -3515,6 +3519,18 @@
             if (n.type == "nation") {
                 if (n.title == nation) {
                     return n
+                }
+            }
+        }
+    }
+
+    function findNationFromScratch(nationToFind) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        for (continent of world.getChildren()) {
+            for (nation of continent.getChildren()) {
+                if (nation.data.id == nationToFind) { 
+                    return nation
                 }
             }
         }
@@ -3755,8 +3771,6 @@
         nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
         //nation_obj.children = [states_obj]
         if (parseInt($("#newNationID").val()) > max_nation_id) { max_nation_id = parseInt($("#newNationID").val()) }
-        $("#max_nation_id").text(max_nation_id)
-        $("#nation_count").text(nation_count)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("CONTINENT")
         var continent = world.findFirst($("#newNationContinent option:selected" ).text())
@@ -3774,7 +3788,37 @@
         cities_by_nation[$("#newNationID").val()] = []
         states_by_nation[$("#newNationID").val()] = []
         nations_by_continent[$("#newNationContinent").val()].push(nation_obj)
+        $("#max_nation_id").text(max_nation_id)
+        $("#nation_count").text(nation_count)
+        $("#usa_defined_count").text(countUSA())
     })
+
+    function countUSA() {
+        usa_defined.splice(0,usa_defined.length)
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        for (continent of world.getChildren()) {
+            for (nation of continent.getChildren()) {
+                if (nation.data.this_is_the_usa == 1) {
+                    usa_defined.push(nation.data.id)
+                }
+            }
+        }
+        return usa_defined.length
+    }
+
+    function findUSA() {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        for (continent of world.getChildren()) {
+            for (nation of continent.getChildren()) {
+                if (nation.data.this_is_the_usa == 1) {
+                    return nation.data.id
+                }
+            }
+        }
+        return null;
+    }
 
     $("#newStateForm").on("submit", function(e) {
         e.preventDefault()
@@ -3891,6 +3935,7 @@
         nodeToEdit.data.this_is_the_usa = $("#editNationUSA").val()
         nodeToEdit.time_zone = $("#editNationTimeZone").val()
         nodeToEdit.data.title_korean = $("#editNationNameK").val()
+        $("#usa_defined_count").text(countUSA())
         scrollToEditedNode("CONTINENTS")
     })
 
@@ -3961,7 +4006,6 @@
         } 
         var nation_arr = []
         if ($('#multi_d_to option').length > 0) {
-            console.log("NATIONS FOUND")
             $("#multi_d_to option").each(function() {
                 var nation_obj ={}
                 nation_obj.title = this.text
