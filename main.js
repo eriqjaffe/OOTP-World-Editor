@@ -135,19 +135,17 @@ ipcMain.on('save_xml', (event, data) => {
             accelerator: isMac ? 'Cmd+O' : 'Control+O',
             label: 'Open...',
         },
+        {
+            click: () => mainWindow.webContents.send('new-xml','click'),
+            accelerator: isMac ? 'Cmd+N' : 'Control+N',
+            label: 'New...',
+        },
         { type: 'separator' },
         {
             id: 'saveMenu',
             click: () => mainWindow.webContents.send('save-xml','click'),
             accelerator: isMac ? 'Cmd+S' : 'Control+S',
             label: 'Save',
-            enabled: true
-        },
-        {
-            id: 'saveAsMenu',
-            click: () => mainWindow.webContents.send('save-xml-as','click'),
-            accelerator: isMac ? 'Cmd+Shift+S' : 'Control+Shift+S',
-            label: 'Save As',
             enabled: true
         },
         { type: 'separator' },
@@ -168,42 +166,42 @@ ipcMain.on('save_xml', (event, data) => {
           {
               id: 'addEthnicityMenu',
               click: () => mainWindow.webContents.send('add-ethnicity','click'),
-              accelerator: isMac ? 'Cmd+E' : 'Control+E',
+              accelerator: isMac ? 'Cmd+Shift+E' : 'Control+Shift+E',
               label: 'Add Ethnicity',
               enabled: true
           },
           {
               id: 'addContinentMenu',
               click: () => mainWindow.webContents.send('add-continent','click'),
-              accelerator: isMac ? 'Cmd+C' : 'Control+C',
+              accelerator: isMac ? 'Cmd+Shift+C' : 'Control+Shift+C',
               label: 'Add Continent',
               enabled: true
           },
           {
               id: 'addNationMenu',
               click: () => mainWindow.webContents.send('add-nation','click'),
-              accelerator: isMac ? 'Cmd+N' : 'Control+N',
+              accelerator: isMac ? 'Cmd+Shift+N' : 'Control+Shift+N',
               label: 'Add Nation',
               enabled: true
           },
           {
               id: 'addStateMenu',
               click: () => mainWindow.webContents.send('add-state','click'),
-              accelerator: isMac ? 'Cmd+T' : 'Control+T',
+              accelerator: isMac ? 'Cmd+Shift+S' : 'Control+Shift+S',
               label: 'Add State',
               enabled: true
           },
           {
               id: 'addCityMenu',
               click: () => mainWindow.webContents.send('add-city','click'),
-              accelerator: isMac ? 'Cmd+I' : 'Control+I',
+              accelerator: isMac ? 'Cmd+Shift+Y' : 'Control+Shift+Y',
               label: 'Add City',
               enabled: true
           },
           {
               id: 'addRegionMenu',
               click: () => mainWindow.webContents.send('add-region','click'),
-              accelerator: isMac ? 'Cmd+R' : 'Control+R',
+              accelerator: isMac ? 'Cmd+Shift+G' : 'Control+Shift+G',
               label: 'Add Region',
               enabled: true
           }
