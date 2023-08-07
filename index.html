@@ -1785,7 +1785,7 @@
                     var nation_obj = {}
                     nation_obj.type = 'nation'
                     nation_obj.folder = true
-                    nation_obj.icon = './images/flag-solid.svg'
+                    nation_obj.icon = (usa != undefined) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
                     nation_obj.id = nation.$.id
                     nation_obj.title = nation.$.name
                     nation_obj.title_korean = (nation.$.name_korean != undefined) ? nation.$.name_korean : ""
@@ -2172,7 +2172,7 @@
                                         cty++
                                         break;
                                     case "nation_ethnicity":
-                                        eth = n.data.subdata.length
+                                        if (n.data.subdata != undefined) { eth = n.data.subdata.length }
                                         break;
                                     case "second_nations":
                                         if (n.data.subdata != undefined) { sec = n.data.subdata.length }
@@ -3737,6 +3737,8 @@
                 var oldUSA = findNationFromScratch(usa)
                 console.log(oldUSA)
                 oldUSA.data.this_is_the_usa = 0
+                oldUSA.icon = './images/flag-solid.svg'
+                oldUSA.renderTitle()
             }
         }
         nations_by_id[$("#newNationID").val()] = $("#newNationName").val()
@@ -3744,7 +3746,7 @@
         var nation_obj = {}
         nation_obj.type = 'nation'
         nation_obj.folder = true
-        nation_obj.icon = './images/flag-solid.svg'
+        nation_obj.icon = ($("#newNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
         nation_obj.id = $("#newNationID").val()
         nation_obj.title = $("#newNationName").val()
         nation_obj.title_korean = $("#newNationNameK").val()
@@ -3940,9 +3942,12 @@
                 var oldUSA = findNationFromScratch(usa)
                 console.log(oldUSA)
                 oldUSA.data.this_is_the_usa = 0
+                oldUSA.icon = './images/flag-solid.svg'
+                oldUSA.renderTitle()
             }
         }
         nodeToEdit.setTitle($("#editNationName").val())
+        nodeToEdit.icon = ($("#editNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
         nodeToEdit.data.abbr = $("#editNationAbbr").val()
         nodeToEdit.data.abbr_korean = $("#editNationAbbrK").val()
         nodeToEdit.data.bbqual = $("#editNationBbqual").val()
@@ -3957,6 +3962,7 @@
         nodeToEdit.data.this_is_the_usa = $("#editNationUSA").val()
         nodeToEdit.time_zone = $("#editNationTimeZone").val()
         nodeToEdit.data.title_korean = $("#editNationNameK").val()
+        nodeToEdit.renderTitle()
         $("#usa_defined_count").text(countUSA())
         scrollToEditedNode("CONTINENTS")
     })
