@@ -3731,7 +3731,7 @@
         e.preventDefault()
         var usa = findUSA()
         if ($("#newNationUSA").val() == 1) {
-            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
+            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change it to "+$("#newNationName").val()+"?")) {
                 return false
             } else {
                 var oldUSA = findNationFromScratch(usa)
@@ -3936,7 +3936,7 @@
         e.preventDefault()
         var usa = findUSA()
         if ($("#editNationUSA").val() == 1) {
-            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
+            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change it to "+$("#editNationName").val()+"?")) {
                 return false
             } else {
                 var oldUSA = findNationFromScratch(usa)
