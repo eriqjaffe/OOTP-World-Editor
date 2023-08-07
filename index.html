@@ -1487,6 +1487,22 @@
     $("#saveXML").on("click",function(e) {
         $("#overlay").css("display","inline-block")
 
+/*         ipcRenderer.invoke('alert', "There are no nations defined as The USA.  There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.").then((result) => {})
+            $("#overlay").css("display","none")
+            return false */
+
+        var usaCount = countUSA()
+
+        if (usaCount < 1) {
+            alert("There are no nations defined as The USA.  There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.")
+            $("#overlay").css("display","none")
+            return false           
+        } else if (usaCount > 1) {
+            alert("There are no nations defined as The USA.  More than one nation is defined as The USA.  While this is not necessarily game-breaking, OOTP expects only one nation to have this flag set.")
+            $("#overlay").css("display","none")
+            return false
+        }
+
         const tree = $.ui.fancytree.getTree("#xmlOutput")
 
         const commentStr = "\nOOTP loads this file whenever the user creates a new game. You can edit this file as long as you watch the syntax. Please read the online manual section about customizing the world XML file.\n"
@@ -3303,7 +3319,7 @@
         } else {
             $('#editNationCapitolState').val("0")
         }
-        
+        $("#editNationUSA").val(node.data.this_is_the_usa)
         rightDivContent("#editNation")
     }
 
@@ -3808,17 +3824,17 @@
     })
 
     function countUSA() {
-        usa_defined.splice(0,usa_defined.length)
+        var count = 0
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("CONTINENTS")
         for (continent of world.getChildren()) {
             for (nation of continent.getChildren()) {
                 if (nation.data.this_is_the_usa == 1) {
-                    usa_defined.push(nation.data.id)
+                    count++
                 }
             }
         }
-        return usa_defined.length
+        return count
     }
 
     function findUSA() {
