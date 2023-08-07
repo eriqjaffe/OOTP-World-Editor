@@ -1,5 +1,5 @@
 {
-  "name": "OOTP-World-Editor",
+  "name": "OOTP World Editor",
   "version": "0.1.0",
   "description": "A world_default.xml editor for OOTP Baseball",
   "main": "main.js",
