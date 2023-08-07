@@ -8,6 +8,10 @@ ipcRenderer.on('save-xml', (event, data) => {
     $("#saveXML").trigger("click")
 })
 
+ipcRenderer.on('new-xml', (event, data) => {
+    $("#newXML").trigger("click")
+})
+
 ipcRenderer.on('add-ethnicity', (event, data) => {
     $("#addEthnicityTrigger").trigger("click")
 });
