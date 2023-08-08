@@ -1378,7 +1378,7 @@
 
     $(document).ready(function() {
 
-        //ipcRenderer.send('debug-load', null)
+        ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
             $(".tzSelect").each(function() {
                 $(this).append($('<option>', { value : z.tz })
@@ -1679,7 +1679,7 @@
             var tree = $.ui.fancytree.getTree("#xmlOutput")
             tree.destroy()
         }
-        var tree_json = [];
+        /* var tree_json = [];
 
         var ethnicities_arr = {}
         ethnicities_arr.title = "ETHNICITIES";
@@ -1703,9 +1703,9 @@
         regions_arr.icon = './images/map-solid.svg'
         regions_arr.type = "REGIONS_PARENT"
         regions_arr.children = []
-        tree_json.push(regions_arr)
+        tree_json.push(regions_arr) */
 
-        initTree(tree_json)
+        
 
         
 
@@ -1721,14 +1721,14 @@
                     $(function() {
                     // SmartWizard initialize
 
-                        var tree_json = [];
+/*                         var tree_json = [];
                         var form = null
 
                         var ethnicity_obj = {}
                         var continent_obj = {}
                         var nation_obj = {}
                         var state_obj = {}
-                        var city_obj = {}
+                        var city_obj = {} */
 
                         $('#smartwizard').smartWizard({
                             selected: 0,
@@ -2510,7 +2510,6 @@
             regions_arr.children = regions
             tree_json.push(regions_arr)
 
-            console.log(tree_json)
             initTree(tree_json)
         } else {
             $("#overlay").css("display","none")
@@ -4266,160 +4265,169 @@
     })
 
     function firstStuffSubmit() {
-        console.log("triggering...")
         $("#form-5").trigger("submit")
     }
 
     $("#form-5").on("submit", function(e) {
         e.preventDefault()
 
-            const regions_arr = {}
-            const regions = []
-            regions_arr.title = "REGIONS"
-            regions_arr.folder = true
-            regions_arr.icon = './images/map-solid.svg'
-            regions_arr.type = "REGIONS_PARENT"
+        const regions_arr = {}
+        regions_arr.title = "REGIONS"
+        regions_arr.folder = true
+        regions_arr.icon = './images/map-solid.svg'
+        regions_arr.type = "REGIONS_PARENT"
+        regions_arr.children = []
+        
+        const ethnicities_arr = {}
+        const ethnicities = []
+        ethnicities_arr.title = "ETHNICITIES";
+        ethnicities_arr.folder = true
+        ethnicities_arr.type = "ETHNICITIES_PARENT"
+        ethnicities_arr.icon = './images/people-group-solid.svg'
+
+        const continent_arr = {};
+        const continents = [];
+        const nations = []
+        continent_arr.title = "CONTINENTS";
+        continent_arr.folder = true;
+        continent_arr.icon = './images/globe-solid.svg'
+        continent_arr.type = "CONTINENTS_PARENT"
+
+        const ethnicity_obj = {}
+        const continent_obj = {}
+        const nation_obj = {}
+        const state_obj = {}
+        const state_arr = []
+        const city_obj = {}
+        const second_nations_obj = {}
+        const nation_eth_obj = {}
+        const tree_json = []
+
+        const states_obj = {}
+        states_obj.title = "States"
+        states_obj.folder = true
+        states_obj.icon = './images/landmark-dome-solid.svg'
+        states_obj.type = "STATES_PARENT"
+        states_obj.children = ([])
+                
+        ethnicity_obj.type = 'ethnicity'
+        ethnicity_obj.folder = false
+        ethnicity_obj.icon = './images/user-group-solid.svg'
+        ethnicity_obj.title = $("#firstEthnicityName").val()
+        ethnicity_obj.name_korean = $("#firstEthnicityNameK").val()
+        ethnicity_obj.id = max_ethnicity_id + 1
+        ethnicity_obj.african = $("#firstEthnicityAfrican").val()
+        ethnicity_obj.asian = $("#firstEthnicityAsian").val()
+        ethnicity_obj.east_indian = $("#firstEthnicityEastIndian").val()
+        ethnicity_obj.caucasian = $("#firstEthnicityCaucasian").val()
+        ethnicity_obj.hispanic = $("#firstEthnicityHispanic").val()
+        ethnicities.push(ethnicity_obj)
+        ethnicities_arr.children = ethnicities
+        max_ethnicity_id++
+        ethnicity_count++
+
+        continent_obj.type = 'continent'
+        continent_obj.folder = true
+        continent_obj.icon = './images/earth-americas-solid.svg'
+        continent_obj.id = max_continent_id + 1
+        continent_obj.title = $("#firstContinentName").val()
+        continent_obj.title_korean = $("#firstContinentNameK").val()
+        continent_obj.pop = $("#firstContinentPop").val()
+        continent_obj.etid = 1
+        continent_obj.abbr = $("#firstContinentAbbr").val()
+        continent_obj.dem = $("#firstContinentDem").val()
+        continent_obj.abbr_korean =  $("#firstContinentAbbrK").val()
+        continent_obj.dem_korean = $("#firstContinentDemK").val()
+        continents.push(continent_obj)
+        continent_arr.children = continents
+        max_continent_id++
+        continent_count++
+
+        nation_obj.type = 'nation'
+        nation_obj.folder = true
+        nation_obj.icon = ($("#firstNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
+        nation_obj.id = 1
+        nation_obj.title = $("#firstNationName").val()
+        nation_obj.title_korean = $("#firstNationNameK").val()
+        nation_obj.short_korean = $("#firstNationShortK").val()
+        nation_obj.pop = $("#firstNationPopulation").val()
+        nation_obj.etid = 1
+        nation_obj.capid = 0
+        nation_obj.gender = $("#firstNationGender").val()
+        nation_obj.bbqual = $("#firstNationBbqual").val()
+        nation_obj.abbr = $("#firstNationAbbr").val()
+        nation_obj.abbr_korean = $("#firstNationAbbrK").val()
+        nation_obj.dem = $("#firstNationDem").val()
+        nation_obj.dem_korean = $("#firstNationDemK").val()
+        nation_obj.time_zone = $("#firstNationTimeZone").val()
+        nation_obj.observes_dst = $("#firstNationDST").val()
+        nation_obj.this_is_the_usa = $("#firstNationUSA").val()
+        nation_obj.children = []
+        nations.push(nation_obj)
+        max_nation_id++
+        nation_count++
+        $("#firstStateTimeZone").val($("#firstNationTimeZone").val())
+
+        second_nations_obj.title = "Second Nations"
+        second_nations_obj.folder = false
+        second_nations_obj.icon = './images/circle-plus-solid.svg'
+        second_nations_obj.type = 'second_nations'
+        second_nations_obj.subdata = []
             
-            const ethnicities_arr = {}
-            const ethnicities = []
-            ethnicities_arr.title = "ETHNICITIES";
-            ethnicities_arr.folder = true
-            ethnicities_arr.type = "ETHNICITIES_PARENT"
-            ethnicities_arr.icon = './images/people-group-solid.svg'
-    
-            const continent_arr = {};
-            const continents = [];
-            continent_arr.title = "CONTINENTS";
-            continent_arr.folder = true;
-            continent_arr.icon = './images/globe-solid.svg'
-            continent_arr.type = "CONTINENTS_PARENT"
+        nation_eth_obj.title = "Ethnicities"
+        nation_eth_obj.folder = false
+        nation_eth_obj.icon = './images/user-group-solid.svg'
+        nation_eth_obj.type = 'nation_ethnicity'
+        nation_eth_obj.subdata = []
 
-            const ethnicity_obj = {}
-            const continent_obj = {}
-            const nation_obj = {}
-            const state_obj = {}
-            const state_arr = []
-            const city_obj = {}
-            const second_nations_obj = {}
-            const nation_eth_obj = {}
-            const tree_json = []
-                  
-            ethnicity_obj.type = 'ethnicity'
-            ethnicity_obj.folder = false
-            ethnicity_obj.icon = './images/user-group-solid.svg'
-            ethnicity_obj.title = $("#firstEthnicityName").val()
-            ethnicity_obj.name_korean = $("#firstEthnicityNameK").val()
-            ethnicity_obj.id = max_ethnicity_id + 1
-            ethnicity_obj.african = $("#firstEthnicityAfrican").val()
-            ethnicity_obj.asian = $("#firstEthnicityAsian").val()
-            ethnicity_obj.east_indian = $("#firstEthnicityEastIndian").val()
-            ethnicity_obj.caucasian = $("#firstEthnicityCaucasian").val()
-            ethnicity_obj.hispanic = $("#firstEthnicityHispanic").val()
-            ethnicities.push(ethnicity_obj)
-            ethnicities_arr.children = ethnicities
-            max_ethnicity_id++
-            ethnicity_count++
+        state_obj.type = 'state'
+        state_obj.folder = true
+        state_obj.icon = './images/landmark-flag-solid.svg'
+        state_obj.id = 1
+        state_obj.title = $("#firstStateName").val()
+        state_obj.title_korean = $("#firstStateNameK").val()
+        state_obj.pop = $("#firstStatePopulation").val()
+        state_obj.abbr = $("#firstStateAbbr").val()
+        state_obj.abbr_korean = $("#firstStateAbbrK").val()
+        state_obj.time_zone = $("#firstStateTimeZone").val()
+        state_obj.observes_dst = $("#firstStateDST").val()
+        state_obj.lat = $("#firstStateLatitude").val().trim()
+        state_obj.long = $("#firstStateLongitude").val().trim()
+        state_obj.children = []
+        max_state_id++
+        state_count++
+        $("#firstCityTimeZone").val($("#firstStateTimeZone").val())
 
-            continent_obj.type = 'continent'
-            continent_obj.folder = true
-            continent_obj.icon = './images/earth-americas-solid.svg'
-            continent_obj.id = max_continent_id + 1
-            continent_obj.title = $("#firstContinentName").val()
-            continent_obj.title_korean = $("#firstContinentNameK").val()
-            continent_obj.pop = $("#firstContinentPop").val()
-            continent_obj.etid = 1
-            continent_obj.abbr = $("#firstContinentAbbr").val()
-            continent_obj.dem = $("#firstContinentDem").val()
-            continent_obj.abbr_korean =  $("#firstContinentAbbrK").val()
-            continent_obj.dem_korean = $("#firstContinentDemK").val()
-            continents.push(continent_obj)
-            continent_arr.children = continents
-            max_continent_id++
-            continent_count++
+        city_obj.type = 'city'
+        city_obj.folder = false
+        city_obj.icon = './images/city-solid.svg'
+        city_obj.id = 1
+        city_obj.title = $("#firstCityName").val()
+        city_obj.title_korean = $("#firstCityNameK").val()
+        city_obj.pop = $("#firstCityPopulation").val()
+        city_obj.lat = $("#firstCityLatitude").val()
+        city_obj.long = $("#firstCityLongitude").val()
+        city_obj.abbr = $("#firstCityAbbr").val()
+        city_obj.altitude = $("#firstCityAltitude").val()
+        city_obj.abbr_korean = $("#firstCityAbbrK").val()
+        city_obj.time_zone = $("#firstCityTimeZone").val()
+        city_obj.observes_dst = $("#firstCityDST").val()
+        city_obj.state = $("#firstCityState").val()
+        city_obj.nation = $("#firstCityNation").val()
+        max_city_id++
+        city_count++
 
-            nation_obj.type = 'nation'
-            nation_obj.folder = true
-            nation_obj.icon = ($("#firstNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
-            nation_obj.id = 1
-            nation_obj.title = $("#firstNationName").val()
-            nation_obj.title_korean = $("#firstNationNameK").val()
-            nation_obj.short_korean = $("#firstNationShortK").val()
-            nation_obj.pop = $("#firstNationPopulation").val()
-            nation_obj.etid = 1
-            nation_obj.capid = 0
-            nation_obj.gender = $("#firstNationGender").val()
-            nation_obj.bbqual = $("#firstNationBbqual").val()
-            nation_obj.abbr = $("#firstNationAbbr").val()
-            nation_obj.abbr_korean = $("#firstNationAbbrK").val()
-            nation_obj.dem = $("#firstNationDem").val()
-            nation_obj.dem_korean = $("#firstNationDemK").val()
-            nation_obj.time_zone = $("#firstNationTimeZone").val()
-            nation_obj.observes_dst = $("#firstNationDST").val()
-            nation_obj.this_is_the_usa = $("#firstNationUSA").val()
-            nation_obj.children = []
-            max_nation_id++
-            nation_count++
-            $("#firstStateTimeZone").val($("#firstNationTimeZone").val())
+        state_arr.push(state_obj)
+        state_obj.children.push(city_obj)
+        states_obj.children = state_arr
+        nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
+        continent_obj.children = nations
 
-            second_nations_obj.title = "Second Nations"
-            second_nations_obj.folder = false
-            second_nations_obj.icon = './images/circle-plus-solid.svg'
-            second_nations_obj.type = 'second_nations'
-            second_nations_obj.subdata = []
-              
-            nation_eth_obj.title = "Ethnicities"
-            nation_eth_obj.folder = false
-            nation_eth_obj.icon = './images/user-group-solid.svg'
-            nation_eth_obj.type = 'nation_ethnicity'
-            nation_eth_obj.subdata = []
+        tree_json.push(ethnicities_arr, continent_arr, regions_arr)
 
-            state_obj.type = 'state'
-            state_obj.folder = true
-            state_obj.icon = './images/landmark-flag-solid.svg'
-            state_obj.id = 1
-            state_obj.title = $("#firstStateName").val()
-            state_obj.title_korean = $("#firstStateNameK").val()
-            state_obj.pop = $("#firstStatePopulation").val()
-            state_obj.abbr = $("#firstStateAbbr").val()
-            state_obj.abbr_korean = $("#firstStateAbbrK").val()
-            state_obj.time_zone = $("#firstStateTimeZone").val()
-            state_obj.observes_dst = $("#firstStateDST").val()
-            state_obj.lat = $("#firstStateLatitude").val().trim()
-            state_obj.long = $("#firstStateLongitude").val().trim()
-            state_obj.children = []
-            max_state_id++
-            state_count++
-            $("#firstCityTimeZone").val($("#firstStateTimeZone").val())
+        initTree(tree_json)
 
-            city_obj.type = 'city'
-            city_obj.folder = false
-            city_obj.icon = './images/city-solid.svg'
-            city_obj.id = $("#firstCityId").val()
-            city_obj.title = $("#firstCityName").val()
-            city_obj.title_korean = $("#firstCityNameK").val()
-            city_obj.pop = $("#firstCityPopulation").val()
-            city_obj.lat = $("#firstCityLatitude").val()
-            city_obj.long = $("#firstCityLongitude").val()
-            city_obj.abbr = $("#firstCityAbbr").val()
-            city_obj.altitude = $("#firstCityAltitude").val()
-            city_obj.abbr_korean = $("#firstCityAbbrK").val()
-            city_obj.time_zone = $("#firstCityTimeZone").val()
-            city_obj.observes_dst = $("#firstCityDST").val()
-            city_obj.state = $("#firstCityState").val()
-            city_obj.nation = $("#firstCityNation").val()
-            max_city_id++
-            city_count++
-
-            state_arr.push(state_obj)
-            state_obj.children.push(city_obj)
-            nation_obj.children = [second_nations_obj, nation_eth_obj, state_arr]
-            continent_obj.children.push(nation_obj)
-
-            tree_json.push(ethnicities_arr, continent_arr)
-
-            console.log(tree_json)
-
-        console.log("FORM SUBMITTY")
+        $.magnificPopup.close()
     })
 
     $("#newEthnicityForm").on("submit", function(e) {
