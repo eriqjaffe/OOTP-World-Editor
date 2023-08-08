@@ -100,7 +100,7 @@ ipcMain.on('save_xml', (event, data) => {
                 }
             });
         } else {
-            result.status = "cancelled"
+            result.status = "success"
             result.message = null
             try {
                 event.sender.send('save_xml_result', result)
