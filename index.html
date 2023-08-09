@@ -17,34 +17,27 @@
     <link href="./scripts/bootstrap.css" rel="stylesheet">
     <link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <link href="./scripts/jquery.contextMenu.css" rel="stylesheet" type='text/css'/>
-    <link href="./scripts/datatables.min.css" rel="stylesheet" type='text/css'/>
+    <link href="./scripts/DataTables-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/Buttons-2.4.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/Select-1.7.0/css/select.dataTables.min.css" rel="stylesheet">
+    <link href="./scripts/smart_wizard_all.min.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
-    <script type="text/javascript" src="./scripts/datatables.min.js"></script>
+    <script src="./scripts/DataTables-1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="./scripts/Buttons-2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="./scripts/FixedHeader-3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="./scripts/Select-1.7.0/js/dataTables.select.min.js"></script>
     <script type="text/javascript" src="./scripts/latinize.js"></script>
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
-
+    <script src="./scripts/jquery.smartWizard.min.js" type="text/javascript"></script>
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
         const XMLWriter = require('xml-writer');
         var nodeToEdit = null;
-        var max_world_id = 0
-        var max_continent_id = 0
-        var max_nation_id = 0
-        var max_state_id = 0
-        var max_city_id = 0
-        var max_ethnicity_id = 0
-        var max_region_id = 0
-        var max_region_sort_order = 0
-        var world_count = 0
-        var continent_count = 0
-        var nation_count = 0
-        var state_count = 0
-        var city_count = 0
-        var ethnicity_count = 0
-        var region_count = 0
+        var max_world_id = max_continent_id = max_nation_id = max_state_id = max_city_id = max_ethnicity_id = max_region_id = max_region_sort_order = world_count = continent_count = nation_count = state_count = city_count = ethnicity_count = region_count = 0
         var ethnicities_by_id = {}
         var cities_by_id = {}
         var states_by_id = {}
@@ -55,6 +48,7 @@
         var states_by_nation = {}
         var cities_by_state = {}
         var cities_by_nation = {}
+        var usa_defined = []
         const time_zones = [ { tz: "-12.00", loc: "(GMT-12:00) International Date Line West" }, { tz: "-11.00", loc: "(GMT-11:00) Midway Island, Samoa" }, { tz: "-10.00", loc: "(GMT-10:00) Hawaii" }, { tz: "-9.00", loc: "(GMT-09:00) Alaska" }, { tz: "-8.00", loc: "(GMT-08:00) Pacific Time (US &amp; Canada)" }, { tz: "-7.00", loc: "(GMT-07:00) Mountain Time (US &amp; Canada)" }, { tz: "-6.00", loc: "(GMT-06:00) Central Time (US &amp; Canada)" }, { tz: "-5.00", loc: "(GMT-05:00) Eastern Time (US &amp; Canada)" }, { tz: "-4.00", loc: "(GMT-04:00) Atlantic Time (Canada)" }, { tz: "-3.50", loc: "(GMT-03:30) Newfoundland" }, { tz: "-3.00", loc: "(GMT-03:00) Brasilia" }, { tz: "-2.00", loc: "(GMT-02:00) Mid-Atlantic" }, { tz: "-1.00", loc: "(GMT-01:00) Cape Verde Is." },  { tz: "0.00", loc: "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London" }, { tz: "1.00", loc: "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" },  { tz: "2.00", loc: "(GMT+02:00) Cairo" }, { tz: "3.00", loc: "(GMT+03:00) Moscow, St. Petersburg, Volgograd" }, { tz: "3.50", loc: "(GMT+03:30) Tehran" }, { tz: "4.00", loc: "(GMT+04:00) Abu Dhabi, Muscat" },  { tz: "4.50", loc: "(GMT+04:30) Kabul" },  { tz: "5.00", loc: "(GMT+05:00) Islamabad, Karachi, Tashkent" }, { tz: "5.50", loc: "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi" }, { tz: "5.75", loc: "(GMT+05:45) Kathmandu" }, { tz: "6.00", loc: "(GMT+06:00) Almaty, Novosibirsk" }, { tz: "6.50", loc: "(GMT+06:30) Yangon (Rangoon)" }, { tz: "7.00", loc: "(GMT+07:00) Bangkok, Hanoi, Jakarta" }, { tz: "8.00", loc: "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" },  { tz: "9.00", loc: "(GMT+09:00) Osaka, Sapporo, Tokyo" }, { tz: "9.50", loc: "(GMT+09:30) Adelaide, Darwin" },  { tz: "10.00", loc: "(GMT+10:00) Canberra, Melbourne, Sydney" }, { tz: "11.00", loc: "(GMT+11:00) Magadan, Solomon Is., New Caledonia" }, { tz: "12.00", loc: "(GMT+12:00) Auckland, Wellington" }]
         const tzDisplay = { "-12.00": "(GMT-12:00) International Date Line West", "-11.00": "(GMT-11:00) Midway Island, Samoa", "-10.00": "(GMT-10:00) Hawaii", "-9.00": "(GMT-09:00) Alaska", "-8.00": "(GMT-08:00) Pacific Time (US &amp; Canada)", "-7.00": "(GMT-07:00) Mountain Time (US &amp; Canada)", "-6.00": "(GMT-06:00) Central Time (US &amp; Canada)", "-5.00": "(GMT-05:00) Eastern Time (US &amp; Canada)", "-4.00": "(GMT-04:00) Atlantic Time (Canada)", "-3.50": "(GMT-03:30) Newfoundland", "-3.00": "(GMT-03:00) Brasilia", "-2.00": "(GMT-02:00) Mid-Atlantic", "-1.00": "(GMT-01:00) Cape Verde Is." , "0.00": "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London", "1.00": "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" , "2.00": "(GMT+02:00) Cairo", "3.00": "(GMT+03:00) Moscow, St. Petersburg, Volgograd", "3.50": "(GMT+03:30) Tehran", "4.00": "(GMT+04:00) Abu Dhabi, Muscat" , "4.50": "(GMT+04:30) Kabul" , "5.00": "(GMT+05:00) Islamabad, Karachi, Tashkent", "5.50": "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi", "5.75": "(GMT+05:45) Kathmandu", "6.00": "(GMT+06:00) Almaty, Novosibirsk", "6.50": "(GMT+06:30) Yangon (Rangoon)", "7.00": "(GMT+07:00) Bangkok, Hanoi, Jakarta", "8.00": "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" , "9.00": "(GMT+09:00) Osaka, Sapporo, Tokyo", "9.50": "(GMT+09:30) Adelaide, Darwin" , "10.00": "(GMT+10:00) Canberra, Melbourne, Sydney", "11.00": "(GMT+11:00) Magadan, Solomon Is., New Caledonia", "12.00": "(GMT+12:00) Auckland, Wellington" }
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
@@ -68,10 +62,20 @@
             ordering:  true,
             paging: false, 
             info: false,
-            scrollY: 700
+            scrollY: 700,
+            scrollCollapse: true
         } );
     </script>
+    <style>
+        .white-popup {
+            height: 650px;
+            width: auto;
+        }
 
+        .sw .toolbar>.sw-btn.disabled, .sw .toolbar>.sw-btn:disabled {
+            opacity: .25;
+        }
+    </style>
 </head>
 <body>
     <div id="overlay">
@@ -254,9 +258,9 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="left">Modern USA?</td>
+                            <td class="left">"This Is The USA"?</td>
                             <td class="right">
-                                <select id="newNationUSA" style="width:99%;">
+                                <select id="newNationUSA" class="defineUSA" style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -731,9 +735,9 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="left">Modern USA?</td>
+                            <td class="left">"This Is The USA"?</td>
                             <td class="right">
-                                <select id="editNationUSA" style="width:99%;">
+                                <select id="editNationUSA" class="defineUSA" style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -1005,6 +1009,7 @@
                 <td>CITIES: <span id="city_count">0</span></td>
                 <td>ETHNICITIES: <span id="ethnicity_count">0</span></td>
                 <td>REGIONS: <span id="region_count">0</span></td>
+                <td>USA DEFINED: <span id="usa_defined_count">0</span></td>
             </tr>
             <tr>
                 <td>MAX_CONTINENT_ID: <span id="max_continent_id">0</span></td>
@@ -1013,13 +1018,353 @@
                 <td>MAX_CITY_ID: <span id="max_city_id">0</span></td>
                 <td>MAX_ETHNICITY_ID: <span id="max_ethnicity_id">0</span></td>
                 <td>MAX_REGION_ID: <span id="max_region_id">0</span></td>
+                <td></td>
             </tr>
         </table>    
     </div>
 
+    <div id="wizardContainer" class="white-popup mfp-hide">
+        <div id="smartwizard">
+            <ul class="nav">
+                <li class="nav-item">
+                <a class="nav-link" href="#step-1">
+                    <div class="num">1</div>
+                    Ethnicity
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#step-2">
+                    <span class="num">2</span>
+                    Continent
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#step-3">
+                    <span class="num">3</span>
+                    Nation
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link " href="#step-4">
+                    <span class="num">4</span>
+                    State
+                </a>
+                <li class="nav-item">
+                <a class="nav-link " href="#step-5">
+                    <span class="num">5</span>
+                    State
+                </a>
+                </li>
+            </ul>
+        
+            <div class="tab-content">
+                <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+                    <h2 style="text-align:center;">Add First Ethnicity</h2>
+                    <form id="form-1" action="">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td class="left">Name:</td>
+                            <td class="right"><input type='text' style="width:95%;" id='firstEthnicityName' class="centerText toKorean" required value="placeholderData"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Name (Korean):</td>
+                            <td class="right"><input type='text' style="width:95%;" id='firstEthnicityNameK' class="centerText"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">African:</td>
+                            <td class="right"><input type='number' style="width:95%;" class='firstEthPct' min='0' max='1000' id='firstEthnicityAfrican' value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Asian:</td>
+                            <td class="right"><input type='number' style="width:95%;" class='firstEthPct' min='0' max='1000' id='firstEthnicityAsian' value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">East Indian:</td>
+                            <td class="right"><input type='number' style="width:95%;" class='firstEthPct' min='0' max='1000' id='firstEthnicityEastIndian' value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Caucasian:</td>
+                            <td class="right"><input type='number' style="width:95%;" class='firstEthPct' min='0' max='1000' id='firstEthnicityCaucasian' value="1000"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Hispanic:</td>
+                            <td class="right"><input type='number' style="width:95%;" class='firstEthPct' min='0' max='1000' id='firstEthnicityHispanic' value="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="left">Total:</td>
+                            <td class="right"><input type='number' min='1000' max='1000' class="readonly centerText" style="width:95%;" id='firstEthnicityTotal' class="centerText" pattern="1000" value="1000"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+                </div>
+                <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
+                    <h2 style="text-align:center;">Add First Continent</h2>
+                    <form id="form-2" action="">
+                        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                            <tbody>
+                            <tr>
+                                <td class="left">Name:</td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="firstContinentName" id="firstContinentName" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation:</td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="firstContinentAbbr" id="firstContinentAbbr" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Demonym:</td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="firstContinentDem" id="firstContinentDem" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Population:</td>
+                                <td class="left"><input style="width:95%;" type="number" class="centerText" name="firstContinentPop" id="firstContinentPop" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Name (Korean):</td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText" name="firstContinentNameK" id="firstContinentNameK" value=""></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation (Korean):</td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText" name="firstContinentAbbrK" id="firstContinentAbbrK" value=""></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Demonym (Korean):</td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText" name="firstContinentDemK" id="firstContinentDemK" value=""></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+                <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
+                    <h2 style="text-align:center;">Add First Nation</h2>
+                    <form id="form-3">
+                        <table class="headlessTable cell-border compact stripe" style="width:95%; margin:0 auto;">
+                            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                            <tbody>
+                            <tr>
+                                <td class="left">Name:</td>
+                                <td class="right"><input type="text" class="centerText toKorean" id="firstNationName" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation:</td>
+                                <td class="right"><input type="text" class="centerText toKorean" id="firstNationAbbr" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Demonym:</td>
+                                <td class="right"><input type="text" class="centerText toKorean" id="firstNationDem" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Population:</td>
+                                <td class="right"><input type="number" id="firstNationPopulation" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Gender:</td>
+                                <td class="right">
+                                    <select id="firstNationGender" style="width:99%;">
+                                        <option value="0">Male</option>
+                                        <option value="1">Female</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Baseball Quality:</td>
+                                <td class="right">
+                                    <select id="firstNationBbqual" style="width:99%;">
+                                        <option value="5">5: Excellent</option>
+                                        <option value="4">4: Good</option>
+                                        <option value="3" selected>3: Average</option>
+                                        <option value="2">2: Fair</option>
+                                        <option value="1">1: Poor</option>
+                                        <option value="0">Non-Existent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Observes DST:</td>
+                                <td class="right">
+                                    <select id="firstNationDST" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">"This Is The USA"?</td>
+                                <td class="right">
+                                    <select id="firstNationUSA" class="defineUSA" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Name (Korean):</td>
+                                <td class="right"><input type="text" class="centerText" id="firstNationNameK" value=""></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Short (Korean):</td>
+                                <td class="right"><input type="text" class="centerText" id="firstNationShortK" value=""></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbr. (Korean):</td>
+                                <td class="right"><input type="text" class="centerText" id="firstNationAbbrK" value=""></td>
+                            
+                            </tr>
+                            <tr>    
+                                <td class="left">Demonym (Korean):</td>
+                                <td class="right"><input type="text" class="centerText" id="firstNationDemK" value=""></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Time Zone:</td>
+                                <td class="right">
+                                    <select class="tzSelect" id="firstNationTimeZone" style="width:100%;">
+                                    </select>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form> 
+                </div>
+                <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
+                    <h2 style="text-align:center;">Add First State</h2>
+                        <form id="form-4">
+                        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                            <tbody>
+                            <tr>
+                                <td class="left">Name:</td>
+                                <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="firstStateName" required value="placeholderData"</td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation:</td>
+                                <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="firstStateAbbr" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Population:</td>
+                                <td class="right"><input type="number" style="width:96%;"id="firstStatePopulation" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Time Zone:</td>
+                                <td class="right"><select class="tzSelect" id="firstStateTimeZone" style="width:99%;"></select></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Observes DST:</td>
+                                <td class="right">
+                                    <select id="firstStateDST" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Latitude:</td>
+                                <td class="right"><input type="text" style="width:96%;" id="firstStateLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Longitude:</td>
+                                <td class="right"><input type="text" style="width:96%;" id="firstStateLongitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Name (Korean):</td>
+                                <td class="right"><input type="text" style="width:96%;"id="firstStateNameK" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation (Korean):</td>
+                                <td class="right"><input type="text" style="width:96%;" id="firstStateAbbrK" value="0"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+                <div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-5">
+                    <h2 style="text-align:center;">Add First City</h2>
+                        <form id="form-5">
+                        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                            <tbody>
+                            <tr>
+                                <td class="left">Name:</td>
+                                <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="firstCityName" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation:</td>
+                                <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="firstCityAbbr" required value="placeholderData"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Population:</td>
+                                <td class="right"><input type="number" style="width:97%;" id="firstCityPopulation" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Time Zone:</td>
+                                <td class="right"><select class="tzSelect" id="firstCityTimeZone" style="width:99%;"></select></td>
+                            </tr>
+                            <tr>
+                                <td class="left">National Capitol:</td>
+                                <td class="right">
+                                    <select style="width:99%;" id="firstCityCapitol" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Observes DST:</td>
+                                <td class="right">
+                                    <select style="width:99%;" id="firstCityDST" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Latitude:</td>
+                                <td class="right"><input type="text" style="width:97%;" id="firstCityLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Longitude:</td>
+                                <td><input type="text" style="width:97%;" id="firstCityLongitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Altitude:</td>
+                                <td class="right">
+                                    <select style="width:99%;" id='firstCityAltitude'> 
+                                        <option value='0'>~0 m</option>
+                                        <option value='1'>~500 m</option>
+                                        <option value='2'>~1000 m</option>
+                                        <option value='3'>~1500 m</option>
+                                        <option value='4'>~2000 m</option>
+                                        <option value='5'>~2500 m</option>
+                                        <option value='6'>~3000 m</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Name (Korean):</td>
+                                <td class="right"><input type="text" style="width:97%;" id="firstCityNameK" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td class="left">Abbreviation (Korean):</td>
+                                <td class="right"><input type="text" style="width:97%;" id="firstCityAbbrK" value="0"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        
+            <!-- Include optional progressbar HTML -->
+            <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>  
+    </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
+    <input type="button" id="newXML" value="New XML file" style="display: none;">
     <input type="button" class="button" id="addEthnicityTrigger" value="Add Ethnicity" style="display:none;">
     <input type="button" class="button" id="addContinentTrigger" value="Add Continent" style="display:none;">
     <input type="button" class="button" id="addNationTrigger" value="Add Nation" style="display:none;">
@@ -1030,7 +1375,6 @@
     require('./renderer.js')
 
     var fancyTreeReady = false;
-    var treeGlobal = "hello world"
 
     $(document).ready(function() {
 
@@ -1303,9 +1647,150 @@
         ipcRenderer.send('open-xml', null)
     })
 
+    $("#newXML").on("click", function() {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        clearRightDiv()
+        if (tree != null) {
+            nodeToEdit = null;
+            max_world_id = max_continent_id = max_nation_id = max_state_id = max_city_id = max_ethnicity_id = max_region_id = max_region_sort_order = world_count = continent_count = nation_count = state_count = city_count = ethnicity_count = region_count = 0
+            ethnicities_by_id = {}
+            cities_by_id = {}
+            states_by_id = {}
+            nations_by_id = {}
+            continents_by_id = {}
+            regions_by_id = {}
+            nations_by_continent = {}
+            states_by_nation = {}
+            cities_by_state = {}
+            cities_by_nation = {}
+            usa_defined = []
+            $("#continent_count").text(continent_count)
+            $("#nation_count").text(nation_count)
+            $("#state_count").text(state_count)
+            $("#city_count").text(city_count)
+            $("#ethnicity_count").text(ethnicity_count)
+            $("#region_count").text(region_count)
+            $("#usa_defined_count").text(usa_defined.length)
+            $("#max_continent_id").text(max_continent_id)
+            $("#max_nation_id").text(max_nation_id)
+            $("#max_state_id").text(max_state_id)
+            $("#max_city_id").text(max_city_id)
+            $("#max_ethnicity_id").text(max_ethnicity_id)
+            $("#max_region_id").text(max_region_id)
+            var tree = $.ui.fancytree.getTree("#xmlOutput")
+            tree.destroy()
+        }
+
+        $.magnificPopup.open({
+            items: {
+                src: '#wizardContainer',
+                type: 'inline',
+                height: 800,
+                width: 1000
+            },
+            callbacks: {
+                open: function() {
+                    $(function() {
+                        $('#smartwizard').smartWizard({
+                            selected: 0,
+                            transition: {
+                                animation: 'slideHorizontal'
+                            },
+                            toolbar: {
+                                showNextButton: true, // show/hide a Next button
+                                showPreviousButton: true, // show/hide a Previous button
+                                position: 'bottom', // none/ top/ both bottom
+                                extraHtml: "<button class='btn sw-btn' id='btnFinish' disabled onclick='firstStuffSubmit()'>Finish</button>"
+                            },
+                        });
+
+                        $('#smartwizard').smartWizard("goToStep", 0);
+
+                         $("#smartwizard").on("showStep", function(e, anchorObject, stepIndex, stepDirection, stepPosition) {
+                            $("#prev-btn").removeClass('disabled').prop('disabled', false);
+                            $("#next-btn").removeClass('disabled').prop('disabled', false);
+                            if(stepPosition === 'first') {
+                                $("#prev-btn").addClass('disabled').prop('disabled', true);
+                            } else if(stepPosition === 'last') {
+                                $("#next-btn").addClass('disabled').prop('disabled', true);
+                            } else {
+                                $("#prev-btn").removeClass('disabled').prop('disabled', false);
+                                $("#next-btn").removeClass('disabled').prop('disabled', false);
+                            }
+
+                            if (stepPosition == 'last') {
+                                //showConfirm();
+                                $("#btnFinish").prop('disabled', false);
+                            } else {
+                                $("#btnFinish").prop('disabled', true);
+                            }
+                        })
+
+                        $("#smartwizard").on("leaveStep", function(e, anchorObject, currentStepIdx, nextStepIdx, stepDirection) {
+                            if (stepDirection == 'forward') {
+                                let form = document.getElementById('form-' + (currentStepIdx + 1));
+                                if (!form.checkValidity()) {
+                                    // Create the temporary button, click and remove it
+                                    var tmpSubmit = document.createElement('button')
+                                    form.appendChild(tmpSubmit)
+                                    tmpSubmit.click()
+                                    form.removeChild(tmpSubmit)
+                                    return false
+                                } else {
+                                    switch (currentStepIdx) {
+                                        case 2:
+                                            $("#firstStateTimeZone").val($("#firstNationTimeZone").val())
+                                            break;
+                                        case 3:
+                                            $("#firstCityTimeZone").val($("#firstStateTimeZone").val())
+                                            break;
+                                    }
+                                }
+                            }
+                        })
+                    });
+                },
+                close: function() {
+                    $('#smartwizard').smartWizard("reset");
+                    $('#smartwizard').smartWizard("setState", [0], "enable");
+                    $('#smartwizard').smartWizard("setState", [1,2,3,4], "disable");
+                }
+            }
+        });
+    })
+
     $("#closeXML").on("click", function() {
         if (confirm("Are you sure?")) {
-            window.location.reload()
+            clearRightDiv()
+            //window.location.reload()
+            nodeToEdit = null;
+            max_world_id = max_continent_id = max_nation_id = max_state_id = max_city_id = max_ethnicity_id = max_region_id = max_region_sort_order = world_count = continent_count = nation_count = state_count = city_count = ethnicity_count = region_count = 0
+            ethnicities_by_id = {}
+            cities_by_id = {}
+            states_by_id = {}
+            nations_by_id = {}
+            continents_by_id = {}
+            regions_by_id = {}
+            nations_by_continent = {}
+            states_by_nation = {}
+            cities_by_state = {}
+            cities_by_nation = {}
+            usa_defined = []
+            $("#continent_count").text(continent_count)
+            $("#nation_count").text(nation_count)
+            $("#state_count").text(state_count)
+            $("#city_count").text(city_count)
+            $("#ethnicity_count").text(ethnicity_count)
+            $("#region_count").text(region_count)
+            $("#usa_defined_count").text(usa_defined.length)
+            $("#max_continent_id").text(max_continent_id)
+            $("#max_nation_id").text(max_nation_id)
+            $("#max_state_id").text(max_state_id)
+            $("#max_city_id").text(max_city_id)
+            $("#max_ethnicity_id").text(max_ethnicity_id)
+            $("#max_region_id").text(max_region_id)
+            var tree = $.ui.fancytree.getTree("#xmlOutput")
+            tree.destroy()
         } 
     })
 
@@ -1491,6 +1976,22 @@
 
     $("#saveXML").on("click",function(e) {
         $("#overlay").css("display","inline-block")
+
+/*         ipcRenderer.invoke('alert', "There are no nations defined as The USA.  There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.").then((result) => {})
+            $("#overlay").css("display","none")
+            return false */
+
+        var usaCount = countUSA()
+
+        if (usaCount < 1) {
+            alert("There are no nations defined as The USA.  There should always be at least one nation with this flag enabled because OOTP needs it as the nation for pre-defined leagues, like NL or AL.")
+            $("#overlay").css("display","none")
+            return false           
+        } else if (usaCount > 1) {
+            alert("There are no nations defined as The USA.  More than one nation is defined as The USA.  While this is not necessarily game-breaking, OOTP expects only one nation to have this flag set.")
+            $("#overlay").css("display","none")
+            return false
+        }
 
         const tree = $.ui.fancytree.getTree("#xmlOutput")
 
@@ -1720,6 +2221,7 @@
             $("#city_count").text(city_count)
             $("#ethnicity_count").text(ethnicity_count)
             $("#region_count").text(region_count)
+            $("#usa_defined_count").text(usa_defined.length)
             $("#max_continent_id").text(max_continent_id)
             $("#max_nation_id").text(max_nation_id)
             $("#max_state_id").text(max_state_id)
@@ -1789,7 +2291,7 @@
                     var nation_obj = {}
                     nation_obj.type = 'nation'
                     nation_obj.folder = true
-                    nation_obj.icon = './images/flag-solid.svg'
+                    nation_obj.icon = (usa != undefined) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
                     nation_obj.id = nation.$.id
                     nation_obj.title = nation.$.name
                     nation_obj.title_korean = (nation.$.name_korean != undefined) ? nation.$.name_korean : ""
@@ -1806,7 +2308,8 @@
                     nation_obj.dem_korean = (nation.$.dem_korean != undefined) ? nation.$.dem_korean : ""
                     nation_obj.time_zone = parseFloat(nation.$.time_zone).toFixed(2).toString()
                     nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
-                    nation_obj.this_is_the_usa = (usa != undefined) ? '1' : "0"
+                    nation_obj.this_is_the_usa = (usa != undefined) ? 1 : 0
+                    if (nation_obj.this_is_the_usa == 1) { usa_defined.push(nation_obj.id) }
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
                     var second_nations_obj = {}
                     second_nations_obj.title = "Second Nations"
@@ -1969,18 +2472,27 @@
             regions_arr.children = regions
             tree_json.push(regions_arr)
 
-            $("#xmlOutput").fancytree({
-                extensions: [],
-                source: tree_json,
-                init: function(event, data){
-                    fancyTreeReady = true
-                },
-                activate: function(event, data){
-                    $("#dataTable").html("")
-                    var node = data.node;
-                    var html = ""
-                    switch (node.type) {
-                        case "ETHNICITIES_PARENT":
+            initTree(tree_json)
+        } else {
+            $("#overlay").css("display","none")
+            alert("cancelled!")
+        }
+    });
+
+    function initTree(json) {
+        $("#xmlOutput").fancytree({
+            extensions: [],
+            source: json,
+            init: function(event, data){
+                fancyTreeReady = true
+            },
+            activate: function(event, data){
+                $("#dataTable").html("")
+                var node = data.node;
+                var html = ""
+                switch (node.type) {
+                    case "ETHNICITIES_PARENT":
+                        if (node.getChildren() != null) {
                             html = '<h2 style="text-align:center;">'+node.countChildren(false)+' Ethnicities found</h2>\n'
 
                             var african = 0
@@ -1988,7 +2500,7 @@
                             var east_indian = 0
                             var caucasian = 0
                             var hispanic = 0
-                            
+
                             for (child of node.getChildren()) {
                                 african += parseInt(child.data.african)
                                 asian += parseInt(child.data.asian)
@@ -2000,14 +2512,14 @@
                             var sum = african + asian + east_indian + caucasian + hispanic
 
                             html += "<div id='pieChartP'>\n"
-                                 + "<div data-lcolor='#623A17'>"+((african/sum)*100).toFixed(3)+"<span>African</span></div>\n"
-                                 + "<div data-lcolor='#F7E2AB'>"+((asian/sum)*100).toFixed(3)+"<span>Asian</span></div>\n"
-                                 + "<div data-lcolor='#CB9662'>"+((east_indian/sum)*100).toFixed(3)+"<span>East Indian</span></div>\n"
-                                 + "<div data-lcolor='#F6DCC3'>"+((caucasian/sum)*100).toFixed(3)+"<span>Caucasian</span></div>\n"
-                                 + "<div data-lcolor='#EFC794'>"+((hispanic/sum)*100).toFixed(3)+"<span>Hispanic</span></div>\n"
-                                 + "</div>\n"
-                                 + "<h4 style='text-align: center;'><b>Approximate Percentages</b></h4>\n"
-                                 + "<div class='result_list'></div>"
+                                    + "<div data-lcolor='#623A17'>"+((african/sum)*100).toFixed(3)+"<span>African</span></div>\n"
+                                    + "<div data-lcolor='#F7E2AB'>"+((asian/sum)*100).toFixed(3)+"<span>Asian</span></div>\n"
+                                    + "<div data-lcolor='#CB9662'>"+((east_indian/sum)*100).toFixed(3)+"<span>East Indian</span></div>\n"
+                                    + "<div data-lcolor='#F6DCC3'>"+((caucasian/sum)*100).toFixed(3)+"<span>Caucasian</span></div>\n"
+                                    + "<div data-lcolor='#EFC794'>"+((hispanic/sum)*100).toFixed(3)+"<span>Hispanic</span></div>\n"
+                                    + "</div>\n"
+                                    + "<h4 style='text-align: center;'><b>Approximate Percentages</b></h4>\n"
+                                    + "<div class='result_list'></div>"
 
                             $("#infoPanel").html(html)
 
@@ -2032,348 +2544,851 @@
                                 usePercent:true,
                                 speedDraw:50
                             });
-                            break;
-                        case "ethnicity":
-                            html = '<h2 style="text-align:center;"><img src="./images/people-group-solid.svg">Ethhnicities&nbsp;&rarr;&nbsp;<img src="./images/user-group-solid.svg">'+node.title+'</h2>\n'
-                                 + "<div id='pieChart'>\n"
-                                 + "<div data-lcolor='#623A17'>"+node.data.african/10+"<span>African</span></div>\n"
-                                 + "<div data-lcolor='#F7E2AB'>"+node.data.asian/10+"<span>Asian</span></div>\n"
-                                 + "<div data-lcolor='#CB9662'>"+node.data.east_indian/10+"<span>East Indian</span></div>\n"
-                                 + "<div data-lcolor='#F6DCC3'>"+node.data.caucasian/10+"<span>Caucasian</span></div>\n"
-                                 + "<div data-lcolor='#EFC794'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
-                                 + "</div>\n"
-                                 + "<h4 style='text-align: center;'><b>"+node.title+"</b></h4>\n"
-                                 + "<div class='result_list'></div><br>\n"
-                                 + "<div style='width:100%; text-align:center;'><input type='button' id='editEthnicityButton' class='submit' value='Edit Ethnicity'></div>"
-                                 
-
+                        } else {
+                            html = "<h2 style='text-align:center;'>No Ethnicities Defined</h2>\n"
+                                 + "<div style='width:100%; text-align:center;'><input type='button' id='blankEthnicitiesButton' value='Add Ethnicity'></div>"
                             $("#infoPanel").html(html)
 
-                            rightDivContent("#infoPanel")
-
-                            $("#pieChart").listtopie({
-                                size:'auto',  
-                                strokeWidth:2,
-                                hoverEvent:false,
-                                hoverBorderColor:'#585858',
-                                hoverWidth:2,
-                                textSize:'16',
-                                marginCenter:30,
-                                listVal:true,
-                                strokeColor:'#fff',
-                                listValMouseOver: true,
-                                infoText:true,
-                                setValues:false,
-                                listValInsertClass:'result_list',
-                                backColorOpacity: '0.8',
-                                hoverSectorColor:true,
-                                usePercent:true,
-                                speedDraw:50
-                            });
-
-                            $("#editEthnicityButton").on("click", function(e) {
-                                editEthnicity(node)
+                            $("#blankEthnicitiesButton").on("click", function() {
+                                $("#addEthnicityTrigger").trigger("click")
                             })
-                            break;
-                        case "CONTINENTS_PARENT":
-                            html = '<h2 style="text-align:center;"><img src="./images/globe-solid.svg">Continents</h2>\n'
+                            rightDivContent("#infoPanel")
+                        }
+                        break;
+                    case "ethnicity":
+                        html = '<h2 style="text-align:center;"><img src="./images/people-group-solid.svg">Ethhnicities&nbsp;&rarr;&nbsp;<img src="./images/user-group-solid.svg">'+node.title+'</h2>\n'
+                                + "<div id='pieChart'>\n"
+                                + "<div data-lcolor='#623A17'>"+node.data.african/10+"<span>African</span></div>\n"
+                                + "<div data-lcolor='#F7E2AB'>"+node.data.asian/10+"<span>Asian</span></div>\n"
+                                + "<div data-lcolor='#CB9662'>"+node.data.east_indian/10+"<span>East Indian</span></div>\n"
+                                + "<div data-lcolor='#F6DCC3'>"+node.data.caucasian/10+"<span>Caucasian</span></div>\n"
+                                + "<div data-lcolor='#EFC794'>"+node.data.hispanic/10+"<span>Hispanic</span></div>\n"
+                                + "</div>\n"
+                                + "<h4 style='text-align: center;'><b>"+node.title+"</b></h4>\n"
+                                + "<div class='result_list'></div><br>\n"
+                                + "<div style='width:100%; text-align:center;'><input type='button' id='editEthnicityButton' class='submit' value='Edit Ethnicity'></div>"
+                                
 
-                            var totalPop = 0;
-                            var continentCount = 0;
+                        $("#infoPanel").html(html)
 
-                            html += "<div id='continentPieChart'>\n"
+                        rightDivContent("#infoPanel")
 
+                        $("#pieChart").listtopie({
+                            size:'auto',  
+                            strokeWidth:2,
+                            hoverEvent:false,
+                            hoverBorderColor:'#585858',
+                            hoverWidth:2,
+                            textSize:'16',
+                            marginCenter:30,
+                            listVal:true,
+                            strokeColor:'#fff',
+                            listValMouseOver: true,
+                            infoText:true,
+                            setValues:false,
+                            listValInsertClass:'result_list',
+                            backColorOpacity: '0.8',
+                            hoverSectorColor:true,
+                            usePercent:true,
+                            speedDraw:50
+                        });
+
+                        $("#editEthnicityButton").on("click", function(e) {
+                            editEthnicity(node)
+                        })
+                        break;
+                    case "CONTINENTS_PARENT":
+                        html = '<h2 style="text-align:center;"><img src="./images/globe-solid.svg">Continents</h2>\n'
+
+                        var totalPop = 0;
+                        var continentCount = 0;
+
+                        html += "<div id='continentPieChart'>\n"
+
+                        if (node.getChildren() != null) {
                             for (child of node.getChildren()) {
                                 totalPop += parseInt(child.data.pop)
                                 continentCount++
-                                html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
+                                html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>"+child.title+"</span></div>\n"
                             }
 
                             html += "</div>"
-                                  + "<h4 style='text-align: center; font-weight:bold;'>"+continentCount+" Continents<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
+                                    + "<h4 style='text-align: center; font-weight:bold;'>"+continentCount+" Continents<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
 
                             $("#infoPanel").html(html)
 
-                            $("#continentPieChart").listtopie({
-                                size:'auto',  
-                                strokeWidth:2,
-                                hoverEvent:false,
-                                hoverBorderColor:'#585858',
-                                hoverWidth:2,
-                                textSize:'16',
-                                marginCenter:30,
-                                listVal:false,
-                                strokeColor:'#fff',
-                                listValMouseOver: true,
-                                infoText:false,
-                                setValues:false,
-                                listValInsertClass:'result_list',
-                                backColorOpacity: '0.8',
-                                hoverSectorColor:true,
-                                usePercent:false,
-                                speedDraw:50
-                            });
-
                             rightDivContent("#infoPanel")
-
-
-                            break;
-                        case "continent":
-                            var nat = 0;
-                            var stt = 0;
-                            var cty = 0;
-                            node.visit(function(n) {
-                                switch (n.type) {
-                                    case "nation":
-                                        nat++
-                                        break;
-                                    case "state":
-                                        stt++
-                                        break;
-                                    case "city":
-                                        cty++
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            })
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + '<table class="blank" style="width:100%;">\n'
-                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Continent</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
-                                 + "<tr class='blank'><td class='left_float'>Nations:</td><td class='right_float'>"+nat+"</td><tr>\n"
-                                 + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
-                                 + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
-                                 + "</table><br>\n"
-                                 + "<input type='button' id='editContinentButton' class='submit' value='Edit Continent'>"
-                                 + "</div>\n" 
-                            $("#infoPanel").html(html)
-                            rightDivContent("#infoPanel")
-                            $("#editContinentButton").on("click", function(e) {
-                                editContinent(node)
-                            })
-                            break;
-                        case "nation":
-                            var stt = 0;
-                            var cty = 0;
-                            var eth = 0;
-                            var sec = 0;
-                            node.visit(function(n) {
-                                switch (n.type) {
-                                    case "state":
-                                        stt++
-                                        break;
-                                    case "city":
-                                        cty++
-                                        break;
-                                    case "nation_ethnicity":
-                                        eth = n.data.subdata.length
-                                        break;
-                                    case "second_nations":
-                                        if (n.data.subdata != undefined) { sec = n.data.subdata.length }
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            })
-
-                            var cap
-                            if (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") {
-                                cap = "<span style='color:red;'>None Set</span>" 
-                            } else {
-                                var city = cities_by_nation[node.data.id].find( function( city ){
-                                    return city.id === node.data.capid;
-                                } );
-                                if (city != null) {
-                                    cap = city.title+",&nbsp;"+states_by_id[city.state]
-                                }
-                            } 
-
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + '<table class="blank" style="width:100%;">\n'
-                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Nation</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">This is the USA:</td><td class="right_float" >'+usa[node.data.this_is_the_usa]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+gender[node.data.gender]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
-                                 + "<tr class='blank'><td class='left_float'>Ethnicities:</td><td class='right_float'>"+eth+"</td><tr>\n"
-                                 + "<tr class='blank'><td class='left_float'>Second Nations:</td><td class='right_float'>"+sec+"</td><tr>\n"
-                                 + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
-                                 + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
-                                 + "</table><br>\n"
-                                 + "<input type='button' id='editNationButton' class='submit' value='Edit Nation'>"
-                                 + "</div>\n" 
-                            $("#infoPanel").html(html)
-                            rightDivContent("#infoPanel")
-                            $("#editNationButton").on("click", function(e) {
-                                editNation(node)
-                            })
-                            break;
-                        case "STATES_PARENT":
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-dome-solid.svg'>"+node.title+'</h2>\n'
-
-                            var totalPop = 0;
-                            var stateCount = 0;
-
-                            html += "<div id='statePieChart'>\n"
-
-                            for (child of node.getChildren()) {
-                                totalPop += parseInt(child.data.pop)
-                                stateCount++
-                                html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
-                            }
-
-                            html += "</div>"
-                                  + "<h4 style='text-align: center; font-weight:bold;'>"+stateCount+" States<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
-
-                            $("#infoPanel").html(html)
-
-                            $("#statePieChart").listtopie({
-                                size:'auto',  
-                                strokeWidth:2,
-                                hoverEvent:false,
-                                hoverBorderColor:'#585858',
-                                hoverWidth:2,
-                                textSize:'16',
-                                marginCenter:30,
-                                listVal:false,
-                                strokeColor:'#fff',
-                                listValMouseOver: true,
-                                infoText:true,
-                                setValues:false,
-                                listValInsertClass:'result_list',
-                                backColorOpacity: '0.8',
-                                hoverSectorColor:true,
-                                usePercent:false,
-                                speedDraw:50
-                            });
-
-                            rightDivContent("#infoPanel")
-                            break;
-                        case "state":
-                            var cty = 0;
-                            node.visit(function(n) {
-                                if (n.type == "city") { cty++ }
-                            })
-                            var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
-                            var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + '<table class="blank" style="width:100%;">\n'
-                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">State</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+dst[node.data.observes_dst]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
-                                 + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
-                                 + "</table><br>\n"
-                                 + "<input type='button' id='editStateButton' class='submit' value='Edit State'>"
-                                 + "</div>\n" 
-                            $("#infoPanel").html(html)
-                            rightDivContent("#infoPanel")
-                            $("#editStateButton").on("click", function(e) {
-                                editState(node)
-                            })
-                            break;
-                        case "city":
-                            var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
-                            var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
-                            var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
-                            var capitol = (node.data.id == node.parent.parent.parent.data.capid) ? "Yes" : "No"
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/city-solid.svg'>"+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + '<table class="blank" style="width:100%;">\n'
-                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">City</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">National Capitol:</td><td class="right_float">'+capitol+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Altitude:</td><td class="right_float">'+altitudes[alt]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+dst[node.data.observes_dst]+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
-                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
-                                 + "</table><br>\n"
-                                 + "<input type='button' id='editCityButton' class='submit' value='Edit City'>"
-                                 + "</div>\n" 
-                            $("#infoPanel").html(html)
-                            rightDivContent("#infoPanel")
-                            $("#editCityButton").on("click", function(e) {
-                                editCity(node)
-                            })
-                            break;
-                        case "second_nations":
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/circle-plus-solid.svg'>"+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + "<table id='secondNationsTable' class='cell-border compact stripe' style='width:100%;'>\n"
-                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Nation</td><td class='dt-head-center'>Percent</td><td class='dt-head-center'>Use Name</td></tr></thead>\n"
-                                 + "<tbody id='sntb'>\n"
-                            if (node.data.subdata != undefined) {        
-                                for (sn of node.data.subdata) {
-                                    var un = (sn.use_name == "1") ? "Yes": "No"
-                                    html += "<tr><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
-                                }
-                            }
-                            html += "</tbody></table><br>"
-                            //html += "<input type='button' id='editSecondNationsButton' class='submit' value='Edit Second Nations'>"
-                            html += "</div>\n" 
-                            $("#infoPanel").html(html)
-                            $('#secondNationsTable').DataTable({ ordering: true });
-                            rightDivContent("#infoPanel")
-/*                             $("#editSecondNationsButton").on("click", function(e) {
-                                editSecondNations(node)
-                            }) */                            
-                            break;
-                        case "nation_ethnicity":
-                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/user-group-solid.svg'>"+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + "<table id='nationEthnicityTable' class='cell-border compact stripe' style='width:100%;'>\n"
-                                 + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>Ethnicity</td><td class='dt-head-center'>Percent</td></tr></thead>\n"
-                                 + "<tbody id='sntb'>\n"
-                            if (node.data.subdata != undefined) {
-                                for (sn of node.data.subdata) {
-                                    html += "<tr><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
-                                }
-                            }
-                            html += "</tbody></table><br>"
-                            //html += "<input type='button' id='editEthnicitiesButton' class='submit' value='Edit Ethnicities'>"
-                            html += "</div>\n" 
-                            $("#infoPanel").html(html)
-                            $('#nationEthnicityTable').DataTable({ order: [[1, 'desc']] });
-                            rightDivContent("#infoPanel")
-/*                             $("#editEthnicitiesButton").on("click", function(e) {
-                                editEthnicity(node)
-                            }) */
-                            break;
-                        case "REGIONS_PARENT":
-                            html = '<h2 style="text-align:center;"><img src="./images/map-solid.svg">'+node.countChildren(false)+' Regions found</h2>\n'
                             
+                            if (totalPop > 0) {
+                                $("#continentPieChart").listtopie({
+                                    size:'auto',  
+                                    strokeWidth:2,
+                                    hoverEvent:false,
+                                    hoverBorderColor:'#585858',
+                                    hoverWidth:2,
+                                    textSize:'16',
+                                    marginCenter:30,
+                                    listVal:true,
+                                    strokeColor:'#fff',
+                                    listValMouseOver: true,
+                                    infoText:true,
+                                    setValues:false,
+                                    listValInsertClass:'result_list',
+                                    backColorOpacity: '0.8',
+                                    hoverSectorColor:true,
+                                    usePercent:false,
+                                    speedDraw:50
+                                });
+                            } else {
+                                $("#continentPieChart").remove()
+                            }
+                            
+                        } else {
+                            html = "<h2 style='text-align:center;'>No Continents Defined</h2>\n"
+                                 + "<div style='width:100%; text-align:center;'><input type='button' id='blankContinentButton' value='Add Continent'></div>"
+                            $("#infoPanel").html(html)
+
+                            $("#blankContinentButton").on("click", function() {
+                                $("#addContinentTrigger").trigger("click")
+                            })
+                            rightDivContent("#infoPanel")
+                        }
+                        break;
+                    case "continent":
+                        var nat = 0;
+                        var stt = 0;
+                        var cty = 0;
+                        node.visit(function(n) {
+                            switch (n.type) {
+                                case "nation":
+                                    nat++
+                                    break;
+                                case "state":
+                                    stt++
+                                    break;
+                                case "city":
+                                    cty++
+                                    break;
+                                default:
+                                    break;
+                            }
+                        })
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + '<table class="blank" style="width:100%;">\n'
+                                + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Continent</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
+                                + "<tr class='blank'><td class='left_float'>Nations:</td><td class='right_float'>"+nat+"</td><tr>\n"
+                                + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
+                                + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
+                                + "</table><br>\n"
+                                + "<input type='button' id='editContinentButton' class='submit' value='Edit Continent'>"
+                                + "</div>\n" 
+                        $("#infoPanel").html(html)
+                        rightDivContent("#infoPanel")
+                        $("#editContinentButton").on("click", function(e) {
+                            editContinent(node)
+                        })
+                        break;
+                    case "nation":
+                        var stt = 0;
+                        var cty = 0;
+                        var eth = 0;
+                        var sec = 0;
+                        node.visit(function(n) {
+                            switch (n.type) {
+                                case "state":
+                                    stt++
+                                    break;
+                                case "city":
+                                    cty++
+                                    break;
+                                case "nation_ethnicity":
+                                    if (n.data.subdata != undefined) { eth = n.data.subdata.length }
+                                    break;
+                                case "second_nations":
+                                    if (n.data.subdata != undefined) { sec = n.data.subdata.length }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        })
+
+                        var cap
+                        if (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") {
+                            cap = "<span style='color:red;'>None Set</span>" 
+                        } else {
+                            var city = cities_by_nation[node.data.id].find( function( city ){
+                                return city.id === node.data.capid;
+                            } );
+                            if (city != null) {
+                                cap = city.title+",&nbsp;"+states_by_id[city.state]
+                            }
+                        } 
+
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + '<table class="blank" style="width:100%;">\n'
+                                + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Nation</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">This is the USA:</td><td class="right_float" >'+usa[node.data.this_is_the_usa]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+gender[node.data.gender]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Demonym (Korean):</td><td class="right_float" >'+node.data.dem_korean+'</td></tr>\n'
+                                + "<tr class='blank'><td class='left_float'>Ethnicities:</td><td class='right_float'>"+eth+"</td><tr>\n"
+                                + "<tr class='blank'><td class='left_float'>Second Nations:</td><td class='right_float'>"+sec+"</td><tr>\n"
+                                + "<tr class='blank'><td class='left_float'>States:</td><td class='right_float'>"+stt+"</td><tr>\n"
+                                + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
+                                + "</table><br>\n"
+                                + "<input type='button' id='editNationButton' class='submit' value='Edit Nation'>"
+                                + "</div>\n" 
+                        $("#infoPanel").html(html)
+                        rightDivContent("#infoPanel")
+                        $("#editNationButton").on("click", function(e) {
+                            editNation(node)
+                        })
+                        break;
+                    case "STATES_PARENT":
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-dome-solid.svg'>"+node.title+'</h2>\n'
+
+                        var totalPop = 0;
+                        var stateCount = 0;
+
+                        html += "<div id='statePieChart'>\n"
+
+                        for (child of node.getChildren()) {
+                            totalPop += parseInt(child.data.pop)
+                            stateCount++
+                            html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
+                        }
+
+                        html += "</div>"
+                                + "<h4 style='text-align: center; font-weight:bold;'>"+stateCount+" States<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
+
+                        $("#infoPanel").html(html)
+
+                        $("#statePieChart").listtopie({
+                            size:'auto',  
+                            strokeWidth:2,
+                            hoverEvent:false,
+                            hoverBorderColor:'#585858',
+                            hoverWidth:2,
+                            textSize:'16',
+                            marginCenter:30,
+                            listVal:false,
+                            strokeColor:'#fff',
+                            listValMouseOver: true,
+                            infoText:true,
+                            setValues:false,
+                            listValInsertClass:'result_list',
+                            backColorOpacity: '0.8',
+                            hoverSectorColor:true,
+                            usePercent:false,
+                            speedDraw:50
+                        });
+
+                        rightDivContent("#infoPanel")
+                        break;
+                    case "state":
+                        var cty = 0;
+                        node.visit(function(n) {
+                            if (n.type == "city") { cty++ }
+                        })
+                        var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
+                        var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + '<table class="blank" style="width:100%;">\n'
+                                + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">State</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+dst[node.data.observes_dst]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
+                                + "<tr class='blank'><td class='left_float'>Cities:</td><td class='right_float'>"+cty+"</td><tr>\n"
+                                + "</table><br>\n"
+                                + "<input type='button' id='editStateButton' class='submit' value='Edit State'>"
+                                + "</div>\n" 
+                        $("#infoPanel").html(html)
+                        rightDivContent("#infoPanel")
+                        $("#editStateButton").on("click", function(e) {
+                            editState(node)
+                        })
+                        break;
+                    case "city":
+                        var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
+                        var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
+                        var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
+                        var capitol = (node.data.id == node.parent.parent.parent.data.capid) ? "Yes" : "No"
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/city-solid.svg'>"+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + '<table class="blank" style="width:100%;">\n'
+                                + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">City</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">National Capitol:</td><td class="right_float">'+capitol+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Altitude:</td><td class="right_float">'+altitudes[alt]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Observes DST:</td><td class="right_float">'+dst[node.data.observes_dst]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float">'+node.data.title_korean+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float">'+node.data.abbr_korean+'</td></tr>\n'
+                                + "</table><br>\n"
+                                + "<input type='button' id='editCityButton' class='submit' value='Edit City'>"
+                                + "</div>\n" 
+                        $("#infoPanel").html(html)
+                        rightDivContent("#infoPanel")
+                        $("#editCityButton").on("click", function(e) {
+                            editCity(node)
+                        })
+                        break;
+                    case "second_nations":
+                        nodeToEdit = node
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/circle-plus-solid.svg'>"+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + "<table id='secondNationsTable' class='cell-border compact stripe' style='width:100%;'>\n"
+                                + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>ID</td><td class='dt-head-center'>Nation</td><td class='dt-head-center'>Percent</td><td class='dt-head-center'>Use Name</td></tr></thead>\n"
+                                + "<tbody id='sntb'>\n"
+                        if (node.data.subdata != undefined) {        
+                            for (sn of node.data.subdata) {
+                                var un = (sn.use_name == "1") ? "Yes": "No"
+                                html += "<tr><td>"+sn.id+"</td><td>"+nations_by_id[sn.id]+"</td><td>"+sn.pct+"</td><td>"+un+"</td></tr>\n"
+                            }
+                        }
+                        html += "</tbody></table>"
+                                + "<div id='buttonHolder' style='width:100%; text-align:center; margin-top:10px;'></div>\n"
+
+                                <!-- ADD DIV HERE -->
+                                + "<div id='addSNDiv' style='display:none; width:100%;'>\n"
+                                + "<form id='addNewSNForm' action=''>\n"
+                                + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Nation</th><th style='text-align:center; width:25%;'>Percent</th><th style='text-align:center; width:25%;'>Use Name</th></tr></thead>\n"
+                                + "<tbody>\n"
+                                + "<tr>\n"
+                                + "<td><select id='addNewSNNation' class='sNationSelect'></select></td>\n"
+                                + "<td><input type='number' step='0.01' min='0.01' max='100' style='width:100px;' id='addNewSNPercent'/></td>\n"
+                                + "<td><select id='addNewSNUseName'>\n"
+                                + "<option value=1>Yes</option>\n"
+                                + "<option value=0>No</option>\n"
+                                + "</select></td>\n"
+                                + "</tr>\n"
+                                + "</tbody></table><br>\n"
+                                + "<b>Total:</b>&nbsp;<input id='addNewSNTotal' type='number' step='0.01' min='0.01' max='100' style='width:100px; margin-right:10px;' value='0'>"
+                                + "<input type='submit' class='submit' value='Add Second Nation'><input type='button' style='margin-left:10px;' class='submit' id='cancelNewSN' value='Cancel'></form>\n"
+                                + "</div>\n"
+
+                                <!-- EDIT DIV HERE -->
+                                + "<div id='editSNDiv' style='display:none;'>\n"
+                                + "<form id='editSNForm' action=''>\n"
+                                + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Nation</th><th style='text-align:center; width:25%;'>Percent</th><th style='text-align:center; width:25%;'>Use Name</th></tr></thead>\n"
+                                + "<tbody>\n"
+                                + "<tr>\n"
+                                + "<td><select id='editSNNation' class='sNationSelect'></select></td>\n"
+                                + "<td><input type='number' step='0.01' min='0.01' max='100' style='width:100px;' id='editSNPercent'/></td>\n"
+                                + "<td><select id='editSNUseName'>\n"
+                                + "<option value=1>Yes</option>\n"
+                                + "<option value=0>No</option>\n"
+                                + "</select></td>\n"
+                                + "</tr>\n"
+                                + "</tbody></table><br>\n"
+                                + "<b>Total:</b>&nbsp;<input id='editSNTotal' type='number' step='0.01' min='0.01' max='100' style='width:100px; margin-right:10px;' value='0'>"
+                                + "<input type='submit' class='submit' value='Submit Changes'><input type='button' style='margin-left:10px;' class='submit' id='cancelEditSN' value='Cancel'></form>\n"
+                                + "</div>\n"
+                                + "</div>\n"
+                        $("#infoPanel").html(html)
+                        $("#addNewSNTotal").on('keydown paste focus mousedown', function(e){
+                            e.preventDefault();
+                        });
+                        sortDropdown("#addNewSNNation")
+                        sortDropdown("#editSNNation")
+                        let table = $('#secondNationsTable').DataTable({ 
+                            fixedHeader: true,
+                            order: ( [ 1, 'asc' ] ),
+                            buttons: [
+                                {
+                                    text: 'Add',
+                                    action: function ( e, dt, node, config ) {
+                                        table.button(0).disable()
+                                        table.button(1).disable()
+                                        table.button(2).disable()
+                                        var total = 0
+                                        var alreadyThere = []
+                                        table.rows().every(function(){
+                                            total += parseFloat(this.data()[2]);
+                                            alreadyThere.push(this.data()[0])
+                                        });
+                                        total = total.toFixed(2)
+                                        $("#addNewSNNation").empty()
+                                        $.each(nations_by_id, function(key, value) {
+                                            if (!alreadyThere.includes(key)) {
+                                                $("#addNewSNNation")
+                                                    .append($('<option>', { value : key })
+                                                    .text(value));
+                                            }
+                                        });
+                                        sortDropdown("#addNewSNNation")
+                                        $("#addNewSNPercent").val(0)
+                                        $("#addNewSNUseName").val(1)
+                                        $("#addNewSNTotal").val(total)
+                                        $("#editSNDiv").css("display","none")
+                                        $("#addSNDiv").css("display","inline-block")
+                                    }
+                                },
+                                {
+                                    text: 'Edit',
+                                    action: function ( e, dt, node, config ) {
+                                        table.button(0).disable()
+                                        table.button(1).disable()
+                                        table.button(2).disable()
+                                        var total = 0
+                                        var alreadyThere = []
+                                        table.rows().every(function(){
+                                            total += parseFloat(this.data()[2]);
+                                            alreadyThere.push(this.data()[0])
+                                        });
+                                        
+                                        $("#editSNNation").empty()
+
+                                        // create dropdown, fitering out nations that are already second nations
+                                        $.each(nations_by_id, function(key, value) {
+                                            if (!alreadyThere.includes(key)) {
+                                                $("#editSNNation")
+                                                    .append($('<option>', { value : key })
+                                                    .text(value));
+                                            }
+                                        });
+                                        
+                                        var row = table.rows( { selected: true } )
+
+                                        // put select row's value back into the dropdown
+                                        $("#editSNNation")
+                                            .append($('<option>', { value : row.data()[0][0] })
+                                            .text(row.data()[0][1]));
+                                        sortDropdown("#editSNNation")
+
+                                        total = total.toFixed(2)
+
+                                        var un = (row.data()[0][3] == "Yes") ? 1 : 0;
+                                        $("#editSNNation").val(row.data()[0][0])
+                                        $("#editSNPercent").val(row.data()[0][2])
+                                        $("#editSNUseName").val(un)
+                                        $("#editSNTotal").val(total)
+                                        $("#editSNDiv").css("display","inline-block")
+                                        $("#addSNDiv").css("display","none")
+                                    },
+                                    enabled: false
+                                },
+                                {
+                                    text: 'Delete',
+                                    action: function ( e, dt, node, config ) {
+                                        $("#editSNDiv").css("display","none")
+                                        $("#addSNDiv").css("display","none")
+                                        var row = table.rows( { selected: true } )
+                                        if (confirm("Are you sure you want to delete "+row.data()[0][1]+"?")) {
+                                            table.rows( { selected: true } ).remove().draw(false);
+                                        }
+                                        var newData = []
+                                        table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                            var obj = {}
+                                            var data = this.data();
+                                            obj.id = data[0]
+                                            obj.pct = data[2]
+                                            obj.use_name = (data[3] == "Yes") ? 1 : 0
+                                            newData.push(obj)
+                                        } );
+                                        nodeToEdit.data.subdata = newData
+                                        table.button(1).disable()
+                                        table.button(2).disable()
+                                    },
+                                    enabled: false
+                                }
+                            ],
+                            select: true,
+                            
+                        }).on( 'select', function ( e, dt, type, indexes ) {
+                            $("#editSNDiv").css("display","none")
+                            $("#addSNDiv").css("display","none")
+                            table.button(1).enable()
+                            table.button(2).enable()
+                        }).on( 'deselect', function ( e, dt, type, indexes ) {
+                            $("#editSNDiv").css("display","none")
+                            $("#addSNDiv").css("display","none")
+                            table.button(1).disable()
+                            table.button(2).disable()
+                        });
+                        table.column(0).visible(false)
+                        table.buttons().container().appendTo( $('#buttonHolder' ) );
+
+                        $("#cancelNewSN").on("click", function(e) {
+                            table.buttons(0).enable()
+                            $("#addSNDiv").css("display","none")
+                        })
+
+                        $("#cancelEditSN").on("click", function(e) {
+                            table.rows( { selected: true } ).deselect()
+                            table.buttons(0).enable()
+                            $("#editSNDiv").css("display","none")
+                        })
+
+                        $("#addNewSNPercent").on("change", function(e) {
+                            var total = 0
+                            table.rows().every(function(){
+                                total += parseFloat(this.data()[2]);
+                            });
+                            total += parseFloat($(this).val())
+                            total = total.toFixed(2)
+                            $("#addNewSNTotal").val(total)
+                        })
+
+                        $("#editSNPercent").on("change", function(e) {
+                            var total = 0
+                            var selRow = table.rows( { selected: true } )
+                            table.rows().every(function() {
+                                if (this.data()[0] != selRow.data()[0][0]) {
+                                    total += parseFloat(this.data()[2]);
+                                }
+                            })
+                            total += parseFloat($(this).val())
+                            total = total.toFixed(2)
+                            $("#editSNTotal").val(total)
+                        })
+
+                        $("#addNewSNForm").on("submit",function(e) {
+                            e.preventDefault()
+                            table.row
+                            .add([
+                                $("#addNewSNNation").val(),
+                                $("#addNewSNNation option:selected" ).text(),
+                                $("#addNewSNPercent").val(),
+                                $("#addNewSNUseName option:selected" ).text()
+                            ])
+                            .draw(false);
+                            $("#addSNDiv").css("display","none")
+                            $("#addNewSNNation").empty()
+                            $("#addNewSNPercent").val(0)
+                            var newData = []
+                            table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                var obj = {}
+                                var data = this.data();
+                                obj.id = data[0]
+                                obj.pct = data[2]
+                                obj.use_name = (data[3] == "Yes") ? 1 : 0
+                                newData.push(obj)
+                            } );
+                            nodeToEdit.data.subdata = newData
+                            table.button(0).enable()
+                            table.button(1).disable()
+                            table.button(2).disable()
+                        })
+
+                        $("#editSNForm").on("submit",function(e) {
+                            e.preventDefault()
+                            table.rows( { selected: true } ).remove().draw(false);
+                            table.row
+                            .add([
+                                $("#editSNNation").val(),
+                                $("#editSNNation option:selected" ).text(),
+                                $("#editSNPercent").val(),
+                                $("#editSNUseName option:selected" ).text()
+                            ])
+                            .draw(false);
+                            $("#editSNDiv").css("display","none")
+                            $("#editSNNation").empty()
+                            $("#editSNPercent").val(0)
+                            var newData = []
+                            table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                var obj = {}
+                                var data = this.data();
+                                obj.id = data[0]
+                                obj.pct = data[2]
+                                obj.use_name = (data[3] == "Yes") ? 1 : 0
+                                newData.push(obj)
+                            } );
+                            nodeToEdit.data.subdata = newData
+                            table.button(0).enable()
+                            table.button(1).disable()
+                            table.button(2).disable()
+                        })
+
+                        rightDivContent("#infoPanel")
+/*                             $("#editSecondNationsButton").on("click", function(e) {
+                            editSecondNations(node)
+                        }) */                            
+                        break;
+                    case "nation_ethnicity":
+                        nodeToEdit = node;
+                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/user-group-solid.svg'>"+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + "<table id='nationEthnicityTable' class='cell-border compact stripe' style='width:100%;'>\n"
+                                + "<thead><tr style='font-weight:bold;'><td class='dt-head-center'>ID</td><td class='dt-head-center'>Ethnicity</td><td class='dt-head-center'>Percent</td></tr></thead>\n"
+                                + "<tbody id='sntb'>\n"
+                        if (node.data.subdata != undefined) {
+                            for (sn of node.data.subdata) {
+                                html += "<tr><td>"+sn.etid+"</td><td>"+ethnicities_by_id[sn.etid]+"</td><td>"+sn.pct+"</td></tr>\n"
+                            }
+                        }
+                        html += "</tbody></table><br>"
+                                + "<div id='buttonHolder2' style='width:100%; text-align:center; margin-top:10px;'></div>\n"
+                        
+                        
+                        <!-- ADD DIV HERE -->
+                                + "<div id='addNEDiv' style='display:none; width:100%;'>\n"
+                                + "<form id='addNewNEForm' action=''>\n"
+                                + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Ethnicity</th><th style='text-align:center; width:40%;'>Percent</th></tr></thead>\n"
+                                + "<tbody>\n"
+                                + "<tr>\n"
+                                + "<td><select id='addNewNEthnicity' class='nEthSelect'></select></td>\n"
+                                + "<td><input type='number' min='0'  style='width:100px;' id='addNewNEPercent'/></td>\n"
+                                + "</tr>\n"
+                                + "</tbody></table><br>\n"
+                                //+ "<b>Total:</b>&nbsp;<input id='addNewNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
+                                + "<input type='submit' class='submit' value='Add Nation Ethnicity'><input type='button' style='margin-left:10px;' class='submit' id='cancelAddNE' value='Cancel'></form>\n"
+                                + "</div>\n"
+
+                        <!-- EDIT DIV HERE -->
+                                + "<div id='editNEDiv' style='display:none;'>\n"
+                                + "<form id='editNEForm' action=''>\n"
+                                + "<table style='width:90%;'><thead><tr><th style='text-align:center; width:60%;'>Ethnicity<th><th style='text-align:center; width:40%;'>Percent</th></tr></thead>\n"
+                                + "<tbody>\n"
+                                + "<tr>\n"
+                                + "<td><select id='editNEthnicity' class='nEthSelect'></select></td>\n"
+                                + "<td><input type='number' min='0' style='width:100px;' id='editNEPercent'/></td>\n"
+                                + "</tr>\n"
+                                + "</tbody></table><br>\n"
+                                //+ "<b>Total:</b>&nbsp;<input id='editNETotal' type='number' style='width:100px; margin-right:10px;' value='0'>"
+                                + "<input type='submit' class='submit' value='Submit Changes'><input type='button' style='margin-left:10px;' class='submit' id='cancelEditNE' value='Cancel'></form>\n"
+                                + "</div>\n"
+
+                        html += "</div>\n" 
+                        $("#infoPanel").html(html)
+
+                        let table2 = $('#nationEthnicityTable').DataTable({ 
+                            fixedHeader: true,
+                            scrollY: 550,
+                            scrollCollapse: true,
+                            order: ( [ 1, 'asc' ] ),
+                            buttons: [
+                                {
+                                    text: 'Add',
+                                    action: function ( e, dt, node, config ) {
+                                        table2.button(0).disable()
+                                        table2.button(1).disable()
+                                        table2.button(2).disable()
+                                        //var total = 0
+                                        var alreadyThere = []
+                                        table2.rows().every(function(){
+                                            //total += parseInt(this.data()[2]);
+                                            alreadyThere.push(this.data()[0])
+                                        });
+                                        $("#addNewNEthnicity").empty()
+                                        $.each(ethnicities_by_id, function(key, value) {
+                                            if (!alreadyThere.includes(key)) {
+                                                $("#addNewNEthnicity")
+                                                    .append($('<option>', { value : key })
+                                                    .text(value));
+                                            }
+                                        });
+                                        sortDropdown("#addNewNEthnicity")
+                                        $("#addNewNEPercent").val(0)
+                                        //$("#addNewNETotal").val(total)
+                                        $("#editNEDiv").css("display","none")
+                                        $("#addNEDiv").css("display","inline-block")
+                                    }
+                                },
+                                {
+                                    text: 'Edit',
+                                    action: function ( e, dt, node, config ) {
+                                        table2.button(0).disable()
+                                        table2.button(1).disable()
+                                        table2.button(2).disable()
+                                        //var total = 0
+                                        var alreadyThere = []
+                                        table2.rows().every(function(){
+                                            //total += parseInt(this.data()[2]);
+                                            alreadyThere.push(this.data()[0])
+                                        });
+
+                                        $("#editNEthnicity").empty()
+
+                                        // create dropdown, fitering out nations that are already second nations
+                                        $.each(ethnicities_by_id, function(key, value) {
+                                            if (!alreadyThere.includes(key)) {
+                                                $("#editNEthnicity")
+                                                    .append($('<option>', { value : key })
+                                                    .text(value));
+                                            } 
+                                        });
+
+        
+                                        var row = table2.rows( { selected: true } )
+
+                                        // put select row's value back into the dropdown
+                                        $("#editNEthnicity")
+                                            .append($('<option>', { value : row.data()[0][0] })
+                                            .text(row.data()[0][1]));
+                                        sortDropdown("#editNEthnicity")
+
+                                        $("#editNEthnicity").val(row.data()[0][0])
+                                        $("#editNEPercent").val(row.data()[0][2])
+                                        //$("#editNETotal").val(total)
+                                        $("#editNEDiv").css("display","inline-block")
+                                        $("#addNEDiv").css("display","none")
+                                    },
+                                    enabled: false
+                                },
+                                {
+                                    text: 'Delete',
+                                    action: function ( e, dt, node, config ) {
+                                        $("#editNEDiv").css("display","none")
+                                        $("#addNEDiv").css("display","none")
+                                        var row = table2.rows( { selected: true } )
+                                        if (confirm("Are you sure you want to delete "+row.data()[0][1]+"?")) {
+                                            table2.rows( { selected: true } ).remove().draw(false);
+                                        }
+                                        var newData = []
+                                        table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                            var obj = {}
+                                            var data = this.data();
+                                            obj.etid = data[0]
+                                            obj.pct = data[2]
+                                            newData.push(obj)
+                                        } );
+                                        nodeToEdit.data.subdata = newData
+                                        table2.button(1).disable()
+                                        table2.button(2).disable()
+                                    },
+                                    enabled: false
+                                }
+                            ],
+                            select: true,
+                            
+                        }).on( 'select', function ( e, dt, type, indexes ) {
+                            $("#editNEDiv").css("display","none")
+                            $("#addNEDiv").css("display","none")
+                            table2.button(1).enable()
+                            table2.button(2).enable()
+                        }).on( 'deselect', function ( e, dt, type, indexes ) {
+                            $("#editNEDiv").css("display","none")
+                            $("#addNEDiv").css("display","none")
+                            table2.button(1).disable()
+                            table2.button(2).disable()
+                        });
+                        table2.column(0).visible(false)
+                        table2.buttons().container().appendTo( $('#buttonHolder2' ) );
+
+                        $("#cancelAddNE").on("click", function(e) {
+                            table2.buttons(0).enable()
+                            $("#addNEDiv").css("display","none")
+                        })
+
+                        $("#cancelEditNE").on("click", function(e) {
+                            table2.rows( { selected: true } ).deselect()
+                            table2.buttons(0).enable()
+                            $("#editNEDiv").css("display","none")
+                        })
+
+                        /* $("#addNewNEPercent").on("change", function(e) {
+                            var total = 0
+                            table2.rows().every(function(){
+                                total += parseInt(this.data()[2]);
+                            });
+                            total += parseInt($(this).val())
+                            $("#addNewNETotal").val(total)
+                        })
+
+                        $("#editNEPercent").on("change", function(e) {
+                            var total = 0
+                            var selRow = table2.rows( { selected: true } )
+                            table2.rows().every(function() {
+                                if (this.data()[0] != selRow.data()[0][0]) {
+                                    total += parseInt(this.data()[2]);
+                                }
+                            })
+                            total += parseInt($(this).val())
+                            $("#editNETotal").val(total)
+                        }) */
+
+                        $("#addNewNEForm").on("submit",function(e) {
+                            e.preventDefault()
+                            table2.row
+                            .add([
+                                $("#addNewNEthnicity").val(),
+                                $("#addNewNEthnicity option:selected" ).text(),
+                                $("#addNewNEPercent").val()
+                            ])
+                            .draw(false);
+                            $("#addNEDiv").css("display","none")
+                            $("#addNewNENation").empty()
+                            $("#addNewNEPercent").val(0)
+                            var newData = []
+                            table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                var obj = {}
+                                var data = this.data();
+                                obj.etid = data[0]
+                                obj.pct = data[2]
+                                newData.push(obj)
+                            } );
+                            nodeToEdit.data.subdata = newData
+                            table2.button(0).enable()
+                            table2.button(1).disable()
+                            table2.button(2).disable()
+                        })
+
+                        $("#editNEForm").on("submit",function(e) {
+                            e.preventDefault()
+                            table2.rows( { selected: true } ).remove().draw(false);
+                            table2.row
+                            .add([
+                                $("#editNEthnicity").val(),
+                                $("#editNEthnicity option:selected" ).text(),
+                                $("#editNEPercent").val()
+                            ])
+                            .draw(false);
+                            $("#editNEDiv").css("display","none")
+                            $("#editNENation").empty()
+                            $("#editNEPercent").val(0)
+                            var newData = []
+                            table2.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                var obj = {}
+                                var data = this.data();
+                                obj.etid = data[0]
+                                obj.pct = data[2]
+                                newData.push(obj)
+                            } );
+                            nodeToEdit.data.subdata = newData
+                            table2.button(0).enable()
+                            table2.button(1).disable()
+                            table2.button(2).disable()
+                        })
+
+                        rightDivContent("#infoPanel")
+
+                        break;
+                    case "REGIONS_PARENT":
+                        if (node.getChildren() != null) {
+                            html = '<h2 style="text-align:center;"><img src="./images/map-solid.svg">'+node.countChildren(false)+' Regions found</h2>\n'
+                        
                             var nation_count = 0
                             var state_count = 0
                             var city_count = 0
@@ -2387,12 +3402,12 @@
                             var sum = nation_count + state_count + city_count
 
                             html += "<div id='pieChartRP'>\n"
-                                 + "<div data-lcolor='"+chroma.random()+"'>"+nation_count+"<span>Nations</span></div>\n"
-                                 + "<div data-lcolor='"+chroma.random()+"'>"+state_count+"<span>States</span></div>\n"
-                                 + "<div data-lcolor='"+chroma.random()+"'>"+city_count+"<span>Cities</span></div>\n"
-                                 + "</div>\n"
-                                 + "<h4 style='text-align: center;'><b>Approximate Percentages</b></h4>\n"
-                                 + "<div class='result_list'></div>"
+                                    + "<div data-lcolor='"+chroma.random()+"'>"+nation_count+"<span>Nations</span></div>\n"
+                                    + "<div data-lcolor='"+chroma.random()+"'>"+state_count+"<span>States</span></div>\n"
+                                    + "<div data-lcolor='"+chroma.random()+"'>"+city_count+"<span>Cities</span></div>\n"
+                                    + "</div>\n"
+                                    + "<h4 style='text-align: center;'><b>Approximate Percentages</b></h4>\n"
+                                    + "<div class='result_list'></div>"
 
                             $("#infoPanel").html(html)
 
@@ -2417,302 +3432,296 @@
                                 usePercent: false,
                                 speedDraw:50
                             });
-                        
-                            break;
-                        case "region":
-                            const n_arr = node.data.nations.sort(sortByKey('title'))
-                            const s_arr = node.data.states.sort(sortByKey('title'))
-                            const c_arr = node.data.cities.sort(sortByKey('title'))
-                            var longest = findLargestArray(n_arr, s_arr, c_arr)
-                            html = '<h2 style="text-align:center;"><img src="./images/map-location-dot-solid.svg">'+node.title+'</h2>\n'
-                                 + '<div style="width:100%; text-align:center;">\n'
-                                 + "<table id='regionInfoTable' style='width:100%;' class='cell-border compact stripe'>"
-                                 + "<thead><tr style='font-weight:bold;'><td style='width:33%;' class='dt-head-center'>Nations</td><td style='width:33%;' class='dt-head-center'>States</td><td style='width:33%;' class='dt-head-center'>Cities</td></tr></thead>\n"
-                                 + "<tbody>\n"
-                            for (i = 0; i < longest.length; i++) {
-                                html += "<tr><td>"+formatValue(n_arr[i])+"</td><td>"+formatValue(s_arr[i])+"</td><td>"+formatValue(c_arr[i])+"</td></tr>"
-                            }
-                            html += "</tbody></table><br>"
-                            html += "<input type='button' id='editRegionButton' class='submit' value='Edit Region'>"
-                            html += "</div>\n" 
+                        } else {
+                            html = "<h2 style='text-align:center;'>No Regions Defined</h2>\n"
+                                 + "<div style='width:100%; text-align:center;'><input type='button' id='blankRegionButton' value='Add Region'></div>"
                             $("#infoPanel").html(html)
-                            $('#regionInfoTable').DataTable({});
-                            rightDivContent("#infoPanel")
-                             $("#editRegionButton").on("click", function(e) {
-                                editRegion(node)
+
+                            $("#blankRegionButton").on("click", function() {
+                                $("#addRegionTrigger").trigger("click")
                             })
-                            break;
-                        default:
-                            html += node.title + " - " + node.type + "<br>";
-                            break;
-                    }
+                            rightDivContent("#infoPanel")
+                        }
+                         
                     
+                        break;
+                    case "region":
+                        const n_arr = node.data.nations.sort(sortByKey('title'))
+                        const s_arr = node.data.states.sort(sortByKey('title'))
+                        const c_arr = node.data.cities.sort(sortByKey('title'))
+                        var longest = findLargestArray(n_arr, s_arr, c_arr)
+                        html = '<h2 style="text-align:center;"><img src="./images/map-location-dot-solid.svg">'+node.title+'</h2>\n'
+                                + '<div style="width:100%; text-align:center;">\n'
+                                + "<table id='regionInfoTable' style='width:100%;' class='cell-border compact stripe'>"
+                                + "<thead><tr style='font-weight:bold;'><td style='width:33%;' class='dt-head-center'>Nations</td><td style='width:33%;' class='dt-head-center'>States</td><td style='width:33%;' class='dt-head-center'>Cities</td></tr></thead>\n"
+                                + "<tbody>\n"
+                        for (i = 0; i < longest.length; i++) {
+                            html += "<tr><td>"+formatValue(n_arr[i])+"</td><td>"+formatValue(s_arr[i])+"</td><td>"+formatValue(c_arr[i])+"</td></tr>"
+                        }
+                        html += "</tbody></table><br>"
+                        html += "<input type='button' id='editRegionButton' class='submit' value='Edit Region'>"
+                        html += "</div>\n" 
+                        $("#infoPanel").html(html)
+                        $('#regionInfoTable').DataTable({});
+                        rightDivContent("#infoPanel")
+                            $("#editRegionButton").on("click", function(e) {
+                            editRegion(node)
+                        })
+                        break;
+                    default:
+                        html += node.title + " - " + node.type + "<br>";
+                        break;
                 }
-            })
+                
+            }
+        })
 
-            var cmItems = {}
+        var cmItems = {}
 
-            $.contextMenu({
-                selector: "#xmlOutput span.fancytree-title",
-                build: function($trigger, e) {
-                    var node = $.ui.fancytree.getNode($trigger);
-                    switch (node.type) {
-                        case "ETHNICITIES_PARENT":
-                            cmItems = {
-                               "add": {name: "Add Ethnicity", icon: 'add'}
-                            }
-                            break;  
-                        case "CONTINENTS_PARENT":
-                            cmItems = {
-                                "add": {name: "Add Continent", icon: 'add'}
-                            }
-                            break;  
-                        case "REGIONS_PARENT":
-                            cmItems = {
-                                "add": {name: "Add Region", icon: 'add'}
-                            }
-                            break;
-                        case "continent":
-                            cmItems = {
-                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
-                                "sep1": "----",
-                                "add": {name: "Add Nation", icon: 'add'},
-                                "sep2": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
-                            }
-                            break;
-                        case "nation":
-                            cmItems = {
-                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
-                                "sep1": "----",
-                                "addState": {name: "Add State", icon: 'add'},
-                                "addSecondNation": {name: "Add Second Nation", icon: 'add'},
-                                "addEthnicity": {name: "Add Ethnicity", icon: 'add'},
-                                "sep2": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
-                            }
-                            break;
-                        case "STATES_PARENT":
-                            cmItems = {
-                                "add": {name: "Add State", icon: 'add'},
-                            }
-                            break;
-                        case "state":
-                            cmItems = {
-                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
-                                "sep1": "----",
-                                "add": {name: "Add City", icon: 'add'},
-                                "sep2": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
-                            }
-                            break;
-                        case "city":
-                            cmItems = { 
-                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
-                                "sep1": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
-                            }
-                            break;
-                        case "ethnicity": {
-                            cmItems = {
-                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
-                                "sep1": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
-                            }
-                            break;
+        $.contextMenu({
+            selector: "#xmlOutput span.fancytree-title",
+            build: function($trigger, e) {
+                var node = $.ui.fancytree.getNode($trigger);
+                switch (node.type) {
+                    case "ETHNICITIES_PARENT":
+                        cmItems = {
+                            "add": {name: "Add Ethnicity", icon: 'add'}
                         }
-                        case "region": {
-                            cmItems = {
-                                "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
-                                "sep1": "----",
-                                "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
-                            }
-                            break;
+                        break;  
+                    case "CONTINENTS_PARENT":
+                        cmItems = {
+                            "add": {name: "Add Continent", icon: 'add'}
                         }
-                        case "nation_ethnicity": {
-                            cmItems = {
-                                "add": {name: "Add Ethnicity", icon: 'add'},
-                                "sep1": "----",
-                                "edit": {name: "Edit Ethnicities for \""+node.parent.title +"\"", icon: 'edit'},
-                            }
-                            break;
+                        break;  
+                    case "REGIONS_PARENT":
+                        cmItems = {
+                            "add": {name: "Add Region", icon: 'add'}
                         }
-                        case "second_nations": {
-                            cmItems = {
-                                "add": {name: "Add Second Nation", icon: 'add'},
-                                "sep1": "----",
-                                "edit": {name: "Edit Second Nations for \""+node.parent.title +"\"", icon: 'edit'},
-                            }
-                            break;
+                        break;
+                    case "continent":
+                        cmItems = {
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "sep1": "----",
+                            "add": {name: "Add Nation", icon: 'add'},
+                            "sep2": "----",
+                            "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
-                        default: 
-                            cmItems = {}
-                            break;
+                        break;
+                    case "nation":
+                        cmItems = {
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "sep1": "----",
+                            "addState": {name: "Add State", icon: 'add'},
+                            "addSecondNation": {name: "Add Second Nation", icon: 'add'},
+                            "addEthnicity": {name: "Add Ethnicity", icon: 'add'},
+                            "sep2": "----",
+                            "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                        }
+                        break;
+                    case "STATES_PARENT":
+                        cmItems = {
+                            "add": {name: "Add State", icon: 'add'},
+                        }
+                        break;
+                    case "state":
+                        cmItems = {
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "sep1": "----",
+                            "add": {name: "Add City", icon: 'add'},
+                            "sep2": "----",
+                            "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                        }
+                        break;
+                    case "city":
+                        cmItems = { 
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "sep1": "----",
+                            "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                        }
+                        break;
+                    case "ethnicity": {
+                        cmItems = {
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "sep1": "----",
+                            "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                        }
+                        break;
                     }
-                    return {
-                        callback: function(key, options) {
-                            var m = "clicked: "+key
-                            switch (node.type) {
-                                case "ETHNICITIES_PARENT":
-                                    $("#addEthnicityTrigger").click()
-                                    break;  
-                                case "CONTINENTS_PARENT":
-                                    switch (key) {
-                                        case "add":
-                                            $("#addContinentTrigger").click()
-                                            break;
-                                    }
-                                    break;  
-                                case "REGIONS_PARENT":
-                                    $("#newRegionSource").trigger("change")
-                                    $("#newRegionFilter").trigger("change")
-                                    rightDivContent("#addRegion")
-                                    break;
-                                case "continent":
-                                    switch (key) {
-                                        case "add":
-                                            addNation(node.data.id)
-                                            break;
-                                        case "delete":
-                                            console.log("You chose to delete "+node.title)
-                                            break;
-                                        case "edit":
-                                            editContinent(node)
-                                            break;
-                                    }
-                                    break;
-                                case "nation":
-                                    switch (key) {
-                                        case "edit":
-                                            editNation(node)
-                                            break;
-                                        case "addState":
-                                            addState(node.parent.data.id,node.data.id)
-                                            //$("#addStateTrigger").click()
-                                            break;
-                                        case "addSecondNation":
-                                            addSecondNation(node.id)
-                                            break;
-                                        case "addEthnicity":
-                                            console.log("add ethnicity TBD")
-                                            break;
-                                        case "delete":
-                                            confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all states and cities as well!")
-                                            break;
-                                    }
-                                    break;
-                                case "STATES_PARENT":
-                                    addState(node.parent.parent.data.id,node.parent.data.id)
-                                    break;
-                                case "state":
-                                    switch (key) {
-                                        case "edit":
-                                            editState(node)
-                                            break;
-                                        case "add":
-                                            //$("#addCityTrigger").click()
-                                            addCity(node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id)
-                                            break;
-                                        case "delete":
-                                            confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all cities as well!")
-                                            break;
-                                    }
-                                    break;
-                                case "city":
-                                    switch (key) {
-                                        case "edit":
-                                            editCity(node)
-                                            break;
-                                        case "delete":
-                                            confirm("Are you sure you want to delete "+node.title+"?")
-                                            break;
-                                    }
-                                    break;
-                                case "ethnicity":
-                                    switch (key) {
-                                        case "delete":
-                                            deleteNode(node)
-                                            break;
-                                        case "edit":
-                                            editEthnicity(node)
-                                            break;
-                                    }
-                                    break;
-                                case "region":
-                                    switch (key) {
-                                        case "delete":
-                                            deleteNode(node)
-                                            break;
-                                        case "edit":
-                                            editRegion(node)
-                                            break;
-                                    }
-                                    break;
-                                case "nation_ethnicity":
-                                    switch (key) {
-                                        case "add":
-                                            console.log("add nation ethnicity to "+node.parent.title)
-                                            break;
-                                        case "edit":
-                                            console.log("edit nation ethnicities for "+node.parent.title)
-                                            break;
-                                    }
-                                    break;
-                                case "second_nations":
-                                    switch (key) {
-                                        case "add":
-                                            console.log("add second nations to "+node.parent.title)
-                                            break;
-                                        case "edit":
-                                            console.log("edit second nations for "+node.parent.title)
-                                            break;
-                                    }
-                                    break;
-                                default: 
-                                    break;
-                            }
-                        },
-                        items: cmItems
+                    case "region": {
+                        cmItems = {
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "sep1": "----",
+                            "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
+                        }
+                        break;
                     }
+                    case "nation_ethnicity": {
+                        cmItems = {
+                            "view": {name: "View/Edit Ethnicities", icon: 'edit'}
+                        }
+                        break;
+                    }
+                    case "second_nations": {
+                        cmItems = {
+                            "view": {name: "View/Edit Second Nations", icon: 'edit'}
+                        }
+                        break;
+                    }
+                    default: 
+                        cmItems = {}
+                        break;
                 }
-            });
+                return {
+                    callback: function(key, options) {
+                        var m = "clicked: "+key
+                        switch (node.type) {
+                            case "ETHNICITIES_PARENT":
+                                $("#addEthnicityTrigger").click()
+                                break;  
+                            case "CONTINENTS_PARENT":
+                                switch (key) {
+                                    case "add":
+                                        $("#addContinentTrigger").click()
+                                        break;
+                                }
+                                break;  
+                            case "REGIONS_PARENT":
+                                $("#newRegionSource").trigger("change")
+                                $("#newRegionFilter").trigger("change")
+                                rightDivContent("#addRegion")
+                                break;
+                            case "continent":
+                                switch (key) {
+                                    case "add":
+                                        addNation(node.data.id)
+                                        break;
+                                    case "delete":
+                                        console.log("You chose to delete "+node.title)
+                                        break;
+                                    case "edit":
+                                        editContinent(node)
+                                        break;
+                                }
+                                break;
+                            case "nation":
+                                switch (key) {
+                                    case "edit":
+                                        editNation(node)
+                                        break;
+                                    case "addState":
+                                        addState(node.parent.data.id,node.data.id)
+                                        //$("#addStateTrigger").click()
+                                        break;
+                                    case "addSecondNation":
+                                        addSecondNation(node.id)
+                                        break;
+                                    case "addEthnicity":
+                                        console.log("add ethnicity TBD")
+                                        break;
+                                    case "delete":
+                                        confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all states and cities as well!")
+                                        break;
+                                }
+                                break;
+                            case "STATES_PARENT":
+                                addState(node.parent.parent.data.id,node.parent.data.id)
+                                break;
+                            case "state":
+                                switch (key) {
+                                    case "edit":
+                                        editState(node)
+                                        break;
+                                    case "add":
+                                        //$("#addCityTrigger").click()
+                                        addCity(node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id)
+                                        break;
+                                    case "delete":
+                                        confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all cities as well!")
+                                        break;
+                                }
+                                break;
+                            case "city":
+                                switch (key) {
+                                    case "edit":
+                                        editCity(node)
+                                        break;
+                                    case "delete":
+                                        confirm("Are you sure you want to delete "+node.title+"?")
+                                        break;
+                                }
+                                break;
+                            case "ethnicity":
+                                switch (key) {
+                                    case "delete":
+                                        deleteNode(node)
+                                        break;
+                                    case "edit":
+                                        editEthnicity(node)
+                                        break;
+                                }
+                                break;
+                            case "region":
+                                switch (key) {
+                                    case "delete":
+                                        deleteNode(node)
+                                        break;
+                                    case "edit":
+                                        editRegion(node)
+                                        break;
+                                }
+                                break;
+                            case "nation_ethnicity":
+                                node.setActive(true)
+                                break;
+                            case "second_nations":
+                                node.setActive(true)
+                                break;
+                            default: 
+                                break;
+                        }
+                    },
+                    items: cmItems
+                }
+            }
+        });
 
+        $("#continent_count").text(continent_count)
+        $("#nation_count").text(nation_count)
+        $("#state_count").text(state_count)
+        $("#city_count").text(city_count)
+        $("#ethnicity_count").text(ethnicity_count)
+        $("#region_count").text(region_count)
+        $("#usa_defined_count").text(usa_defined.length)
+        $("#max_continent_id").text(max_continent_id)
+        $("#max_nation_id").text(max_nation_id)
+        $("#max_state_id").text(max_state_id)
+        $("#max_city_id").text(max_city_id)
+        $("#max_ethnicity_id").text(max_ethnicity_id)
+        $("#max_region_id").text(max_region_id)
 
-            $("#continent_count").text(continent_count)
-            $("#nation_count").text(nation_count)
-            $("#state_count").text(state_count)
-            $("#city_count").text(city_count)
-            $("#ethnicity_count").text(ethnicity_count)
-            $("#region_count").text(region_count)
-            $("#max_continent_id").text(max_continent_id)
-            $("#max_nation_id").text(max_nation_id)
-            $("#max_state_id").text(max_state_id)
-            $("#max_city_id").text(max_city_id)
-            $("#max_ethnicity_id").text(max_ethnicity_id)
-            $("#max_region_id").text(max_region_id)
-
-            var tree = $.ui.fancytree.getTree("#xmlOutput")
-            var world = tree.findFirst("CONTINENT")
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        if (world != null) {
             world.sortChildren(null, true);
-
-            var ethnicities = tree.findFirst("ETHNICITIES")
-            ethnicities.sortChildren(null, true);
-
-            var regions = tree.findFirst("REGIONS")
-            regions.sortChildren(null, true);
-
-            $.each(nations_by_id, function(key, value) {
-                $('#multi_d')
-                    .append($('<option>', { value : key })
-                    .text(value));
-            });
-
-            $("#overlay").css("display","none")
-        } else {
-            $("#overlay").css("display","none")
-            alert("cancelled!")
         }
-    });
+    
+        var ethnicities = tree.findFirst("ETHNICITIES")
+        if (ethnicities != null) {
+            ethnicities.sortChildren(null, true);
+        }
+        var regions = tree.findFirst("REGIONS")
+        if (regions != null) {
+            regions.sortChildren(null, true);
+        }
+    
+        $.each(nations_by_id, function(key, value) {
+            $('#multi_d')
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+
+        $("#overlay").css("display","none")
+    }
 
     $("#addEthnicityTrigger").on("click", function(e) {
         $("#newEthnicityName").val("")
@@ -2846,7 +3855,7 @@
         } else {
             $('#editNationCapitolState').val("0")
         }
-        
+        $("#editNationUSA").val(node.data.this_is_the_usa)
         rightDivContent("#editNation")
     }
 
@@ -2932,6 +3941,22 @@
         $("#editRegionSource").trigger("change")
         rightDivContent("#editRegion")
     }
+
+/*     $(".defineUSA").on("change", function() {
+        //var el = "#"+$(this).attr("id")
+        //var newUSA = ($(this).attr("id") == "newNationUSA") ? $("#newNationID").val() : $("#editNationID").val()
+        //var usa = findUSA()
+        if ($(this).val() == 1) {
+            if (findUSA != null) {
+                if (confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change that?")) {
+                    var oldUSA = findNationFromScratch(usa)
+                    oldUSA.data.this_is_the_usa = 0
+                }
+            }
+        } else {
+            console.log("you set it to not be the usa")
+        }
+    }) */
 
     function addNation(continent) {
         $("#newNationContinent").empty()
@@ -3048,6 +4073,18 @@
             if (n.type == "nation") {
                 if (n.title == nation) {
                     return n
+                }
+            }
+        }
+    }
+
+    function findNationFromScratch(nationToFind) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        for (continent of world.getChildren()) {
+            for (nation of continent.getChildren()) {
+                if (nation.data.id == nationToFind) { 
+                    return nation
                 }
             }
         }
@@ -3183,6 +4220,185 @@
         $("#editEthnicityTotal").val(sum)
     })
 
+    $(".firstEthPct").on("change",function() {
+        var sum = 0;
+        $(".firstEthPct").each(function(){
+            sum += +$(this).val();
+        });
+        if (sum !== 1000) {
+            $("#firstEthnicityTotal").css("color","red")
+        } else {
+            $("#firstEthnicityTotal").css("color","green")
+        }
+        $("#firstEthnicityTotal").val(sum)
+    })
+
+    function firstStuffSubmit() {
+        $("#form-5").trigger("submit")
+    }
+
+    $("#form-5").on("submit", function(e) {
+        e.preventDefault()
+
+        const regions_arr = {}
+        regions_arr.title = "REGIONS"
+        regions_arr.folder = true
+        regions_arr.icon = './images/map-solid.svg'
+        regions_arr.type = "REGIONS_PARENT"
+        regions_arr.children = []
+        
+        const ethnicities_arr = {}
+        const ethnicities = []
+        ethnicities_arr.title = "ETHNICITIES";
+        ethnicities_arr.folder = true
+        ethnicities_arr.type = "ETHNICITIES_PARENT"
+        ethnicities_arr.icon = './images/people-group-solid.svg'
+
+        const continent_arr = {};
+        const continents = [];
+        const nations = []
+        continent_arr.title = "CONTINENTS";
+        continent_arr.folder = true;
+        continent_arr.icon = './images/globe-solid.svg'
+        continent_arr.type = "CONTINENTS_PARENT"
+
+        const ethnicity_obj = {}
+        const continent_obj = {}
+        const nation_obj = {}
+        const state_obj = {}
+        const state_arr = []
+        const city_obj = {}
+        const second_nations_obj = {}
+        const nation_eth_obj = {}
+        const tree_json = []
+
+        const states_obj = {}
+        states_obj.title = "States"
+        states_obj.folder = true
+        states_obj.icon = './images/landmark-dome-solid.svg'
+        states_obj.type = "STATES_PARENT"
+        states_obj.children = ([])
+                
+        ethnicity_obj.type = 'ethnicity'
+        ethnicity_obj.folder = false
+        ethnicity_obj.icon = './images/user-group-solid.svg'
+        ethnicity_obj.title = $("#firstEthnicityName").val()
+        ethnicity_obj.name_korean = $("#firstEthnicityNameK").val()
+        ethnicity_obj.id = max_ethnicity_id + 1
+        ethnicity_obj.african = $("#firstEthnicityAfrican").val()
+        ethnicity_obj.asian = $("#firstEthnicityAsian").val()
+        ethnicity_obj.east_indian = $("#firstEthnicityEastIndian").val()
+        ethnicity_obj.caucasian = $("#firstEthnicityCaucasian").val()
+        ethnicity_obj.hispanic = $("#firstEthnicityHispanic").val()
+        ethnicities.push(ethnicity_obj)
+        ethnicities_arr.children = ethnicities
+        max_ethnicity_id++
+        ethnicity_count++
+
+        continent_obj.type = 'continent'
+        continent_obj.folder = true
+        continent_obj.icon = './images/earth-americas-solid.svg'
+        continent_obj.id = max_continent_id + 1
+        continent_obj.title = $("#firstContinentName").val()
+        continent_obj.title_korean = $("#firstContinentNameK").val()
+        continent_obj.pop = $("#firstContinentPop").val()
+        continent_obj.etid = 1
+        continent_obj.abbr = $("#firstContinentAbbr").val()
+        continent_obj.dem = $("#firstContinentDem").val()
+        continent_obj.abbr_korean =  $("#firstContinentAbbrK").val()
+        continent_obj.dem_korean = $("#firstContinentDemK").val()
+        continents.push(continent_obj)
+        continent_arr.children = continents
+        max_continent_id++
+        continent_count++
+
+        nation_obj.type = 'nation'
+        nation_obj.folder = true
+        nation_obj.icon = ($("#firstNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
+        nation_obj.id = 1
+        nation_obj.title = $("#firstNationName").val()
+        nation_obj.title_korean = $("#firstNationNameK").val()
+        nation_obj.short_korean = $("#firstNationShortK").val()
+        nation_obj.pop = $("#firstNationPopulation").val()
+        nation_obj.etid = 1
+        nation_obj.capid = 0
+        nation_obj.gender = $("#firstNationGender").val()
+        nation_obj.bbqual = $("#firstNationBbqual").val()
+        nation_obj.abbr = $("#firstNationAbbr").val()
+        nation_obj.abbr_korean = $("#firstNationAbbrK").val()
+        nation_obj.dem = $("#firstNationDem").val()
+        nation_obj.dem_korean = $("#firstNationDemK").val()
+        nation_obj.time_zone = $("#firstNationTimeZone").val()
+        nation_obj.observes_dst = $("#firstNationDST").val()
+        nation_obj.this_is_the_usa = $("#firstNationUSA").val()
+        nation_obj.children = []
+        nations.push(nation_obj)
+        max_nation_id++
+        nation_count++
+        $("#firstStateTimeZone").val($("#firstNationTimeZone").val())
+
+        second_nations_obj.title = "Second Nations"
+        second_nations_obj.folder = false
+        second_nations_obj.icon = './images/circle-plus-solid.svg'
+        second_nations_obj.type = 'second_nations'
+        second_nations_obj.subdata = []
+            
+        nation_eth_obj.title = "Ethnicities"
+        nation_eth_obj.folder = false
+        nation_eth_obj.icon = './images/user-group-solid.svg'
+        nation_eth_obj.type = 'nation_ethnicity'
+        nation_eth_obj.subdata = []
+
+        state_obj.type = 'state'
+        state_obj.folder = true
+        state_obj.icon = './images/landmark-flag-solid.svg'
+        state_obj.id = 1
+        state_obj.title = $("#firstStateName").val()
+        state_obj.title_korean = $("#firstStateNameK").val()
+        state_obj.pop = $("#firstStatePopulation").val()
+        state_obj.abbr = $("#firstStateAbbr").val()
+        state_obj.abbr_korean = $("#firstStateAbbrK").val()
+        state_obj.time_zone = $("#firstStateTimeZone").val()
+        state_obj.observes_dst = $("#firstStateDST").val()
+        state_obj.lat = $("#firstStateLatitude").val().trim()
+        state_obj.long = $("#firstStateLongitude").val().trim()
+        state_obj.children = []
+        max_state_id++
+        state_count++
+        $("#firstCityTimeZone").val($("#firstStateTimeZone").val())
+
+        city_obj.type = 'city'
+        city_obj.folder = false
+        city_obj.icon = './images/city-solid.svg'
+        city_obj.id = 1
+        city_obj.title = $("#firstCityName").val()
+        city_obj.title_korean = $("#firstCityNameK").val()
+        city_obj.pop = $("#firstCityPopulation").val()
+        city_obj.lat = $("#firstCityLatitude").val()
+        city_obj.long = $("#firstCityLongitude").val()
+        city_obj.abbr = $("#firstCityAbbr").val()
+        city_obj.altitude = $("#firstCityAltitude").val()
+        city_obj.abbr_korean = $("#firstCityAbbrK").val()
+        city_obj.time_zone = $("#firstCityTimeZone").val()
+        city_obj.observes_dst = $("#firstCityDST").val()
+        city_obj.state = $("#firstCityState").val()
+        city_obj.nation = $("#firstCityNation").val()
+        max_city_id++
+        city_count++
+
+        state_arr.push(state_obj)
+        state_obj.children.push(city_obj)
+        states_obj.children = state_arr
+        nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
+        continent_obj.children = nations
+
+        tree_json.push(ethnicities_arr, continent_arr, regions_arr)
+
+        initTree(tree_json)
+
+        $.magnificPopup.close()
+    })
+
     $("#newEthnicityForm").on("submit", function(e) {
         e.preventDefault()
         ethnicity_count++;
@@ -3244,12 +4460,24 @@
 
     $("#newNationForm").on("submit", function(e) {
         e.preventDefault()
+        var usa = findUSA()
+        if ($("#newNationUSA").val() == 1) {
+            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change it to "+$("#newNationName").val()+"?")) {
+                return false
+            } else {
+                var oldUSA = findNationFromScratch(usa)
+                console.log(oldUSA)
+                oldUSA.data.this_is_the_usa = 0
+                oldUSA.icon = './images/flag-solid.svg'
+                oldUSA.renderTitle()
+            }
+        }
         nations_by_id[$("#newNationID").val()] = $("#newNationName").val()
         nation_count++;
         var nation_obj = {}
         nation_obj.type = 'nation'
         nation_obj.folder = true
-        nation_obj.icon = './images/flag-solid.svg'
+        nation_obj.icon = ($("#newNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
         nation_obj.id = $("#newNationID").val()
         nation_obj.title = $("#newNationName").val()
         nation_obj.title_korean = $("#newNationNameK").val()
@@ -3288,8 +4516,6 @@
         nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
         //nation_obj.children = [states_obj]
         if (parseInt($("#newNationID").val()) > max_nation_id) { max_nation_id = parseInt($("#newNationID").val()) }
-        $("#max_nation_id").text(max_nation_id)
-        $("#nation_count").text(nation_count)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("CONTINENT")
         var continent = world.findFirst($("#newNationContinent option:selected" ).text())
@@ -3307,7 +4533,42 @@
         cities_by_nation[$("#newNationID").val()] = []
         states_by_nation[$("#newNationID").val()] = []
         nations_by_continent[$("#newNationContinent").val()].push(nation_obj)
+        $("#max_nation_id").text(max_nation_id)
+        $("#nation_count").text(nation_count)
+        $("#usa_defined_count").text(countUSA())
     })
+
+    function countUSA() {
+        var count = 0
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        for (continent of world.getChildren()) {
+            for (nation of continent.getChildren()) {
+                if (nation.data.this_is_the_usa == 1) {
+                    count++
+                }
+            }
+        }
+        return count
+    }
+
+    function findUSA() {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENTS")
+        for (continent of world.getChildren()) {
+            if (continent.getChildren() != null) {
+                for (nation of continent.getChildren()) {
+                    console.log(nation)
+                    if (nation.data.this_is_the_usa == 1) {
+                        return nation.data.id
+                    }
+                }
+            } else {
+
+            }
+        }
+        return null;
+    }
 
     $("#newStateForm").on("submit", function(e) {
         e.preventDefault()
@@ -3409,7 +4670,20 @@
 
     $("#editNationForm").on("submit", function(e) {
         e.preventDefault()
+        var usa = findUSA()
+        if ($("#editNationUSA").val() == 1) {
+            if (!confirm(nations_by_id[usa]+" is already defined as the USA.\n\nAre you sure you want to change it to "+$("#editNationName").val()+"?")) {
+                return false
+            } else {
+                var oldUSA = findNationFromScratch(usa)
+                console.log(oldUSA)
+                oldUSA.data.this_is_the_usa = 0
+                oldUSA.icon = './images/flag-solid.svg'
+                oldUSA.renderTitle()
+            }
+        }
         nodeToEdit.setTitle($("#editNationName").val())
+        nodeToEdit.icon = ($("#editNationUSA").val() == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
         nodeToEdit.data.abbr = $("#editNationAbbr").val()
         nodeToEdit.data.abbr_korean = $("#editNationAbbrK").val()
         nodeToEdit.data.bbqual = $("#editNationBbqual").val()
@@ -3424,6 +4698,8 @@
         nodeToEdit.data.this_is_the_usa = $("#editNationUSA").val()
         nodeToEdit.time_zone = $("#editNationTimeZone").val()
         nodeToEdit.data.title_korean = $("#editNationNameK").val()
+        nodeToEdit.renderTitle()
+        $("#usa_defined_count").text(countUSA())
         scrollToEditedNode("CONTINENTS")
     })
 
@@ -3494,7 +4770,6 @@
         } 
         var nation_arr = []
         if ($('#multi_d_to option').length > 0) {
-            console.log("NATIONS FOUND")
             $("#multi_d_to option").each(function() {
                 var nation_obj ={}
                 nation_obj.title = this.text
@@ -3610,6 +4885,11 @@
         nodeToEdit.setFocus()
         nodeToEdit.setActive()
         nodeToEdit.makeVisible({scrollIntoView: true});
+    }
+
+    function clearRightDiv() {
+        $("#infoPanel").html("")
+        rightDivContent("#infoPanel")
     }
     </script>
 </html>

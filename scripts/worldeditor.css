@@ -34,6 +34,18 @@ h2 img {
     padding-right: 5px;
 }
 
+div.dt-buttons {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Optional: Add some spacing between the buttons */
+.dt-button {
+    font-size: 14px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
 
 .blank {
     border:none;
