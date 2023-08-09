@@ -1343,11 +1343,11 @@
                             </tr>
                             <tr>
                                 <td class="left">Name (Korean):</td>
-                                <td class="right"><input type="text" style="width:97%;" id="firstCityNameK" value="0"></td>
+                                <td class="right"><input type="text" style="width:97%;" id="firstCityNameK"></td>
                             </tr>
                             <tr>
                                 <td class="left">Abbreviation (Korean):</td>
-                                <td class="right"><input type="text" style="width:97%;" id="firstCityAbbrK" value="0"></td>
+                                <td class="right"><input type="text" style="width:97%;" id="firstCityAbbrK"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -2371,7 +2371,12 @@
                         var city_arr = []
                         if (state.CITIES[0].CITY != undefined) {
                             for (city of state.CITIES[0].CITY) {
-                                cities_by_id[city.$.id] = city.$.name
+                                var obj = {}
+                                obj.name = city.$.name
+                                obj.state = state.$.id
+                                obj.nation = nation.$.id
+                                obj.continent = continent.$.id
+                                cities_by_id[city.$.id] = obj
                                 city_count++;
                                 var city_obj = {}
                                 var city_bn_obj = {}
@@ -2417,6 +2422,7 @@
             continent_arr.children = continents
             tree_json.push(continent_arr)
 
+            console.log(cities_by_nation[1])
             var regions_arr = {}
             regions_arr.title = "REGIONS"
             regions_arr.folder = true
@@ -2441,7 +2447,7 @@
                 try {
                     for (city of REGION_CITIES[0].REGION_CITY) {
                         var city_obj ={}
-                        city_obj.title = cities_by_id[city.$.id]
+                        city_obj.title = cities_by_id[city.$.id].name
                         city_obj.id = city.$.id
                         city_arr.push(city_obj)
                     }
@@ -2722,13 +2728,14 @@
                         })
 
                         var cap
-                        if (cities_by_id[node.data.capid] == undefined || cities_by_id[node.data.capid] == "0") {
+                        if (cities_by_id[node.data.capid] == undefined || node.data.capid == "0") {
                             cap = "<span style='color:red;'>None Set</span>" 
                         } else {
                             var city = cities_by_nation[node.data.id].find( function( city ){
                                 return city.id === node.data.capid;
                             } );
                             if (city != null) {
+                                console.log(city)
                                 cap = city.title+",&nbsp;"+states_by_id[city.state]
                             }
                         } 
@@ -4267,6 +4274,7 @@
         const nation_obj = {}
         const state_obj = {}
         const state_arr = []
+        const city_arr = []
         const city_obj = {}
         const second_nations_obj = {}
         const nation_eth_obj = {}
@@ -4298,7 +4306,7 @@
         continent_obj.type = 'continent'
         continent_obj.folder = true
         continent_obj.icon = './images/earth-americas-solid.svg'
-        continent_obj.id = max_continent_id + 1
+        continent_obj.id = 1
         continent_obj.title = $("#firstContinentName").val()
         continent_obj.title_korean = $("#firstContinentNameK").val()
         continent_obj.pop = $("#firstContinentPop").val()
@@ -4309,6 +4317,7 @@
         continent_obj.dem_korean = $("#firstContinentDemK").val()
         continents.push(continent_obj)
         continent_arr.children = continents
+        continents_by_id[1] = $("#firstContinentName").val()
         max_continent_id++
         continent_count++
 
@@ -4333,6 +4342,7 @@
         nation_obj.this_is_the_usa = $("#firstNationUSA").val()
         nation_obj.children = []
         nations.push(nation_obj)
+        nations_by_id[1] = $("#firstNationName").val()
         max_nation_id++
         nation_count++
         $("#firstStateTimeZone").val($("#firstNationTimeZone").val())
@@ -4363,6 +4373,7 @@
         state_obj.lat = $("#firstStateLatitude").val().trim()
         state_obj.long = $("#firstStateLongitude").val().trim()
         state_obj.children = []
+        states_by_id[1] = $("#firstStateName").val()
         max_state_id++
         state_count++
         $("#firstCityTimeZone").val($("#firstStateTimeZone").val())
@@ -4381,16 +4392,38 @@
         city_obj.abbr_korean = $("#firstCityAbbrK").val()
         city_obj.time_zone = $("#firstCityTimeZone").val()
         city_obj.observes_dst = $("#firstCityDST").val()
-        city_obj.state = $("#firstCityState").val()
-        city_obj.nation = $("#firstCityNation").val()
+        city_obj.state = "1"
+        city_obj.nation = "1"
+
+        var obj = {}
+        obj.name = $("#firstCityName").val()
+        obj.state = "1"
+        obj.nation = "1"
+        obj.continent = "1"
+
+        var city_bn_obj = {}
+        city_bn_obj.id = "1"
+        city_bn_obj.title = $("#firstCityName").val()
+        city_bn_obj.state = "1"
+        city_bn_obj.nation = "1"
+
+        cities_by_state[1] = obj
+        cities_by_id[$("#newCityId").val()] = obj
+
         max_city_id++
         city_count++
 
+        city_arr.push(city_obj)
         state_arr.push(state_obj)
         state_obj.children.push(city_obj)
         states_obj.children = state_arr
         nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
         continent_obj.children = nations
+
+        nations_by_continent[1] = nations
+        states_by_nation[1] = state_arr
+        cities_by_state[1] = city_arr
+        cities_by_nation[1] = [city_bn_obj]
 
         tree_json.push(ethnicities_arr, continent_arr, regions_arr)
 
@@ -4607,7 +4640,12 @@
         e.preventDefault()
         var nation = findNation($("#newCityContinent option:selected").text(), $("#newCityNation option:selected").text())
         var state = findState($("#newCityContinent option:selected").text(), $("#newCityNation option:selected").text(), $("#newCityState option:selected").text())
-        cities_by_id[$("#newCityId").val()] = $("#newCityName").val()
+        var obj = {}
+        obj.name = $("#newCityName").val()
+        obj.state = $("#newCityState").val()
+        obj.nation = $("#newCityNation").val()
+        obj.continent = $("#newCityContinent").val()
+        cities_by_id[$("#newCityId").val()] = obj
         city_count++;
         var city_obj = {}
         var city_bn_obj = {}
