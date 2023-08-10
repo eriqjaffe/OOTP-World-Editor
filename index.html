@@ -32,6 +32,7 @@
     <script type="text/javascript" src="./scripts/latinize.js"></script>
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
     <script src="./scripts/jquery.smartWizard.min.js" type="text/javascript"></script>
+    
     <script>
         const { ipcRenderer } = require('electron');
         const { translate } = require('bing-translate-api');
@@ -1023,6 +1024,10 @@
         </table>    
     </div>
 
+    <div id="wizardSplash" class="white-popup mfp-hide">
+        The wizard splash screen will go here!
+        <input type='button' id="wizardInit" value="Let's Go!">
+    </div>
     <div id="wizardContainer" class="white-popup mfp-hide">
         <div id="smartwizard">
             <ul class="nav">
@@ -1702,11 +1707,15 @@
                                 position: 'bottom', // none/ top/ both bottom
                                 extraHtml: "<button class='btn sw-btn' id='btnFinish' disabled onclick='firstStuffSubmit()'>Finish</button>"
                             },
+                            autoAdjustHeight: false,
+                            //theme: 'arrows'
                         });
 
+                        $(".tab-content").height('517')
                         $('#smartwizard').smartWizard("goToStep", 0);
 
                          $("#smartwizard").on("showStep", function(e, anchorObject, stepIndex, stepDirection, stepPosition) {
+                            $(".tab-content").height('517')
                             $("#prev-btn").removeClass('disabled').prop('disabled', false);
                             $("#next-btn").removeClass('disabled').prop('disabled', false);
                             if(stepPosition === 'first') {
@@ -2422,7 +2431,6 @@
             continent_arr.children = continents
             tree_json.push(continent_arr)
 
-            console.log(cities_by_nation[1])
             var regions_arr = {}
             regions_arr.title = "REGIONS"
             regions_arr.folder = true
