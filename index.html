@@ -1071,7 +1071,7 @@
                         <tbody>
                         <tr>
                             <td class="left">Name:</td>
-                            <td class="right"><input type='text' style="width:95%;" id='firstEthnicityName' class="centerText toKorean" required value="placeholderData"></td>
+                            <td class="right"><input type='text' style="width:95%;" id='firstEthnicityName' class="centerText toKorean" required value="placeholderEthnicity"></td>
                         </tr>
                         <tr>
                             <td class="left">Name (Korean):</td>
@@ -1113,7 +1113,7 @@
                             <tbody>
                             <tr>
                                 <td class="left">Name:</td>
-                                <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="firstContinentName" id="firstContinentName" required value="placeholderData"></td>
+                                <td class="left"><input style="width:95%;" type="text" class="centerText toKorean" name="firstContinentName" id="firstContinentName" required value="placeholderContinent"></td>
                             </tr>
                             <tr>
                                 <td class="left">Abbreviation:</td>
@@ -1151,7 +1151,7 @@
                             <tbody>
                             <tr>
                                 <td class="left">Name:</td>
-                                <td class="right"><input type="text" class="centerText toKorean" id="firstNationName" required value="placeholderData"></td>
+                                <td class="right"><input type="text" class="centerText toKorean" id="firstNationName" required value="placeholderNation"></td>
                             </tr>
                             <tr>
                                 <td class="left">Abbreviation:</td>
@@ -1241,7 +1241,7 @@
                             <tbody>
                             <tr>
                                 <td class="left">Name:</td>
-                                <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="firstStateName" required value="placeholderData"</td>
+                                <td class="right"><input type="text" style="width:96%;" class="centerText toKorean" id="firstStateName" required value="placeholderState"</td>
                             </tr>
                             <tr>
                                 <td class="left">Abbreviation:</td>
@@ -1292,7 +1292,7 @@
                             <tbody>
                             <tr>
                                 <td class="left">Name:</td>
-                                <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="firstCityName" required value="placeholderData"></td>
+                                <td class="right"><input type="text" style="width:97%;" class="centerText toKorean" id="firstCityName" required value="placeholderCity"></td>
                             </tr>
                             <tr>
                                 <td class="left">Abbreviation:</td>
@@ -2687,6 +2687,8 @@
                                     break;
                             }
                         })
+
+                        var pop = (parseInt(node.data.pop) != NaN) ? "0" : parseInt(node.data.pop).toLocaleString("en-US")
                         html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.title+'</h2>\n'
                                 + '<div style="width:100%; text-align:center;">\n'
                                 + '<table class="blank" style="width:100%;">\n'
@@ -2694,7 +2696,7 @@
                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Continent</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
-                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+pop+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Abbreviation (Korean):</td><td class="right_float" >'+node.data.abbr_korean+'</td></tr>\n'
@@ -2736,18 +2738,18 @@
                         })
 
                         var cap
-                        if (cities_by_id[node.data.capid] == undefined || node.data.capid == "0") {
+                        if (node.data.capid == undefined || node.data.capid == "0") {
                             cap = "<span style='color:red;'>None Set</span>" 
                         } else {
                             var city = cities_by_nation[node.data.id].find( function( city ){
                                 return city.id === node.data.capid;
                             } );
                             if (city != null) {
-                                console.log(city)
                                 cap = city.title+",&nbsp;"+states_by_id[city.state]
                             }
                         } 
 
+                        var pop = (parseInt(node.data.pop) != NaN) ? "0" : parseInt(node.data.pop).toLocaleString("en-US")
                         html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.title+'</h2>\n'
                                 + '<div style="width:100%; text-align:center;">\n'
                                 + '<table class="blank" style="width:100%;">\n'
@@ -2755,7 +2757,7 @@
                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">Nation</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
-                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+pop+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
@@ -2780,43 +2782,55 @@
                         })
                         break;
                     case "STATES_PARENT":
-                        html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-dome-solid.svg'>"+node.title+'</h2>\n'
+                        if (node.getChildren() != null) {
+                            html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-dome-solid.svg'>"+node.title+'</h2>\n'
 
-                        var totalPop = 0;
-                        var stateCount = 0;
+                            var totalPop = 0;
+                            var stateCount = 0;
 
-                        html += "<div id='statePieChart'>\n"
+                            html += "<div id='statePieChart'>\n"
 
-                        for (child of node.getChildren()) {
-                            totalPop += parseInt(child.data.pop)
-                            stateCount++
-                            html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
+                            for (child of node.getChildren()) {
+                                totalPop += parseInt(child.data.pop)
+                                stateCount++
+                                html += "<div data-lcolor='"+chroma.random()+"'>"+child.data.pop+"<span>: "+child.title+"</span></div>\n"
+                            }
+
+                            html += "</div>"
+                                    + "<h4 style='text-align: center; font-weight:bold;'>"+stateCount+" States<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
+
+                            $("#infoPanel").html(html)
+
+                            $("#statePieChart").listtopie({
+                                size:'auto',  
+                                strokeWidth:2,
+                                hoverEvent:false,
+                                hoverBorderColor:'#585858',
+                                hoverWidth:2,
+                                textSize:'16',
+                                marginCenter:30,
+                                listVal:false,
+                                strokeColor:'#fff',
+                                listValMouseOver: true,
+                                infoText:true,
+                                setValues:false,
+                                listValInsertClass:'result_list',
+                                backColorOpacity: '0.8',
+                                hoverSectorColor:true,
+                                usePercent:false,
+                                speedDraw:50
+                            });
+                        } else {
+                            var html = "<h2 style='text-align:center;'>No States Defined</h2>\n"
+                                     + "<div style='width:100%; text-align:center;'><input type='button' id='blankStateButton' value='Add State'></div>"
+
+                            $("#infoPanel").html(html)
+
+                            $("#blankStateButton").on("click", function() {
+                                //console.log(node.parent.parent.title, node.parent.title)
+                                addState(node.parent.parent.data.id, node.parent.data.id)
+                            })
                         }
-
-                        html += "</div>"
-                                + "<h4 style='text-align: center; font-weight:bold;'>"+stateCount+" States<br><br>Total Population: "+totalPop.toLocaleString("en-US")+"</h4>\n"
-
-                        $("#infoPanel").html(html)
-
-                        $("#statePieChart").listtopie({
-                            size:'auto',  
-                            strokeWidth:2,
-                            hoverEvent:false,
-                            hoverBorderColor:'#585858',
-                            hoverWidth:2,
-                            textSize:'16',
-                            marginCenter:30,
-                            listVal:false,
-                            strokeColor:'#fff',
-                            listValMouseOver: true,
-                            infoText:true,
-                            setValues:false,
-                            listValInsertClass:'result_list',
-                            backColorOpacity: '0.8',
-                            hoverSectorColor:true,
-                            usePercent:false,
-                            speedDraw:50
-                        });
 
                         rightDivContent("#infoPanel")
                         break;
@@ -2827,13 +2841,14 @@
                         })
                         var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
                         var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
+                        var pop = (parseInt(node.data.pop) != NaN) ? "0" : parseInt(node.data.pop).toLocaleString("en-US")
                         html = '<h2 style="text-align:center;"><img src="./images/earth-americas-solid.svg">'+node.parent.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/flag-solid.svg'>"+node.parent.parent.title+"&nbsp;&rarr;&nbsp;<img src='./images/landmark-flag-solid.svg'>"+node.title+'</h2>\n'
                                 + '<div style="width:100%; text-align:center;">\n'
                                 + '<table class="blank" style="width:100%;">\n'
                                 + '<tr class="blank"><td class="left_float">ID:</td><td class="right_float">'+node.data.id+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Type:</td><td class="right_float">State</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
-                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+parseInt(node.data.pop).toLocaleString("en-US")+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float">'+pop+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Latitude:</td><td class="right_float">'+lat+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Longitude:</td><td class="right_float">'+lon+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float">'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
@@ -3856,13 +3871,23 @@
                 .append($('<option>', { value : x.id })
                 .text(x.title));
         }
-        var city = cities_by_nation[node.data.id].find( function( city ){
-            return city.id === node.data.capid;
-        } );
-        if (city == null) {
-            console.log("No cities yet!")
-        }
+
         sortDropdown("#editNationCapitolState")
+        
+        if (node.data.capid == 0) {
+            $("#editNationCapitolState").prepend("<option value='0' selected='selected'>SELECT A STATE</option>");
+            $("#editNationCapitol").prepend("<option value='0' selected='selected'></option>");
+        } else {
+            var city = cities_by_nation[node.data.id].find( function( city ){
+                return city.id === node.data.capid;
+            } );
+            if (city == null) {
+                console.log("No cities yet!")
+            }
+
+        }
+        
+        
         if (parseInt(node.data.capid) > 0) {
             $('#editNationCapitolState').val(city.state)
             $('#editNationCapitolState').trigger("change")
@@ -4416,7 +4441,7 @@
         city_bn_obj.nation = "1"
 
         cities_by_state[1] = obj
-        cities_by_id[$("#newCityId").val()] = obj
+        cities_by_id[1] = obj
 
         max_city_id++
         city_count++
@@ -4489,6 +4514,7 @@
         world.sortChildren(null, true);
         var continent = world.findFirst($("#newContinentName").val())
         world.setExpanded()
+        tree.activateKey(false)
         continent.setFocus()
         continent.setActive()
         continent_count++
@@ -4565,9 +4591,11 @@
         var newNodes = continent.findAll($("#newNationName").val())
         for (node of newNodes) {
             if (node.title == $("#newNationName").val()) {
+                tree.activateKey(false)
                 node.setFocus()
                 node.setActive()
                 node.makeVisible({scrollIntoView: true});
+                node.setExpanded()
                 break;
             }
         }
@@ -4599,7 +4627,6 @@
         for (continent of world.getChildren()) {
             if (continent.getChildren() != null) {
                 for (nation of continent.getChildren()) {
-                    console.log(nation)
                     if (nation.data.this_is_the_usa == 1) {
                         return nation.data.id
                     }
@@ -4637,6 +4664,8 @@
         states.addChildren(state_obj)
         states.sortChildren(null, true)
         var node = states.findFirst($("#newStateName").val())
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
@@ -4679,6 +4708,8 @@
         state.addChildren(city_obj)
         state.sortChildren(null, true)
         var node = state.findFirst($("#newCityName").val())
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
@@ -4699,6 +4730,10 @@
         nodeToEdit.data.caucasian = $("#editEthnicityCaucasian").val()
         nodeToEdit.data.hispanic = $("#editEthnicityHispanic").val()
         scrollToEditedNode("ETHNICITIES")
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
     })
 
     $("#editContinentForm").on("submit", function(e) {
@@ -4712,6 +4747,10 @@
         nodeToEdit.data.pop = $("#editContinentPop").val()
         nodeToEdit.data.title_korean = $("#editContinentNameK").val()
         scrollToEditedNode("CONTINENTS")
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
     })
 
     $("#editNationForm").on("submit", function(e) {
@@ -4733,7 +4772,7 @@
         nodeToEdit.data.abbr = $("#editNationAbbr").val()
         nodeToEdit.data.abbr_korean = $("#editNationAbbrK").val()
         nodeToEdit.data.bbqual = $("#editNationBbqual").val()
-        nodeToEdit.data.capid = "0" // TBD
+        nodeToEdit.data.capid = $("#editNationCapitol").val()
         nodeToEdit.data.dem = $("#editNationDem").val()
         nodeToEdit.data.dem_korean = $("#editNationDemK").val()
         nodeToEdit.data.etid = $("#editNationEtid").val()
@@ -4747,6 +4786,10 @@
         nodeToEdit.renderTitle()
         $("#usa_defined_count").text(countUSA())
         scrollToEditedNode("CONTINENTS")
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
     })
 
     $("#editStateForm").on("submit", function(e) {
@@ -4761,6 +4804,10 @@
         nodeToEdit.data.time_zone = $("#editStateTimeZone").val()
         nodeToEdit.data.title_korean = $("#editStateNameK").val()
         scrollToEditedNode("CONTINENTS")
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
     })
 
     $("#editCityForm").on("submit", function(e) {
@@ -4779,6 +4826,10 @@
             nodeToEdit.parent.parent.parent.data.capid = $("#editCityId").val()
         }
         scrollToEditedNode("CONTINENTS")
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
     })
 
     $(".resetButton").on("click", function() {
