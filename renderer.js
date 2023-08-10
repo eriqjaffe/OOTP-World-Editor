@@ -39,3 +39,7 @@ ipcRenderer.on('add-region', (event, data) => {
 ipcRenderer.on('close-xml', (event, data) => {
     $("#closeXML").trigger("click")
 })
+
+ipcRenderer.on('about', (event, data) => {
+    $("#about").trigger("click")
+});

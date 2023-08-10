@@ -226,7 +226,7 @@ ipcMain.on('save_xml', (event, data) => {
         submenu: [
         {
             click: () => mainWindow.webContents.send('about','click'),
-                label: 'About the OOTP Uniform Maker',
+                label: 'About the OOTP World Editor',
         },
         {
             label: 'About OOTP Baseball',
@@ -247,17 +247,11 @@ ipcMain.on('save_xml', (event, data) => {
             await shell.openExternal('https://electronjs.org')
             }
         },
-        {
-            label: 'About fabric.js',
-            click: async () => {
-            await shell.openExternal('http://fabricjs.com/')
-            }
-        },
         { type: 'separator' },
         {
             label: 'View project on GitHub',
             click: async () => {
-            await shell.openExternal('https://github.com/eriqjaffe/OOTP-Uniform-Maker')
+            await shell.openExternal('https://github.com/eriqjaffe/OOTP-World-Editor')
             }
         },
         {

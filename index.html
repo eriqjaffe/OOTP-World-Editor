@@ -76,6 +76,18 @@
         .sw .toolbar>.sw-btn.disabled, .sw .toolbar>.sw-btn:disabled {
             opacity: .25;
         }
+
+        ul.fancytree-container {
+            /* font-family: tahoma,arial,helvetica;
+            font-size: 10pt;
+            white-space: nowrap;
+            padding: 3px;
+            margin: 0; */
+            background-color: transparent;
+            border: 0px solid transparent;
+            /* min-height: 0;
+            position: relative; */
+        }
     </style>
 </head>
 <body>
@@ -1366,6 +1378,9 @@
             </div>
         </div>  
     </div>
+    <div id="FAQ" class="white-popup mfp-hide">
+        Background Image: Modified from <a href="https://commons.wikimedia.org/wiki/File:Mercator_world_map_%28physical,_political,_population%29.jpg" target="_blank">"Mercator world map (physical, political, population).jpg"</a> by <a href="https://commons.wikimedia.org/wiki/User:Janwillemvanaalst" target="_blank">Janwillemvanaalst</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+    </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
@@ -1376,6 +1391,7 @@
     <input type="button" class="button" id="addStateTrigger" value="Add State" style="display:none;">
     <input type="button" class="button" id="addCityTrigger" value="Add City" style="display:none;">
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
+    <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
 <script>
     require('./renderer.js')
 
@@ -4892,6 +4908,13 @@
         if (parseInt($("#newRegionID").val()) > max_region_id) { max_region_id = parseInt($("#newRegionID").val()) }
         max_region_sort_order++
     })
+
+    $("#about").magnificPopup({
+		items: {
+			src: '#FAQ',
+			type: 'inline'
+		}
+	});
     
     function rightDivContent(div) {
         $(".rightDiv").each(function() {

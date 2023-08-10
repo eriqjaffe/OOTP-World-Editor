@@ -5,6 +5,13 @@
     line-height: 1.5;
 }
 
+body {
+    background-image: url('../images/Mercator_world_map_\(physical\,_political\,_population\).jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+}
+
 #overlay {
 	position:fixed;
     padding:0;
