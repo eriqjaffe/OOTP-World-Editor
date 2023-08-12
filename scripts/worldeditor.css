@@ -52,6 +52,7 @@ input[type='number']::-webkit-outer-spin-button {
 
 h2 {
     margin-bottom: 75px;
+    font-weight: 700!important;
 }
 
 h2 img {
