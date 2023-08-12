@@ -12,6 +12,25 @@ body {
     background-position: center; 
 }
 
+.header {
+    font-weight: 900;
+    font-size: 2em;
+}
+
+.question {
+    font-size: 1.1em;
+	font-weight: 700;
+	margin-top:10px;
+	display:inline-block;
+}
+
+.answer {
+	width:95%;
+	float:right;
+	margin-top:5px;
+	display:inline-block;
+}
+
 #overlay {
 	position:fixed;
     padding:0;

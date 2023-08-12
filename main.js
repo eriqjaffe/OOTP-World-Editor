@@ -32,6 +32,10 @@ ipcMain.on('debug-load', (event, arg) => {
     })
 });
 
+ipcMain.on('get-version', (event, arg) => {
+    event.sender.send('version-info', app.getVersion())
+})
+
 ipcMain.on('open-xml', (event, arg) => {
     const options = {
 		properties: ['openFile'],

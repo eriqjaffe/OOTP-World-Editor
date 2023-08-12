@@ -57,6 +57,7 @@
         const gender = { 0: "Male", 1: "Female" }
         const dst = { 0: "No", 1: "Yes"}
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
+        let currentVersion = ""
 
         $.extend( $.fn.dataTable.defaults, {
             searching: false,
@@ -1379,7 +1380,19 @@
         </div>  
     </div>
     <div id="FAQ" class="white-popup mfp-hide">
-        Background Image: Modified from <a href="https://commons.wikimedia.org/wiki/File:Mercator_world_map_%28physical,_political,_population%29.jpg" target="_blank">"Mercator world map (physical, political, population).jpg"</a> by <a href="https://commons.wikimedia.org/wiki/User:Janwillemvanaalst" target="_blank">Janwillemvanaalst</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+        <div style="width:100%; text-align:center;">	
+			<span class="header">About The OOTP World Editor</span><div id="currentVersion"></div>
+		</div>
+        <div id="faqContainer" style="width:100%; height:90%; overflow:auto;">
+			<div class="question" style="margin-top:10px!important;">So what is this thing?</div><br>
+			<div class="answer">This is a utility designed to make it easy to create and edit "world" xml files for Out Of The Park Baseball 24 and newer.  It may work with older versions, but it may not.</div><br>
+			<div class="question">What is Out Of The Park Baseball?</div><br>
+			<div class="answer">Out Of The Park Baseball is an award winning baseball management simulation published by OOTP Developments.  For more information about OOTP, as well as the other games they make, <a href="http://www.ootpdevelopments.com" target="_blank">visit their site</a>.</div><br>
+			<div class="question">How did you do this?</div><br>
+			<div class="answer">The World Editor is built using <a href="https://nodejs.org/en/about/" target="_blank">Node.js</a> and <a href="https://www.electronjs.org/" target="_blank">Electron</a>.  So it's written entirely in HTML and JavaScript like pretty much any website.</div></br>
+			<div class="question">Who is responsible for this thing?</div>
+			<div class="answer">That would be me.  My name is Eriq Jaffe, and I've been playing OOTP Baseball since 2004.  Feel free to <a href="mailto:eriqjaffe@gmail.com">shoot me an email</a> with any questions or comments.  You can also view the source code for this on <a href="https://github.com/eriqjaffe/OOTP-World-Editor" target="_blank">GitHub</a>.<br><br>The background image is modified from an image by <a href="https://commons.wikimedia.org/wiki/File:Mercator_world_map_(physical,_political,_population).jpg" target="_blank">Janwillemvanaalst</a>, <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a>, via Wikimedia Commons.</div><br>
+		</div>
     </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
@@ -1398,6 +1411,8 @@
     var fancyTreeReady = false;
 
     $(document).ready(function() {
+
+        ipcRenderer.send('get-version', null)
 
         ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
@@ -2209,6 +2224,11 @@
         tmpXML = tmpXML.replace("-->","-->\n")
 
         ipcRenderer.send('save_xml',Buffer.from(tmpXML))
+    })
+
+    ipcRenderer.on('version-info', (event, data) => {
+        currentVersion = data
+        $("#currentVersion").text("Version "+currentVersion)
     })
 
     ipcRenderer.on('save_xml_result', (event, data) => {
