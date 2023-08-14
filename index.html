@@ -25,6 +25,7 @@
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.fancytree.dnd5.js"></script>
     <script src="./scripts/DataTables-1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="./scripts/Buttons-2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="./scripts/FixedHeader-3.4.0/js/dataTables.fixedHeader.min.js"></script>
@@ -1484,6 +1485,8 @@
     <input type="button" class="button" id="addCityTrigger" value="Add City" style="display:none;">
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
+    <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
+    
 <script>
     require('./renderer.js')
 
@@ -2610,10 +2613,114 @@
 
     function initTree(json) {
         $("#xmlOutput").fancytree({
-            extensions: [],
+            extensions: ['dnd5'],
             source: json,
             init: function(event, data){
                 fancyTreeReady = true
+            },
+            dnd5: {
+            /* Expand nodes after n milliseconds of hovering - default */
+            autoExpandMS: 1500,      
+            /* Absolute position offset for .fancytree-drop-marker - default */
+            /* Relative to ..fancytree-title (icon/img near a node accepting drop) */
+            dropMarkerOffsetX: -24,  
+            /* Additional offset for drop-marker with hitMode = "before"/"after" - default*/
+            dropMarkerInsertOffsetX: -16, 
+            /* true: Drag multiple (i.e. selected) nodes - default is false*/
+            multiSource: false,                
+            /* Prevent dropping nodes from different Fancytrees - default is false */
+            preventForeignNodes: true,   
+            /* Prevent dropping items other than Fancytree nodes - default is false */
+            preventNonNodes: false,       
+            /* Prevent dropping nodes on own descendants - default */
+            preventRecursion: true,  
+            /* Prevent dropping nodes 'before self', etc. - default */
+            preventVoidMoves: true,     
+            /* Enable auto-scrolling while dragging - default */
+            scroll: true,        
+            /* Active top/bottom margin in pixel - default */
+            scrollSensitivity: 20,        
+            /* Pixels per event - default */
+            scrollSpeed: 5,               
+            /* Events (drag support) */
+            dragStart: function (node, data) {
+                //console.log('dragStart');
+                switch (node.type) {
+                    case "ETHNICITIES_PARENT":
+                        return false;
+                        break;
+                    case "ethnicity":
+                        return false;
+                        break;
+                    case "CONTINENTS_PARENT":
+                        return false;
+                        break;
+                    case "continent":
+                        return false;
+                        break;
+                    case "nation_ethnicity":
+                        return false;
+                        break;
+                    case "second_nations":
+                        return false;
+                        break;
+                    case "STATES_PARENT":
+                        return false;
+                        break;
+                } 
+                return true;
+            },
+            dragDrag: function (node, data) {
+                //console.log('dragDrag');
+            }, 
+            dragEnd: function (node, data) {
+                //console.log('dragEnd');
+            },         
+            /* Events (drop support) */
+            dragEnter: function (node, data) {
+                switch (data.otherNode.type) {
+                    case "nation":
+                        if (node.type != "continent") {
+                            return false;
+                        }
+                        break;
+                    case "state":
+                        if (node.type != "nation") {
+                            return false
+                        }
+                        break;
+                    case "city":
+                        if (node.type != "state") {
+                            return false;
+                        }
+                        break;
+                }
+                return true;
+            },      
+            dragOver: function (node, data) {
+                //console.log(node.type, data.otherNode.type)
+                /* var $image = $("#rejectDrop");
+                console.log($image[0])
+                if (node.type == data.otherNode.type) {
+                    data.dataTransfer.setDragImage($image[0], -10, -10);
+                    data.useDefaultImage = false;
+                    //console.log("you can't drop that here")
+                    return false
+                } */
+                //console.log(node)
+                //console.log('dragOver');
+            },     
+            dragExpand: function (node, data) {
+                //console.log('dragExpand');
+                return true;
+            },      
+            dragDrop: function (node, data) {
+                
+                //console.log('dragDrop');
+            },
+            dragLeave: function (node, data) {
+                //console.log('dragLeave');
+            }
             },
             activate: function(event, data){
                 $("#dataTable").html("")
