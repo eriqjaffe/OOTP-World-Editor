@@ -2667,7 +2667,8 @@
                     case "STATES_PARENT":
                         return false;
                         break;
-                } 
+                }
+                data.dropEffect = "move";
                 return true;
             },
             dragDrag: function (node, data) {
@@ -2715,8 +2716,28 @@
                 return true;
             },      
             dragDrop: function (node, data) {
-                
-                //console.log('dragDrop');
+                console.log(data.dropEffect, data.hitMode)
+                var target = null
+                switch (data.otherNode.type) {
+                    case "nation":
+                        target = node
+                        data.otherNode.parent.setExpanded(false)
+                        break;
+                    case "state":
+                        target = node.children[2]
+                        data.otherNode.parent.parent.parent.setExpanded(false)
+                        break;
+                    case "city":
+                        target = node
+                        data.otherNode.parent.parent.parent.parent.setExpanded(false)
+                        break;
+                }
+                //console.log(node.children)
+                data.otherNode.moveTo(target, data.hitMode);
+                target.sortChildren(null, true);
+                data.otherNode.setFocus()
+                data.otherNode.setActive()
+                data.otherNode.makeVisible({scrollIntoView: true});
             },
             dragLeave: function (node, data) {
                 //console.log('dragLeave');
