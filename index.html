@@ -32,6 +32,7 @@
     <script type="text/javascript" src="./scripts/latinize.js"></script>
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
     <script src="./scripts/jquery.smartWizard.min.js" type="text/javascript"></script>
+    <script src="https://kit.fontawesome.com/1bfcbf3745.js" crossorigin="anonymous"></script>
     
     <script>
         const { ipcRenderer } = require('electron');
@@ -89,6 +90,19 @@
             /* min-height: 0;
             position: relative; */
         }
+
+        .context-menu-list .context-menu-icon.context-menu-icon--fa { 
+            font-family: 'Lato', Helvetica, sans-serif; font-weight: 400; 
+        }
+
+         .context-menu-icon.context-menu-icon--fa::before {
+            color: black
+        }
+
+        .context-menu-icon::before  {
+            color: black
+        } 
+        
     </style>
 </head>
 <body>
@@ -3551,63 +3565,69 @@
                 switch (node.type) {
                     case "ETHNICITIES_PARENT":
                         cmItems = {
-                            "add": {name: "Add Ethnicity", icon: 'add'}
+                            "add": {name: "Add Ethnicity", icon: 'fa-plus'}
                         }
                         break;  
                     case "CONTINENTS_PARENT":
                         cmItems = {
-                            "add": {name: "Add Continent", icon: 'add'}
+                            "add": {name: "Add Continent", icon: 'fa-plus'}
                         }
                         break;  
                     case "REGIONS_PARENT":
                         cmItems = {
-                            "add": {name: "Add Region", icon: 'add'}
+                            "add": {name: "Add Region", icon: 'fa-plus'}
                         }
                         break;
                     case "continent":
                         cmItems = {
-                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
-                            "add": {name: "Add Nation", icon: 'add'},
+                            "add": {name: "Add Nation", icon: 'fa-plus'},
                             "sep2": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
                         break;
                     case "nation":
                         cmItems = {
-                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
-                            "addState": {name: "Add State", icon: 'add'},
-                            "addSecondNation": {name: "Add Second Nation", icon: 'add'},
-                            "addEthnicity": {name: "Add Ethnicity", icon: 'add'},
+                            "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
+                            "addState": {name: "Add State", icon: 'fa-plus'},
+                            "addSecondNation": {name: "Add Second Nation", icon: 'fa-plus'},
+                            "addEthnicity": {name: "Add Ethnicity", icon: 'fa-plus'},
+                            "sep3": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
                         break;
                     case "STATES_PARENT":
                         cmItems = {
-                            "add": {name: "Add State", icon: 'add'},
+                            "add": {name: "Add State", icon: 'fa-plus'},
                         }
                         break;
                     case "state":
                         cmItems = {
-                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
-                            "add": {name: "Add City", icon: 'add'},
+                            "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
+                            "add": {name: "Add City", icon: 'fa-plus'},
+                            "sep3": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
                         break;
                     case "city":
                         cmItems = { 
-                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
+                            "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
+                            "sep2": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
                         break;
                     case "ethnicity": {
                         cmItems = {
-                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
@@ -3615,7 +3635,7 @@
                     }
                     case "region": {
                         cmItems = {
-                            "edit": {name: "Edit \""+node.title +"\"", icon: 'edit'},
+                            "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
@@ -3623,13 +3643,13 @@
                     }
                     case "nation_ethnicity": {
                         cmItems = {
-                            "view": {name: "View/Edit Ethnicities", icon: 'edit'}
+                            "view": {name: "View/Edit Ethnicities", icon: 'fa-pen-to-square'}
                         }
                         break;
                     }
                     case "second_nations": {
                         cmItems = {
-                            "view": {name: "View/Edit Second Nations", icon: 'edit'}
+                            "view": {name: "View/Edit Second Nations", icon: 'fa-pen-to-square'}
                         }
                         break;
                     }
@@ -3662,7 +3682,9 @@
                                         addNation(node.data.id)
                                         break;
                                     case "delete":
-                                        console.log("You chose to delete "+node.title)
+                                        if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s nations, states and cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
+                                            deleteNode(node)
+                                        } 
                                         break;
                                     case "edit":
                                         editContinent(node)
@@ -3685,7 +3707,12 @@
                                         console.log("add ethnicity TBD")
                                         break;
                                     case "delete":
-                                        confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all states and cities as well!")
+                                        if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s states and cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
+                                            deleteNode(node)
+                                        } 
+                                        break;
+                                    case "move":
+                                        console.log("move nation tbd")
                                         break;
                                 }
                                 break;
@@ -3702,7 +3729,12 @@
                                         addCity(node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id)
                                         break;
                                     case "delete":
-                                        confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all cities as well!")
+                                        if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
+                                            deleteNode(node)
+                                        } 
+                                        break;
+                                    case "move":
+                                        console.log("move state tbd")
                                         break;
                                 }
                                 break;
@@ -3712,14 +3744,21 @@
                                         editCity(node)
                                         break;
                                     case "delete":
-                                        confirm("Are you sure you want to delete "+node.title+"?")
+                                        if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis action can not be undone and may have unintended consequences!")) {
+                                            deleteNode(node)
+                                        } 
+                                        break;
+                                    case "move":
+                                        console.log("move city tbd")
                                         break;
                                 }
                                 break;
                             case "ethnicity":
                                 switch (key) {
                                     case "delete":
-                                        deleteNode(node)
+                                        if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis action can not be undone and may have unintended consequences!")) {
+                                            deleteNode(node)
+                                        } 
                                         break;
                                     case "edit":
                                         editEthnicity(node)
@@ -3729,7 +3768,9 @@
                             case "region":
                                 switch (key) {
                                     case "delete":
-                                        deleteNode(node)
+                                        if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis action can not be undone and may have unintended consequences!")) {
+                                            deleteNode(node)
+                                        } 
                                         break;
                                     case "edit":
                                         editRegion(node)
@@ -3843,11 +3884,8 @@
 	});
 
     function deleteNode(node) {
-        if (confirm("Are you sure you want to delete "+node.title+"?\n\nnThis may have unintended effects!")) {
-            console.log("You asked for it")
-        } else {
-            console.log("You clearly thought better of it")
-        }
+        console.log("You asked for it")
+        node.remove()
     }
 
     function editEthnicity(node) {
