@@ -5,6 +5,32 @@
     line-height: 1.5;
 }
 
+body {
+    background-image: url('../images/Mercator_world_map_\(physical\,_political\,_population\).jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+}
+
+.header {
+    font-weight: 900;
+    font-size: 2em;
+}
+
+.question {
+    font-size: 1.1em;
+	font-weight: 700;
+	margin-top:10px;
+	display:inline-block;
+}
+
+.answer {
+	width:95%;
+	float:right;
+	margin-top:5px;
+	display:inline-block;
+}
+
 #overlay {
 	position:fixed;
     padding:0;
@@ -26,6 +52,7 @@ input[type='number']::-webkit-outer-spin-button {
 
 h2 {
     margin-bottom: 75px;
+    font-weight: 700!important;
 }
 
 h2 img {
