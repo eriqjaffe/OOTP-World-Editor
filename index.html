@@ -1022,6 +1022,71 @@
                 </form>
             </div>
 
+            <!--DIVS FOR MOVING-->
+            <div id="moveNation" class="rightDiv">
+                <h2 style="text-align:center;">Move Nation</h2>
+                <form id="moveNationForm" action="">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td>Move To Continent:</td>
+                            <td><select id="moveNationToContinent"></select></td>
+                        </tr>
+                        </tbody>
+                    </table><br>
+                    <div style="text-align:center;">
+                        <input type="submit" id="submitNationMove" value="Move Nation">
+                    </div>
+                </form>
+            </div>
+            <div id="moveState" class="rightDiv">
+                <h2 style="text-align:center;">Move State</h2>
+                <form id="moveStateForm" action="">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td>Move To Continent:</td>
+                            <td><select id="moveStateToContinent"></select></td>
+                        </tr>
+						<tr>
+                            <td>Move To Nation:</td>
+                            <td><select id="moveStateToNation"></select></td>
+                        </tr>
+                        </tbody>
+                    </table><br>
+                    <div style="text-align:center;">
+                        <input type="submit" id="submitStateMove" value="Move State">
+                    </div>
+                </form>
+            </div>
+            <div id="moveCity" class="rightDiv">
+                <h2 style="text-align:center;">Move City</h2>
+                <form id="moveCityForm" action="">
+                    <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+                        <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+                        <tbody>
+                        <tr>
+                            <td>Move To Continent:</td>
+                            <td><select id="moveCityToContinent"></select></td>
+                        </tr>
+						<tr>
+                            <td>Move To Nation:</td>
+                            <td><select id="moveCityToNation"></select></td>
+                        </tr>
+						<tr>
+                            <td>Move To State:</td>
+                            <td><select id="moveCityToState"></select></td>
+                        </tr>
+                        </tbody>
+                    </table><br>
+                    <div style="text-align:center;">
+                        <input type="submit" id="submitCityMove" value="Move City">
+                    </div>
+                </form>
+            </div>
+
             <!--GENERAL INFORMATION DIV-->
             <div id="infoPanel" class="rightDiv">    
             </div>
@@ -3712,7 +3777,7 @@
                                         } 
                                         break;
                                     case "move":
-                                        console.log("move nation tbd")
+                                        moveNation(node)
                                         break;
                                 }
                                 break;
@@ -3734,7 +3799,7 @@
                                         } 
                                         break;
                                     case "move":
-                                        console.log("move state tbd")
+                                        moveState(node)
                                         break;
                                 }
                                 break;
@@ -3749,7 +3814,7 @@
                                         } 
                                         break;
                                     case "move":
-                                        console.log("move city tbd")
+                                        moveCity(node)
                                         break;
                                 }
                                 break;
@@ -4056,7 +4121,105 @@
         rightDivContent("#editRegion")
     }
 
-/*     $(".defineUSA").on("change", function() {
+    function moveNation(node) {
+        nodeToEdit = node
+        $("#moveNationToContinent").empty()
+        $.each(continents_by_id, function(key, value) {
+            if (key != node.parent.data.id) {
+                $("#moveNationToContinent")
+                    .append($('<option>', { value : key })
+                    .text(value));
+            }
+        });
+        sortDropdown("#moveNationToContinent")
+        rightDivContent("#moveNation")
+    }
+
+    function moveState(node) {
+        nodeToEdit = node
+        $("#moveStateToContinent").empty()
+        $("#moveStateToNation").empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#moveStateToContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#moveStateToContinent")
+        for (nation of nations_by_continent[$("#moveStateToContinent").val()]) {
+            if (nodeToEdit.parent.parent.data.id != nation.id) {
+                $('#moveStateToNation')
+                    .append($('<option>', { value : nation.id })
+                    .text(nation.title));
+            }
+        }
+        sortDropdown("#moveStateToNation")
+        rightDivContent("#moveState")
+    }
+
+    $("#moveStateToContinent").on("change", function() {
+        $("#moveStateToNation").empty()
+        for (nation of nations_by_continent[$(this).val()]) {
+            if (nodeToEdit.parent.parent.data.id != nation.id) {
+                $('#moveStateToNation')
+                    .append($('<option>', { value : nation.id })
+                    .text(nation.title));
+            }
+        }
+        sortDropdown("#moveStateToNation")
+    })
+
+    function moveCity(node) {
+        nodeToEdit = node
+        $("#moveCityToContinent").empty()
+        $("#moveCityToNation").empty()
+        $("#moveCityToNation").empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#moveCityToContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#moveCityToContinent")
+        for (nation of nations_by_continent[$("#moveCityToContinent").val()]) {
+            $('#moveCityToNation')
+                .append($('<option>', { value : nation.id })
+                .text(nation.title));
+        }
+        sortDropdown("#moveCityToNation")
+        for (state of states_by_nation[$("#moveCityToNation").val()]) {
+            if (nodeToEdit.parent.data.id != state.id) {
+                $('#moveCityToState')
+                    .append($('<option>', { value : state.id })
+                    .text(state.title));
+            }
+        }
+        sortDropdown("#moveCityToState")
+        rightDivContent("#moveCity")
+    }
+
+    $("#moveCityToContinent").on("change", function() {
+        $("#moveCityToNation").empty()
+        for (nation of nations_by_continent[$(this).val()]) {
+            $('#moveCityToNation')
+                .append($('<option>', { value : nation.id })
+                .text(nation.title));
+        }
+        sortDropdown("#moveCityToNation")
+        $("#moveCityToNation").trigger("change")
+    })
+
+    $("#moveCityToNation").on("change", function() {
+        $("#moveCityToState").empty()
+        for (state of states_by_nation[$(this).val()]) {
+            if (nodeToEdit.parent.data.id != state.id) {
+                $("#moveCityToState")
+                    .append($('<option>', { state : nation.id })
+                    .text(state.title));
+            }
+        }
+        sortDropdown("#moveCityToState")
+    })
+
+    /*     $(".defineUSA").on("change", function() {
         //var el = "#"+$(this).attr("id")
         //var newUSA = ($(this).attr("id") == "newNationUSA") ? $("#newNationID").val() : $("#editNationID").val()
         //var usa = findUSA()
@@ -4180,6 +4343,7 @@
     }
 
     function findNation(continent, nation) {
+        console.log(continent, nation)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var con = findContinent(continent)
         var arr = con.findAll(nation) 
@@ -4904,6 +5068,41 @@
         tree.activateKey(false)
         nodeToEdit.setFocus()
         nodeToEdit.setActive()
+    })
+
+    $("#moveNationForm").on("submit", function(e) {
+        e.preventDefault()
+        var oldParent = nodeToEdit.parent
+        var newParent = findContinent($("#moveNationToContinent option:selected" ).text())
+        nodeToEdit.moveTo(newParent)
+        oldParent.setExpanded(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
+        scrollToEditedNode("CONTINENTS")
+    })
+
+    $("#moveStateForm").on("submit", function(e) {
+        e.preventDefault()
+        var oldParent = nodeToEdit.parent.parent
+        var newParent = findNation($("#moveStateToContinent option:selected" ).text(), $("#moveStateToNation option:selected" ).text())
+        console.log(oldParent)
+        console.log(newParent)
+        nodeToEdit.moveTo(newParent.children[2])
+        oldParent.setExpanded(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
+        scrollToEditedNode("CONTINENTS")
+    })
+
+    $("#moveCityForm").on("submit", function(e) {
+        e.preventDefault()
+        var oldParent = nodeToEdit.parent
+        var newParent = findState($("#moveCityToContinent option:selected" ).text(), $("#moveCityToNation option:selected" ).text(), $("#moveCityToState option:selected" ).text())
+        nodeToEdit.moveTo(newParent)
+        oldParent.parent.parent.parent.setExpanded(false)
+        nodeToEdit.setFocus()
+        nodeToEdit.setActive()
+        scrollToEditedNode("CONTINENTS")
     })
 
     $(".resetButton").on("click", function() {
