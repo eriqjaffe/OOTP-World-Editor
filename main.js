@@ -208,7 +208,15 @@ ipcMain.on('save_xml', (event, data) => {
               accelerator: isMac ? 'Cmd+Shift+G' : 'Control+Shift+G',
               label: 'Add Region',
               enabled: true
-          }
+          },
+          { type: 'separator' },
+          {
+              id: 'adjustPopulationMenu',
+              click: () => mainWindow.webContents.send('adjust-population','click'),
+              accelerator: isMac ? 'Cmd+Shift+P' : 'Control+Shift+P',
+              label: 'Adjust Population',
+              enabled: true
+           }
         ]
     },
     {

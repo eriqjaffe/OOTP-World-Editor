@@ -1405,6 +1405,7 @@
     <input type="button" class="button" id="addCityTrigger" value="Add City" style="display:none;">
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
+    <input type="button" class="button" id="adjustPopulation" value="Adjust Population" style="display:none;">
 <script>
     require('./renderer.js')
 
@@ -4927,6 +4928,23 @@
         $("#region_count").text(region_count)
         if (parseInt($("#newRegionID").val()) > max_region_id) { max_region_id = parseInt($("#newRegionID").val()) }
         max_region_sort_order++
+    })
+
+    $("#adjustPopulation").on("click", function(e) {
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        for (continent of world.children) {
+            console.log(continent.title)
+            for (nation of continent.children) {
+                console.log(" "+nation.title)
+                for (state of nation.children[2].children) {
+                    console.log("  "+state.title)
+                    for (city of state.children) {
+                        console.log("   "+city.title)
+                    }
+                }
+            }
+        }
     })
 
     $("#about").magnificPopup({

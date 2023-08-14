@@ -43,3 +43,7 @@ ipcRenderer.on('close-xml', (event, data) => {
 ipcRenderer.on('about', (event, data) => {
     $("#about").trigger("click")
 });
+
+ipcRenderer.on('adjust-population', (event, data) => {
+    $("#adjustPopulation").trigger("click")
+})
