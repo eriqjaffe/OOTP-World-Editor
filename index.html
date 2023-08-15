@@ -56,6 +56,7 @@
         const tzDisplay = { "-12.00": "(GMT-12:00) International Date Line West", "-11.00": "(GMT-11:00) Midway Island, Samoa", "-10.00": "(GMT-10:00) Hawaii", "-9.00": "(GMT-09:00) Alaska", "-8.00": "(GMT-08:00) Pacific Time (US &amp; Canada)", "-7.00": "(GMT-07:00) Mountain Time (US &amp; Canada)", "-6.00": "(GMT-06:00) Central Time (US &amp; Canada)", "-5.00": "(GMT-05:00) Eastern Time (US &amp; Canada)", "-4.00": "(GMT-04:00) Atlantic Time (Canada)", "-3.50": "(GMT-03:30) Newfoundland", "-3.00": "(GMT-03:00) Brasilia", "-2.00": "(GMT-02:00) Mid-Atlantic", "-1.00": "(GMT-01:00) Cape Verde Is." , "0.00": "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London", "1.00": "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" , "2.00": "(GMT+02:00) Cairo", "3.00": "(GMT+03:00) Moscow, St. Petersburg, Volgograd", "3.50": "(GMT+03:30) Tehran", "4.00": "(GMT+04:00) Abu Dhabi, Muscat" , "4.50": "(GMT+04:30) Kabul" , "5.00": "(GMT+05:00) Islamabad, Karachi, Tashkent", "5.50": "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi", "5.75": "(GMT+05:45) Kathmandu", "6.00": "(GMT+06:00) Almaty, Novosibirsk", "6.50": "(GMT+06:30) Yangon (Rangoon)", "7.00": "(GMT+07:00) Bangkok, Hanoi, Jakarta", "8.00": "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" , "9.00": "(GMT+09:00) Osaka, Sapporo, Tokyo", "9.50": "(GMT+09:30) Adelaide, Darwin" , "10.00": "(GMT+10:00) Canberra, Melbourne, Sydney", "11.00": "(GMT+11:00) Magadan, Solomon Is., New Caledonia", "12.00": "(GMT+12:00) Auckland, Wellington" }
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
         const usa = { 0: "No", 1: "Yes" }
+        const hardcoded = { 0: "No", 1: "Yes" }
         const gender = { 0: "Male", 1: "Female" }
         const dst = { 0: "No", 1: "Yes"}
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
@@ -291,6 +292,15 @@
                             <td class="left">"This Is The USA"?</td>
                             <td class="right">
                                 <select id="newNationUSA" class="defineUSA" style="width:99%;">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Use Hardcoded ML Player Origins</td>
+                            <td class="right">
+                                <select id="newNationHardcoded" class="defineHardcoded style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -768,6 +778,15 @@
                             <td class="left">"This Is The USA"?</td>
                             <td class="right">
                                 <select id="editNationUSA" class="defineUSA" style="width:99%;">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Use Hardcoded ML Player Origins</td>
+                            <td class="right">
+                                <select id="editNationHardcoded" class="defineHardcoded" style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -1300,6 +1319,15 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td class="left">Use Hardcoded ML Player Origins</td>
+                                <td class="right">
+                                    <select id="firstNationHardcoded" class="defineHardcoded" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
                                 <td class="left">Name (Korean):</td>
                                 <td class="right"><input type="text" class="centerText" id="firstNationNameK" value=""></td>
                             </tr>
@@ -1506,20 +1534,20 @@
 
     $(document).ready(function() {
 
-        $.magnificPopup.open({
-		items: {
-			src: '#warning',
-			type: 'inline'
-		},
-        focus: '#warningAck',
-        closeOnBgClick: false,
-        enableEscapeKey: false,
-        showCloseBtn:false
-	});
+/*         $.magnificPopup.open({
+            items: {
+                src: '#warning',
+                type: 'inline'
+            },
+            focus: '#warningAck',
+            closeOnBgClick: false,
+            enableEscapeKey: false,
+            showCloseBtn:false
+        }); */
 
         ipcRenderer.send('get-version', null)
 
-        //ipcRenderer.send('debug-load', null)
+        ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
             $(".tzSelect").each(function() {
                 $(this).append($('<option>', { value : z.tz })
@@ -2486,7 +2514,8 @@
                     nation_obj.dem_korean = (nation.$.dem_korean != undefined) ? nation.$.dem_korean : ""
                     nation_obj.time_zone = parseFloat(nation.$.time_zone).toFixed(2).toString()
                     nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
-                    nation_obj.this_is_the_usa = (usa != undefined) ? 1 : 0
+                    nation_obj.this_is_the_usa = (usa != undefined) ? "1" : "0"
+                    nation_obj.use_hardcoded_ml_player_origins = (nation.$.use_hardcoded_ml_player_origins != undefined) ? nation.$.use_hardcoded_ml_player_origins : "0"
                     if (nation_obj.this_is_the_usa == 1) { usa_defined.push(nation_obj.id) }
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
                     var second_nations_obj = {}
@@ -2982,6 +3011,7 @@
                         })
                         break;
                     case "nation":
+                        console.log(node)
                         var stt = 0;
                         var cty = 0;
                         var eth = 0;
@@ -3031,6 +3061,7 @@
                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">This is the USA:</td><td class="right_float" >'+usa[node.data.this_is_the_usa]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Use Hardcoded ML Player Origins:</td><td class="right_float" >'+hardcoded[node.data.this_is_the_usa]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+gender[node.data.gender]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
@@ -4187,6 +4218,7 @@
             $('#editNationCapitolState').val("0")
         }
         $("#editNationUSA").val(node.data.this_is_the_usa)
+        $("#editNationHardcoded").val(node.data.use_hardcoded_ml_player_origins)
         rightDivContent("#editNation")
     }
 
@@ -4764,6 +4796,7 @@
         nation_obj.time_zone = $("#firstNationTimeZone").val()
         nation_obj.observes_dst = $("#firstNationDST").val()
         nation_obj.this_is_the_usa = $("#firstNationUSA").val()
+        nation_obj.use_hardcoded_ml_player_origins = $("#firstNationHardcoded").val()
         nation_obj.children = []
         nations.push(nation_obj)
         nations_by_id[1] = $("#firstNationName").val()
@@ -4953,6 +4986,7 @@
         nation_obj.time_zone = $("#newNationTimeZone").val()
         nation_obj.observes_dst = $("#newNationDST").val()
         nation_obj.this_is_the_usa = $("#newNationUSA").val()
+        nation_obj.use_hardcoded_ml_player_origins = $("#newNationHardcoded").val()
         var states_obj = {}
         states_obj.title = "States"
         states_obj.folder = true
