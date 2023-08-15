@@ -1805,6 +1805,8 @@
                 startNewXML()
                 return
             }           
+        } else {
+            startNewXML()
         }
     })
 
@@ -1837,7 +1839,9 @@
         $("#max_ethnicity_id").text(max_ethnicity_id)
         $("#max_region_id").text(max_region_id)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
-        tree.destroy()
+        if (tree != null) { 
+            tree.destroy() 
+        }
 
         $.magnificPopup.open({
             items: {
@@ -2302,41 +2306,44 @@
         
         var regions = tree.findFirst("REGIONS")
         var reg = regions.toDict(true)
-        for (r of reg.children) {
-            xw.startElement("REGION")
-            .writeAttribute("id", r.data.id)
-            .writeAttribute("sort_order", r.data.sort_order)
-            .writeAttribute("name", r.title)
-            .writeAttribute("name_korean", r.data.title_korean)
-            if (r.data.cities.length > 0) {
-                xw.startElement("REGION_CITIES")
-                for (st of r.data.cities) {
-                    xw.startElement("REGION_CITY")
-                      .writeAttribute("id", st.id)
-                    .endElement()
+        if (reg.children != undefined) {
+            for (r of reg.children) {
+                xw.startElement("REGION")
+                .writeAttribute("id", r.data.id)
+                .writeAttribute("sort_order", r.data.sort_order)
+                .writeAttribute("name", r.title)
+                .writeAttribute("name_korean", r.data.title_korean)
+                if (r.data.cities.length > 0) {
+                    xw.startElement("REGION_CITIES")
+                    for (st of r.data.cities) {
+                        xw.startElement("REGION_CITY")
+                        .writeAttribute("id", st.id)
+                        .endElement()
+                    }
+                    xw.endElement()
+                }
+                if (r.data.states.length > 0) {
+                    xw.startElement("REGION_STATES")
+                    for (st of r.data.states) {
+                        xw.startElement("REGION_STATE")
+                        .writeAttribute("id", st.id)
+                        .endElement()
+                    }
+                    xw.endElement()
+                }
+                if (r.data.nations.length) {
+                    xw.startElement("REGION_NATIONS")
+                    for (st of r.data.nations) {
+                        xw.startElement("REGION_NATION")
+                        .writeAttribute("id", st.id)
+                        .endElement()
+                    }
+                    xw.endElement()
                 }
                 xw.endElement()
             }
-            if (r.data.states.length > 0) {
-                xw.startElement("REGION_STATES")
-                for (st of r.data.states) {
-                    xw.startElement("REGION_STATE")
-                      .writeAttribute("id", st.id)
-                    .endElement()
-                }
-                xw.endElement()
-            }
-            if (r.data.nations.length) {
-                xw.startElement("REGION_NATIONS")
-                for (st of r.data.nations) {
-                    xw.startElement("REGION_NATION")
-                      .writeAttribute("id", st.id)
-                    .endElement()
-                }
-                xw.endElement()
-            }
-            xw.endElement()
         }
+        
 
         xw.endElement()
 
@@ -3470,6 +3477,8 @@
 
                         html += "</div>\n" 
                         $("#infoPanel").html(html)
+
+                        console.log(ethnicities_by_id)
 
                         let table2 = $('#nationEthnicityTable').DataTable({ 
                             fixedHeader: true,
@@ -4714,6 +4723,7 @@
         ethnicity_obj.hispanic = $("#firstEthnicityHispanic").val()
         ethnicities.push(ethnicity_obj)
         ethnicities_arr.children = ethnicities
+        ethnicities_by_id[1] = $("#firstEthnicityName").val()
         max_ethnicity_id++
         ethnicity_count++
 
