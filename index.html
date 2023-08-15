@@ -2619,129 +2619,103 @@
                 fancyTreeReady = true
             },
             dnd5: {
-            /* Expand nodes after n milliseconds of hovering - default */
-            autoExpandMS: 1500,      
-            /* Absolute position offset for .fancytree-drop-marker - default */
-            /* Relative to ..fancytree-title (icon/img near a node accepting drop) */
-            dropMarkerOffsetX: -24,  
-            /* Additional offset for drop-marker with hitMode = "before"/"after" - default*/
-            dropMarkerInsertOffsetX: -16, 
-            /* true: Drag multiple (i.e. selected) nodes - default is false*/
-            multiSource: false,                
-            /* Prevent dropping nodes from different Fancytrees - default is false */
-            preventForeignNodes: true,   
-            /* Prevent dropping items other than Fancytree nodes - default is false */
-            preventNonNodes: false,       
-            /* Prevent dropping nodes on own descendants - default */
-            preventRecursion: true,  
-            /* Prevent dropping nodes 'before self', etc. - default */
-            preventVoidMoves: true,     
-            /* Enable auto-scrolling while dragging - default */
-            scroll: true,        
-            /* Active top/bottom margin in pixel - default */
-            scrollSensitivity: 20,        
-            /* Pixels per event - default */
-            scrollSpeed: 5,               
-            /* Events (drag support) */
-            dragStart: function (node, data) {
-                //console.log('dragStart');
-                switch (node.type) {
-                    case "ETHNICITIES_PARENT":
-                        return false;
-                        break;
-                    case "ethnicity":
-                        return false;
-                        break;
-                    case "CONTINENTS_PARENT":
-                        return false;
-                        break;
-                    case "continent":
-                        return false;
-                        break;
-                    case "nation_ethnicity":
-                        return false;
-                        break;
-                    case "second_nations":
-                        return false;
-                        break;
-                    case "STATES_PARENT":
-                        return false;
-                        break;
-                }
-                data.dropEffect = "move";
-                return true;
-            },
-            dragDrag: function (node, data) {
-                //console.log('dragDrag');
-            }, 
-            dragEnd: function (node, data) {
-                //console.log('dragEnd');
-            },         
-            /* Events (drop support) */
-            dragEnter: function (node, data) {
-                switch (data.otherNode.type) {
-                    case "nation":
-                        if (node.type != "continent") {
+                autoExpandMS: 200,      
+                dropMarkerOffsetX: -24,  
+                dropMarkerInsertOffsetX: -16, 
+                multiSource: false,                
+                preventForeignNodes: true,   
+                preventNonNodes: false,       
+                preventRecursion: true,  
+                preventVoidMoves: true,     
+                scroll: true,        
+                scrollSensitivity: 20,        
+                scrollSpeed: 5,               
+                dragStart: function (node, data) {
+                    switch (node.type) {
+                        case "ETHNICITIES_PARENT":
                             return false;
-                        }
-                        break;
-                    case "state":
-                        if (node.type != "nation") {
-                            return false
-                        }
-                        break;
-                    case "city":
-                        if (node.type != "state") {
+                            break;
+                        case "ethnicity":
                             return false;
-                        }
-                        break;
+                            break;
+                        case "CONTINENTS_PARENT":
+                            return false;
+                            break;
+                        case "continent":
+                            return false;
+                            break;
+                        case "nation_ethnicity":
+                            return false;
+                            break;
+                        case "second_nations":
+                            return false;
+                            break;
+                        case "STATES_PARENT":
+                            return false;
+                            break;
+                    }
+                    data.dropEffect = "move";
+                    return true;
+                },
+                dragDrag: function (node, data) {
+                    //console.log('dragDrag');
+                }, 
+                dragEnd: function (node, data) {
+                    //console.log('dragEnd');
+                },         
+                /* Events (drop support) */
+                dragEnter: function (node, data) {
+                    switch (data.otherNode.type) {
+                        case "nation":
+                            if (node.type != "continent") {
+                                return false;
+                            }
+                            break;
+                        case "state":
+                            if (node.type != "nation") {
+                                return false
+                            }
+                            break;
+                        case "city":
+                            if (node.type != "state") {
+                                return false;
+                            }
+                            break;
+                    }
+                    return true;
+                },      
+                dragOver: function (node, data) {
+                    //console.log('dragOver');
+                },     
+                dragExpand: function (node, data) {
+                    //console.log('dragExpand');
+                    return true;
+                },      
+                dragDrop: function (node, data) {
+                    var target = null
+                    switch (data.otherNode.type) {
+                        case "nation":
+                            target = node
+                            data.otherNode.parent.setExpanded(false)
+                            break;
+                        case "state":
+                            target = node.children[2]
+                            data.otherNode.parent.parent.parent.setExpanded(false)
+                            break;
+                        case "city":
+                            target = node
+                            data.otherNode.parent.parent.parent.parent.setExpanded(false)
+                            break;
+                    }
+                    data.otherNode.moveTo(target, data.hitMode);
+                    target.sortChildren(null, true);
+                    data.otherNode.setFocus()
+                    data.otherNode.setActive()
+                    data.otherNode.makeVisible({scrollIntoView: true});
+                },
+                dragLeave: function (node, data) {
+                    //console.log('dragLeave');
                 }
-                return true;
-            },      
-            dragOver: function (node, data) {
-                //console.log(node.type, data.otherNode.type)
-                /* var $image = $("#rejectDrop");
-                console.log($image[0])
-                if (node.type == data.otherNode.type) {
-                    data.dataTransfer.setDragImage($image[0], -10, -10);
-                    data.useDefaultImage = false;
-                    //console.log("you can't drop that here")
-                    return false
-                } */
-                //console.log(node)
-                //console.log('dragOver');
-            },     
-            dragExpand: function (node, data) {
-                //console.log('dragExpand');
-                return true;
-            },      
-            dragDrop: function (node, data) {
-                console.log(data.dropEffect, data.hitMode)
-                var target = null
-                switch (data.otherNode.type) {
-                    case "nation":
-                        target = node
-                        data.otherNode.parent.setExpanded(false)
-                        break;
-                    case "state":
-                        target = node.children[2]
-                        data.otherNode.parent.parent.parent.setExpanded(false)
-                        break;
-                    case "city":
-                        target = node
-                        data.otherNode.parent.parent.parent.parent.setExpanded(false)
-                        break;
-                }
-                //console.log(node.children)
-                data.otherNode.moveTo(target, data.hitMode);
-                target.sortChildren(null, true);
-                data.otherNode.setFocus()
-                data.otherNode.setActive()
-                data.otherNode.makeVisible({scrollIntoView: true});
-            },
-            dragLeave: function (node, data) {
-                //console.log('dragLeave');
-            }
             },
             activate: function(event, data){
                 $("#dataTable").html("")
