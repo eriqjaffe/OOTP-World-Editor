@@ -17,6 +17,12 @@ body {
     font-size: 2em;
 }
 
+.warning {
+    font-weight: 900;
+    font-size: 1.5em;
+    color: red;
+}
+
 .question {
     font-size: 1.1em;
 	font-weight: 700;
