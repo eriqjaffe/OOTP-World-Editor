@@ -1475,6 +1475,17 @@
 			<div class="answer">That would be me.  My name is Eriq Jaffe, and I've been playing OOTP Baseball since 2004.  Feel free to <a href="mailto:eriqjaffe@gmail.com">shoot me an email</a> with any questions or comments.  You can also view the source code for this on <a href="https://github.com/eriqjaffe/OOTP-World-Editor" target="_blank">GitHub</a>.<br><br>The background image is modified from an image by <a href="https://commons.wikimedia.org/wiki/File:Mercator_world_map_(physical,_political,_population).jpg" target="_blank">Janwillemvanaalst</a>, <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a>, via Wikimedia Commons.</div><br>
 		</div>
     </div>
+    <div id="warning" class="faq-white-popup mfp-hide">
+        <div style="width:100%; text-align:center;">	
+			<span class="header" style="color:red;">WARNING!!!</span><br><br>
+            <span class="warning">THIS IS A BETA APPLICATION</span><br><br>
+            <span class="warning">MAKE SURE YOU BACK UP OR USE A COPY OF YOUR WORLD_DEFAULT.XML</span><br><br>
+            <span class="warning">I TAKE NO RESPONSIBILITY FOR ANYTHING THAT HAPPENS BECAUSE YOU ARE USING THIS PROGRAM</span><br><br>
+            <span class="warning">SERIOUSLY</span><br><br>
+            <span class="warning">FOR REALS</span><br><br><br><br><br><br>
+            <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
+		</div>
+    </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
@@ -1495,9 +1506,20 @@
 
     $(document).ready(function() {
 
+        $.magnificPopup.open({
+		items: {
+			src: '#warning',
+			type: 'inline'
+		},
+        focus: '#warningAck',
+        closeOnBgClick: false,
+        enableEscapeKey: false,
+        showCloseBtn:false
+	});
+
         ipcRenderer.send('get-version', null)
 
-        ipcRenderer.send('debug-load', null)
+        //ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
             $(".tzSelect").each(function() {
                 $(this).append($('<option>', { value : z.tz })
@@ -1755,6 +1777,11 @@
         $(".headlessTable").dataTable({ordering: false, scrollY: "auto"})
 
         ipcRenderer.send('menu-reset', null)
+    })
+
+    $("#warningAck").on("click", function(e) {
+        e.preventDefault()
+        $.magnificPopup.close()
     })
 
     $(".readonly").on('keydown paste focus mousedown', function(e){
