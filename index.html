@@ -25,6 +25,7 @@
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.fancytree.dnd5.js"></script>
     <script src="./scripts/DataTables-1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="./scripts/Buttons-2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="./scripts/FixedHeader-3.4.0/js/dataTables.fixedHeader.min.js"></script>
@@ -59,6 +60,7 @@
         const dst = { 0: "No", 1: "Yes"}
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
         let currentVersion = ""
+        let newXML = false
 
         $.extend( $.fn.dataTable.defaults, {
             searching: false,
@@ -1473,6 +1475,17 @@
 			<div class="answer">That would be me.  My name is Eriq Jaffe, and I've been playing OOTP Baseball since 2004.  Feel free to <a href="mailto:eriqjaffe@gmail.com">shoot me an email</a> with any questions or comments.  You can also view the source code for this on <a href="https://github.com/eriqjaffe/OOTP-World-Editor" target="_blank">GitHub</a>.<br><br>The background image is modified from an image by <a href="https://commons.wikimedia.org/wiki/File:Mercator_world_map_(physical,_political,_population).jpg" target="_blank">Janwillemvanaalst</a>, <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a>, via Wikimedia Commons.</div><br>
 		</div>
     </div>
+    <div id="warning" class="faq-white-popup mfp-hide">
+        <div style="width:100%; text-align:center;">	
+			<span class="header" style="color:red;">WARNING!!!</span><br><br>
+            <span class="warning">THIS IS A BETA APPLICATION</span><br><br>
+            <span class="warning">MAKE SURE YOU BACK UP OR USE A COPY OF YOUR WORLD_DEFAULT.XML</span><br><br>
+            <span class="warning">I TAKE NO RESPONSIBILITY FOR ANYTHING THAT HAPPENS BECAUSE YOU ARE USING THIS PROGRAM</span><br><br>
+            <span class="warning">SERIOUSLY</span><br><br>
+            <span class="warning">FOR REALS</span><br><br><br><br><br><br>
+            <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
+		</div>
+    </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
@@ -1484,6 +1497,8 @@
     <input type="button" class="button" id="addCityTrigger" value="Add City" style="display:none;">
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
+    <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
+    
 <script>
     require('./renderer.js')
 
@@ -1491,9 +1506,20 @@
 
     $(document).ready(function() {
 
+        $.magnificPopup.open({
+		items: {
+			src: '#warning',
+			type: 'inline'
+		},
+        focus: '#warningAck',
+        closeOnBgClick: false,
+        enableEscapeKey: false,
+        showCloseBtn:false
+	});
+
         ipcRenderer.send('get-version', null)
 
-        ipcRenderer.send('debug-load', null)
+        //ipcRenderer.send('debug-load', null)
         for (z of time_zones) {
             $(".tzSelect").each(function() {
                 $(this).append($('<option>', { value : z.tz })
@@ -1753,6 +1779,11 @@
         ipcRenderer.send('menu-reset', null)
     })
 
+    $("#warningAck").on("click", function(e) {
+        e.preventDefault()
+        $.magnificPopup.close()
+    })
+
     $(".readonly").on('keydown paste focus mousedown', function(e){
         e.preventDefault();
     });
@@ -1764,37 +1795,49 @@
 
     $("#newXML").on("click", function() {
         var tree = $.ui.fancytree.getTree("#xmlOutput")
-        clearRightDiv()
         if (tree != null) {
-            nodeToEdit = null;
-            max_world_id = max_continent_id = max_nation_id = max_state_id = max_city_id = max_ethnicity_id = max_region_id = max_region_sort_order = world_count = continent_count = nation_count = state_count = city_count = ethnicity_count = region_count = 0
-            ethnicities_by_id = {}
-            cities_by_id = {}
-            states_by_id = {}
-            nations_by_id = {}
-            continents_by_id = {}
-            regions_by_id = {}
-            nations_by_continent = {}
-            states_by_nation = {}
-            cities_by_state = {}
-            cities_by_nation = {}
-            usa_defined = []
-            $("#continent_count").text(continent_count)
-            $("#nation_count").text(nation_count)
-            $("#state_count").text(state_count)
-            $("#city_count").text(city_count)
-            $("#ethnicity_count").text(ethnicity_count)
-            $("#region_count").text(region_count)
-            $("#usa_defined_count").text(usa_defined.length)
-            $("#max_continent_id").text(max_continent_id)
-            $("#max_nation_id").text(max_nation_id)
-            $("#max_state_id").text(max_state_id)
-            $("#max_city_id").text(max_city_id)
-            $("#max_ethnicity_id").text(max_ethnicity_id)
-            $("#max_region_id").text(max_region_id)
-            var tree = $.ui.fancytree.getTree("#xmlOutput")
-            tree.destroy()
+            if (confirm("Do you want to save your current file?")) {
+                newXML = true
+                $("#saveXML").trigger("click")
+                //startNewXML()
+            } else {
+                newXML = false
+                startNewXML()
+                return
+            }           
         }
+    })
+
+    function startNewXML() {
+        clearRightDiv()
+        nodeToEdit = null;
+        max_world_id = max_continent_id = max_nation_id = max_state_id = max_city_id = max_ethnicity_id = max_region_id = max_region_sort_order = world_count = continent_count = nation_count = state_count = city_count = ethnicity_count = region_count = 0
+        ethnicities_by_id = {}
+        cities_by_id = {}
+        states_by_id = {}
+        nations_by_id = {}
+        continents_by_id = {}
+        regions_by_id = {}
+        nations_by_continent = {}
+        states_by_nation = {}
+        cities_by_state = {}
+        cities_by_nation = {}
+        usa_defined = []
+        $("#continent_count").text(continent_count)
+        $("#nation_count").text(nation_count)
+        $("#state_count").text(state_count)
+        $("#city_count").text(city_count)
+        $("#ethnicity_count").text(ethnicity_count)
+        $("#region_count").text(region_count)
+        $("#usa_defined_count").text(usa_defined.length)
+        $("#max_continent_id").text(max_continent_id)
+        $("#max_nation_id").text(max_nation_id)
+        $("#max_state_id").text(max_state_id)
+        $("#max_city_id").text(max_city_id)
+        $("#max_ethnicity_id").text(max_ethnicity_id)
+        $("#max_region_id").text(max_region_id)
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.destroy()
 
         $.magnificPopup.open({
             items: {
@@ -1876,7 +1919,7 @@
                 }
             }
         });
-    })
+    }
 
     $("#closeXML").on("click", function() {
         if (confirm("Are you sure?")) {
@@ -2315,6 +2358,10 @@
             alert(data.message)
         }
         $("#overlay").css("display","none")
+        if (newXML == true) {
+            newXML = false
+            startNewXML()
+        }
     })
 
     ipcRenderer.on('xml-opened', (event, result) => {
@@ -2610,10 +2657,109 @@
 
     function initTree(json) {
         $("#xmlOutput").fancytree({
-            extensions: [],
+            extensions: ['dnd5'],
             source: json,
             init: function(event, data){
                 fancyTreeReady = true
+            },
+            dnd5: {
+                autoExpandMS: 200,      
+                dropMarkerOffsetX: -24,  
+                dropMarkerInsertOffsetX: -16, 
+                multiSource: false,                
+                preventForeignNodes: true,   
+                preventNonNodes: false,       
+                preventRecursion: true,  
+                preventVoidMoves: true,     
+                scroll: true,        
+                scrollSensitivity: 20,        
+                scrollSpeed: 5,               
+                dragStart: function (node, data) {
+                    switch (node.type) {
+                        case "ETHNICITIES_PARENT":
+                            return false;
+                            break;
+                        case "ethnicity":
+                            return false;
+                            break;
+                        case "CONTINENTS_PARENT":
+                            return false;
+                            break;
+                        case "continent":
+                            return false;
+                            break;
+                        case "nation_ethnicity":
+                            return false;
+                            break;
+                        case "second_nations":
+                            return false;
+                            break;
+                        case "STATES_PARENT":
+                            return false;
+                            break;
+                    }
+                    data.dropEffect = "move";
+                    return true;
+                },
+                dragDrag: function (node, data) {
+                    //console.log('dragDrag');
+                }, 
+                dragEnd: function (node, data) {
+                    //console.log('dragEnd');
+                },         
+                /* Events (drop support) */
+                dragEnter: function (node, data) {
+                    switch (data.otherNode.type) {
+                        case "nation":
+                            if (node.type != "continent") {
+                                return false;
+                            }
+                            break;
+                        case "state":
+                            if (node.type != "nation") {
+                                return false
+                            }
+                            break;
+                        case "city":
+                            if (node.type != "state") {
+                                return false;
+                            }
+                            break;
+                    }
+                    return true;
+                },      
+                dragOver: function (node, data) {
+                    //console.log('dragOver');
+                },     
+                dragExpand: function (node, data) {
+                    //console.log('dragExpand');
+                    return true;
+                },      
+                dragDrop: function (node, data) {
+                    var target = null
+                    switch (data.otherNode.type) {
+                        case "nation":
+                            target = node
+                            data.otherNode.parent.setExpanded(false)
+                            break;
+                        case "state":
+                            target = node.children[2]
+                            data.otherNode.parent.parent.parent.setExpanded(false)
+                            break;
+                        case "city":
+                            target = node
+                            data.otherNode.parent.parent.parent.parent.setExpanded(false)
+                            break;
+                    }
+                    data.otherNode.moveTo(target, data.hitMode);
+                    target.sortChildren(null, true);
+                    data.otherNode.setFocus()
+                    data.otherNode.setActive()
+                    data.otherNode.makeVisible({scrollIntoView: true});
+                },
+                dragLeave: function (node, data) {
+                    //console.log('dragLeave');
+                }
             },
             activate: function(event, data){
                 $("#dataTable").html("")
@@ -3276,10 +3422,7 @@
                             table.button(2).disable()
                         })
 
-                        rightDivContent("#infoPanel")
-/*                             $("#editSecondNationsButton").on("click", function(e) {
-                            editSecondNations(node)
-                        }) */                            
+                        rightDivContent("#infoPanel")                        
                         break;
                     case "nation_ethnicity":
                         nodeToEdit = node;

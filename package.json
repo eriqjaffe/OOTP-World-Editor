@@ -1,5 +1,5 @@
 {
-  "name": "OOTP World Editor",
+  "name": "OOTP-World-Editor",
   "version": "0.1.0",
   "description": "A world_default.xml editor for OOTP Baseball",
   "main": "main.js",
@@ -9,10 +9,57 @@
   "dependencies": {
     "add-filename-increment": "^1.0.0",
     "bing-translate-api": "^2.9.1",
-    "electron": "^25.2.0",
     "xml-writer": "^1.7.0",
     "xml2js": "^0.6.0",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.32"
+  },
+  "devDependencies": {
+    "electron": "^25.2.0",
+    "electron-builder": "^24.6.3"
+  },
+  "build": {
+    "appId": "com.ootputilities.worldeditor",
+    "files": [
+      "**/*",
+       "!debug${/*}"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        "zip",
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "${productName}_${version}_portable.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "artifactName": "${productName} ${version} setup.${ext}",
+      "menuCategory": "OOTP Utilities",
+      "shortcutName": "${productName}",
+      "include": "build/installer.nsh",
+      "uninstallDisplayName": "${productName} ${version}",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "tar.gz"
+      ]
+    },
+    "deb": {}
   }
 }

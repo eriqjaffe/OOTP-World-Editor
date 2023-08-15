@@ -258,10 +258,10 @@ ipcMain.on('save_xml', (event, data) => {
             await shell.openExternal('https://github.com/eriqjaffe/OOTP-World-Editor')
             }
         },
-        {
+        /* {
             click: () => mainWindow.webContents.send('update','click'),
             label: 'Check For Updates',
-        }
+        } */
         ]
     }
     ]
