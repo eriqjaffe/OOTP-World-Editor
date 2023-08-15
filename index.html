@@ -1824,15 +1824,19 @@
     $("#newXML").on("click", function() {
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         if (tree != null) {
-            if (confirm("Do you want to save your current file?")) {
-                newXML = true
-                $("#saveXML").trigger("click")
-                //startNewXML()
+            if (confirm("Are you sure?  You currently have a file open.")) {
+                if (confirm("Do you want to save your current file?")) {
+                    newXML = true
+                    $("#saveXML").trigger("click")
+                    //startNewXML()
+                } else {
+                    newXML = false
+                    startNewXML()
+                    return
+                }        
             } else {
                 newXML = false
-                startNewXML()
-                return
-            }           
+            }
         } else {
             startNewXML()
         }
