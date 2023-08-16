@@ -489,7 +489,7 @@
                         <tr>
                             <td class="left">Altitude:</td>
                             <td class="right">
-                                <select style="width:99%;" id='newCityAltitude'> 
+                                <select style="width:80%;" id='newCityAltitude'> 
                                     <option value='0'>~0 m</option>
                                     <option value='1'>~500 m</option>
                                     <option value='2'>~1000 m</option>
@@ -498,6 +498,7 @@
                                     <option value='5'>~2500 m</option>
                                     <option value='6'>~3000 m</option>
                                 </select>
+                                <input type="button" id="getNewCityAltitude" value="Get">
                             </td>
                         </tr>
                         <tr>
@@ -938,7 +939,7 @@
                         <tr>
                             <td class="left">Altitude:</td>
                             <td class="right">
-                                <select style="width:99%;" id='editCityAltitude'> 
+                                <select style="width:80%;" id='editCityAltitude'> 
                                     <option value='0'>~0 m</option>
                                     <option value='1'>~500 m</option>
                                     <option value='2'>~1000 m</option>
@@ -947,6 +948,7 @@
                                     <option value='5'>~2500 m</option>
                                     <option value='6'>~3000 m</option>
                                 </select>
+                                <input type="button" id="getEditCityAltitude" value="Get">
                             </td>
                         </tr>
                         <tr>
@@ -1457,7 +1459,7 @@
                             <tr>
                                 <td class="left">Altitude:</td>
                                 <td class="right">
-                                    <select style="width:99%;" id='firstCityAltitude'> 
+                                    <select style="width:80%;" id='firstCityAltitude'> 
                                         <option value='0'>~0 m</option>
                                         <option value='1'>~500 m</option>
                                         <option value='2'>~1000 m</option>
@@ -1466,6 +1468,7 @@
                                         <option value='5'>~2500 m</option>
                                         <option value='6'>~3000 m</option>
                                     </select>
+                                    <input type="button" id="getFirstCityAltitude" value="Get">
                                 </td>
                             </tr>
                             <tr>
@@ -2694,6 +2697,11 @@
             alert("cancelled!")
         }
     });
+
+    ipcRenderer.on('elevation-retrieved', (event, result) => {
+        var json = JSON.parse(result)
+        $(json.target).val(getAltitudeEstimate(json.results[0].elevation))
+    })
 
     function initTree(json) {
         $("#xmlOutput").fancytree({
@@ -4531,7 +4539,6 @@
     }
 
     function findNation(continent, nation) {
-        console.log(continent, nation)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var con = findContinent(continent)
         var arr = con.findAll(nation) 
@@ -4641,6 +4648,18 @@
             return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
         }))
         $("#newCityState").trigger("change")
+    })
+
+    $("#getNewCityAltitude").on("click", function() {
+        ipcRenderer.send('get-elevation',[$("#newCityLatitude").val(),$("#newCityLongitude").val(),"#newCityAltitude"])
+    })
+
+    $("#getEditCityAltitude").on("click", function() {
+        ipcRenderer.send('get-elevation',[$("#editCityLatitude").val(),$("#editCityLongitude").val(),"#editCityAltitude"])
+    })
+
+    $("#getFirstCityAltitude").on("click", function() {
+        ipcRenderer.send('get-elevation',[$("#firstCityLatitude").val(),$("#firstCityLongitude").val(),"#firstCityAltitude"])
     })
 
     $(".toKorean").on("keyup",function() {
@@ -5459,5 +5478,48 @@
         $("#infoPanel").html("")
         rightDivContent("#infoPanel")
     }
+
+    function getAltitudeEstimate(x) {
+        let valuesArray = [0, 500, 1000, 1500, 2000, 2500, 3000]
+        let closestValue = valuesArray[0]; // Initialize with the first value in the array
+        let minDifference = Math.abs(x - valuesArray[0]); // Initialize with the difference between x and the first value
+
+        for (let i = 1; i < valuesArray.length; i++) {
+            const difference = Math.abs(x - valuesArray[i]);
+            
+            if (difference < minDifference) {
+            minDifference = difference;
+            closestValue = valuesArray[i];
+            }
+        }
+
+        switch (closestValue) {
+            case 0:
+                return 0;
+                break;
+            case 500:
+                return 1;
+                break;
+            case 1000:
+                return 2;
+                break;
+            case 1500:
+                return 3;
+                break;
+            case 2000:
+                return 4;
+                break;
+            case 2500:
+                return 5;
+                break;
+            case 3000:
+                return 6;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+
     </script>
 </html>

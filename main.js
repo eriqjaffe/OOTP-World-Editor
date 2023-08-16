@@ -3,6 +3,7 @@ const xml2js = require("xml2js");
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
+const https = require('https')
 const increment = require('add-filename-increment');
 
 const tempDir = os.tmpdir()
@@ -22,6 +23,27 @@ ipcMain.on('menu-reset', (event,arg) => {
     Menu.getApplicationMenu().getMenuItemById('addStateMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addCityMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addRegionMenu').enabled = false */
+})
+
+ipcMain.on('get-elevation', (event, arg) => {
+    let url = "https://api.open-elevation.com/api/v1/lookup?locations="+arg[0]+","+arg[1]
+    https.get(url,(res) => {
+        let body = ""
+        res.on("data", (chunk) => {
+            body += chunk
+        })
+        res.on("end", () => {
+            try {
+                let json = JSON.parse(body)
+                json.target = arg[2]
+                event.sender.send('elevation-retrieved', JSON.stringify(json))
+            } catch (error) {
+                console.error(error.message)
+            }
+        })  
+    }).on("error", (error) => {
+        console.error(error.message)
+    })
 })
 
 ipcMain.on('debug-load', (event, arg) => {
