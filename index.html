@@ -2470,9 +2470,10 @@
         let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text())
         let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text())
         json.forEach(function(city) { 
-            console.log(city)
+            console.log(city.Name)
             var nameK = ""
             var abbrK = ""
+            translateSynchronously(city.Name)
             max_city_id++
             var obj = {}
             obj.name = city.Name
@@ -5632,6 +5633,15 @@
             default:
                 return 0;
                 break;
+        }
+    }
+
+    async function translateSynchronously(text) {
+        try {
+            const res = await translate(text, null, 'ko');
+            console.log(res.translation);
+        } catch (err) {
+            console.error(err);
         }
     }
 
