@@ -2464,7 +2464,7 @@
         sortDropdown("#bulkCityState")
     })
 
-    $("#bulkCityForm").on("submit", function(e) {
+    /* $("#bulkCityForm").on("submit", function(e) {
         e.preventDefault()
         let json = JSON.parse(bulkImportData)
         let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text())
@@ -2506,6 +2506,43 @@
             //console.log(city_obj)
         });
     })
+ */
+
+ $("#bulkCityForm").on("submit", async function(e) {
+    e.preventDefault();
+    let json = JSON.parse(bulkImportData);
+    let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text());
+    let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
+
+    for (const city of json) {
+        let res = null
+        console.log(city.Name);
+        var nameK = "";
+        var abbrK = "";
+        
+        try {
+            res = await translateSynchronously(city.Name);
+            nameK = res.translation;
+        } catch (err) {
+            //console.error(err);
+        }
+
+        console.log(nameK)
+
+        console.log(city.Abbreviation)
+
+        try {
+            res = await translateSynchronously(city.Abbreviation);
+            abbrK = res.translation;
+        } catch (err) {
+            //console.error(err);
+        }
+
+        console.log(abbrK)
+
+        // The rest of your code for each city...
+    }
+});
 
     ipcRenderer.on('version-info', (event, data) => {
         currentVersion = data
