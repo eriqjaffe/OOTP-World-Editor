@@ -62,6 +62,7 @@
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
         let currentVersion = ""
         let newXML = false
+        let bulkImportData = null
 
         $.extend( $.fn.dataTable.defaults, {
             searching: false,
@@ -1137,10 +1138,6 @@
         </table>    
     </div>
 
-    <div id="wizardSplash" class="white-popup mfp-hide">
-        The wizard splash screen will go here!
-        <input type='button' id="wizardInit" value="Let's Go!">
-    </div>
     <div id="wizardContainer" class="white-popup mfp-hide">
         <div id="smartwizard">
             <ul class="nav">
@@ -1514,6 +1511,31 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkCityImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;">Import Cities From File</h2>
+        <form id="bulkCityForm" action="">
+        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+            <tbody>
+            <tr>
+                <td class="left">Continent:</td>
+                <td class="right"><select id="bulkCityContinent" style="width:99%;"></select></td>
+            </tr>
+            <tr>
+                <td class="left">Nation:</td>
+                <td class="right"><select id="bulkCityNation" style="width:99%;"></select></td>
+            </tr>
+            <tr>
+                <td class="left">State:</td>
+                <td class="right"><select id="bulkCityState" style="width:99%;"></select></td>
+            </tr>
+            </tbody>
+        </table><br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Cities">
+        </div>
+        </form>
+    </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
@@ -1525,6 +1547,7 @@
     <input type="button" class="button" id="addCityTrigger" value="Add City" style="display:none;">
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
+    <input type="button" class="button" id="bulkImportCities" value="Bulk Import Cities" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -2393,6 +2416,94 @@
         tmpXML = tmpXML.replace("-->","-->\n")
 
         ipcRenderer.send('save_xml',Buffer.from(tmpXML))
+    })
+
+    $("#bulkImportCities").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-cities', null)
+    })
+
+    ipcRenderer.on('bulk-city-import', (event, data) => {
+        $('#bulkCityContinent').empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#bulkCityContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#bulkCityContinent")
+        $("#bulkCityContinent").trigger("change")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkCityImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = data
+    })
+
+    $("#bulkCityContinent").on("change", function(e) {
+        $('#bulkCityNation').empty()
+        for (nation of nations_by_continent[$("#bulkCityContinent").val()]) {
+            $('#bulkCityNation')
+                .append($('<option>', { value : nation.id })
+                .text(nation.title));
+
+        }
+        sortDropdown("#bulkCityNation")
+        $("#bulkCityNation").trigger("change")
+    })
+
+    $("#bulkCityNation").on("change", function(e) {
+        $('#bulkCityState').empty()
+        for (state of states_by_nation[$("#bulkCityNation").val()]) {
+            $('#bulkCityState')
+                .append($('<option>', { value : state.id })
+                .text(state.title));
+
+        }
+        sortDropdown("#bulkCityState")
+    })
+
+    $("#bulkCityForm").on("submit", function(e) {
+        e.preventDefault()
+        let json = JSON.parse(bulkImportData)
+        let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text())
+        let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text())
+        json.forEach(function(city) { 
+            console.log(city)
+            var nameK = ""
+            var abbrK = ""
+            max_city_id++
+            var obj = {}
+            obj.name = city.Name
+            obj.state = $("#bulkCityState").val()
+            obj.nation = $("#bulkCityNation").val()
+            obj.continent = $("#bulkCityContinent").val()
+            cities_by_id[max_city_id] = obj
+            city_count++;
+            var city_obj = {}
+            var city_bn_obj = {}
+            city_obj.type = 'city'
+            city_obj.folder = false
+            city_obj.icon = './images/city-solid.svg'
+            city_obj.id = max_city_id
+            city_obj.title = city.Name
+            city_obj.title_korean = nameK
+            city_obj.pop = city.Population
+            city_obj.lat = city.Lat
+            city_obj.long = city.Long
+            city_obj.abbr = city.Abbreviation
+            city_obj.altitude = 0
+            city_obj.abbr_korean = ""
+            city_obj.time_zone = city.TimeZone
+            city_obj.observes_dst = (city.DST.toLowerCase == "yes") ? 1 : 0
+            city_obj.state = $("#bulkCityState").val()
+            city_obj.nation = $("#bulkCityNation").val()
+            $("#max_city_id").text(max_city_id)
+            $("#city_count").text(city_count)
+            state.addChildren(city_obj)
+            //console.log(city_obj)
+        });
     })
 
     ipcRenderer.on('version-info', (event, data) => {

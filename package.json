@@ -9,6 +9,7 @@
   "dependencies": {
     "add-filename-increment": "^1.0.0",
     "bing-translate-api": "^2.9.1",
+    "xlsx": "^0.18.5",
     "xml-writer": "^1.7.0",
     "xml2js": "^0.6.0",
     "xmldom": "^0.6.0",
@@ -22,7 +23,7 @@
     "appId": "com.ootputilities.worldeditor",
     "files": [
       "**/*",
-       "!debug${/*}"
+      "!debug${/*}"
     ],
     "mac": {
       "category": "public.app-category.utilities",

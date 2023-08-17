@@ -5,6 +5,8 @@ const os = require('os')
 const path = require('path')
 const https = require('https')
 const increment = require('add-filename-increment');
+const xlsx = require('xlsx')
+const { translate } = require('bing-translate-api');
 
 const tempDir = os.tmpdir()
 
@@ -147,6 +149,42 @@ ipcMain.on("check-for-debug", (event, data) => {
     }
 })
 
+ipcMain.on("bulk-import-cities", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let responseData = null
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0});
+                    event.sender.send('bulk-city-import', JSON.stringify(responseData))
+                } 
+            } catch (err) {
+                console.log(err)
+                event.sender.send('bulk-city-import', err)
+            }
+        } else {
+            event.sender.send('bulk-city-import', 'cancelled')
+        }
+    })
+})
+
+function isExcelFile(filePath) {
+    try {
+      const workbook = xlsx.readFile(filePath);
+      return true; // If the file can be read by xlsx, it's likely an Excel file
+    } catch (error) {
+      return false;
+    }
+  }
+
   const template = [
     ...(isMac ? [{
         label: app.name,
@@ -239,6 +277,48 @@ ipcMain.on("check-for-debug", (event, data) => {
               accelerator: isMac ? 'Cmd+Shift+G' : 'Control+Shift+G',
               label: 'Add Region',
               enabled: true
+          },
+          { type: 'separator' },
+          {
+            label: 'Bulk  Import',
+            submenu: [
+                {
+                    id: 'bulkEthnicityMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
+                    label: 'Add Ethnicities',
+                    enabled: true
+                },
+                {
+                    id: 'bulkContinentMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-continents','click'),
+                    label: 'Add Continents',
+                    enabled: true
+                },
+                {
+                    id: 'bulkNationMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-nations','click'),
+                    label: 'Add Nations',
+                    enabled: true
+                },
+                {
+                    id: 'bulkStateMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-states','click'),
+                    label: 'Add States',
+                    enabled: true
+                },
+                {
+                    id: 'bulkCityMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-cities','click'),
+                    label: 'Add Cities',
+                    enabled: true
+                },
+                {
+                    id: 'bulkRegionMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-regions','click'),
+                    label: 'Add Regions',
+                    enabled: true
+                }
+            ]
           }
         ]
     },

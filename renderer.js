@@ -43,3 +43,7 @@ ipcRenderer.on('close-xml', (event, data) => {
 ipcRenderer.on('about', (event, data) => {
     $("#about").trigger("click")
 });
+
+ipcRenderer.on('bulk-add-cities', (event, data) => {
+    $("#bulkImportCities").trigger("click")
+})
