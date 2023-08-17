@@ -138,6 +138,15 @@ ipcMain.on('save_xml', (event, data) => {
     })
 })
 
+ipcMain.on("check-for-debug", (event, data) => { 
+    if (!app.isPackaged) {
+        mainWindow.webContents.openDevTools()
+        event.sender.send('load-debug', null)
+    } else {
+        event.sender.send('open-warning', null)
+    }
+})
+
   const template = [
     ...(isMac ? [{
         label: app.name,
@@ -309,8 +318,6 @@ app.whenReady().then(() => {
       shell.openExternal(url);
       return { action: 'deny' };
     });
-
-    mainWindow.webContents.openDevTools()
 
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()

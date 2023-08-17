@@ -1532,9 +1532,8 @@
 
     var fancyTreeReady = false;
 
-    $(document).ready(function() {
-
-/*         $.magnificPopup.open({
+    ipcRenderer.on('open-warning', (event, data) => {
+        $.magnificPopup.open({
             items: {
                 src: '#warning',
                 type: 'inline'
@@ -1543,11 +1542,20 @@
             closeOnBgClick: false,
             enableEscapeKey: false,
             showCloseBtn:false
-        }); */
+        });
+    }) 
+
+     ipcRenderer.on('load-debug', (event, data) => {
+        console.log("loading debug!")
+        ipcRenderer.send('debug-load', null)
+    })
+
+    $(document).ready(function() {
+
+        ipcRenderer.send('check-for-debug', null)
 
         ipcRenderer.send('get-version', null)
-
-        ipcRenderer.send('debug-load', null)
+        
         for (z of time_zones) {
             $(".tzSelect").each(function() {
                 $(this).append($('<option>', { value : z.tz })
