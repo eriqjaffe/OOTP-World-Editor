@@ -2525,6 +2525,12 @@
         $("#max_city_id").text(max_city_id)
         $("#city_count").text(city_count)
         state.addChildren(city_obj)
+        city_bn_obj.id = max_city_id
+        city_bn_obj.title = city.Name
+        city_bn_obj.state = $("#bulkCityState").val()
+        city_bn_obj.nation = $("#bulkCityNation").val()
+        cities_by_state[$("#bulkCityState").val()].push(city_obj)
+        cities_by_nation[$("#bulkCityNation").val()].push(city_bn_obj)
         count++
     }
 
