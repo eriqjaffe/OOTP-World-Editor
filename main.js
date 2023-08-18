@@ -176,6 +176,33 @@ ipcMain.on("bulk-import-cities", (event, data) => {
     })
 })
 
+ipcMain.on("bulk-import-states", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let responseData = null
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0});
+                    event.sender.send('bulk-state-import', JSON.stringify(responseData))
+                } 
+            } catch (err) {
+                console.log(err)
+                event.sender.send('bulk-state-import', err)
+            }
+        } else {
+            event.sender.send('bulk-state-import', 'cancelled')
+        }
+    })
+})
+
 function isExcelFile(filePath) {
     try {
       const workbook = xlsx.readFile(filePath);
@@ -280,44 +307,44 @@ const template = [
 },
           { type: 'separator' },
           {
-            label: 'Bulk  Import',
+            label: 'Import From File',
             submenu: [
-                {
+                /* {
                     id: 'bulkEthnicityMenu',
                     click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
-                    label: 'Add Ethnicities',
+                    label: 'Import Ethnicities',
                     enabled: true
                 },
                 {
                     id: 'bulkContinentMenu',
                     click: () => mainWindow.webContents.send('bulk-add-continents','click'),
-                    label: 'Add Continents',
+                    label: 'Import Continents',
                     enabled: true
                 },
                 {
                     id: 'bulkNationMenu',
                     click: () => mainWindow.webContents.send('bulk-add-nations','click'),
-                    label: 'Add Nations',
+                    label: 'Import Nations',
                     enabled: true
-                },
+                }, */
                 {
                     id: 'bulkStateMenu',
                     click: () => mainWindow.webContents.send('bulk-add-states','click'),
-                    label: 'Add States',
+                    label: 'Import States',
                     enabled: true
                 },
                 {
                     id: 'bulkCityMenu',
                     click: () => mainWindow.webContents.send('bulk-add-cities','click'),
-                    label: 'Add Cities',
+                    label: 'Import Cities',
                     enabled: true
                 },
-                {
+                /* {
                     id: 'bulkRegionMenu',
                     click: () => mainWindow.webContents.send('bulk-add-regions','click'),
                     label: 'Add Regions',
                     enabled: true
-                }
+                } */
             ]
           }
         ]

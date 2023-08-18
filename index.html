@@ -1517,6 +1517,30 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkStateImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importStatesHeader">Import States From File</h2>
+        <form id="bulkStateForm" action="">
+        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+            <tbody>
+            <tr>
+                <td class="left">Continent:</td>
+                <td class="right"><select id="bulkStateContinent" style="width:99%;"></select></td>
+            </tr>
+            <tr>
+                <td class="left">Nation:</td>
+                <td class="right"><select id="bulkStateNation" style="width:99%;"></select></td>
+            </tr>
+            </tbody>
+        </table><br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import States">
+            <br><br>
+            <span id="stateImportProgressLabel">&nbsp;</span><br>
+            <div id="stateImportProgress"></div>
+        </div>
+        </form>
+    </div>
     <div id="bulkCityImport" class="faq-white-popup mfp-hide">
         <h2 style="text-align:center;" id="importCitiesHeader">Import Cities From File</h2>
         <form id="bulkCityForm" action="">
@@ -1557,6 +1581,7 @@
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
     <input type="button" class="button" id="bulkImportCities" value="Bulk Import Cities" style="display:none;">
+    <input type="button" class="button" id="bulkImportStates" value="Bulk Import States" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -2433,6 +2458,10 @@
     })
 
     ipcRenderer.on('bulk-city-import', (event, data) => {
+        if (JSON.parse(data).length < 1) {
+            alert("There don't appear to be any cities in that file")
+            return false;
+        }
         $("#importCitiesHeader").html("Importing "+JSON.parse(data).length+" Cities From File")
         $('#bulkCityContinent').empty()
         $.each(continents_by_id, function(key, value) {
@@ -2474,73 +2503,173 @@
         sortDropdown("#bulkCityState")
     })
 
- $("#bulkCityForm").on("submit", async function(e) {
-    e.preventDefault();
-    let json = JSON.parse(bulkImportData);
-    let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text());
-    let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
+    $("#bulkCityForm").on("submit", async function(e) {
+        e.preventDefault();
+        let json = JSON.parse(bulkImportData);
+        let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text());
+        let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
+        let count = 1
 
-    let count = 1
+        for (const city of json) {
 
-    
+            $("#cityImportProgressLabel").text("Importing "+city.Name+"...")
 
-    for (const city of json) {
+            $('#cityImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
 
-        $("#cityImportProgressLabel").text("Importing "+city.Name+"...")
+            let nameK = await translate(city.Name, null, 'ko')
+            let abbrK = await translate(city.Abbreviation, null, 'ko')
 
-        $('#cityImportProgress').LineProgressbar({
-            duration: 100,
-            percentage: (count/json.length)*100
+            if (parseInt(state.Alt) < 0) {
+                // TBD
+            }
+        
+            max_city_id++
+            var obj = {}
+            obj.name = city.Name
+            obj.state = $("#bulkCityState").val()
+            obj.nation = $("#bulkCityNation").val()
+            obj.continent = $("#bulkCityContinent").val()
+            cities_by_id[max_city_id] = obj
+            city_count++;
+            var city_obj = {}
+            var city_bn_obj = {}
+            city_obj.type = 'city'
+            city_obj.folder = false
+            city_obj.icon = './images/city-solid.svg'
+            city_obj.id = max_city_id
+            city_obj.title = city.Name
+            city_obj.title_korean = nameK.translation
+            city_obj.pop = city.Population
+            city_obj.lat = parseFloat(city.Lat).toFixed(5).toString()
+            city_obj.long = parseFloat(city.Long).toFixed(5).toString()
+            city_obj.abbr = city.Abbreviation
+            city_obj.altitude = 0
+            city_obj.abbr_korean = abbrK.translation
+            city_obj.time_zone = parseFloat(city.TimeZone).toFixed(2).toString()
+            city_obj.observes_dst = (city.DST.toLowerCase == "yes") ? 1 : 0
+            city_obj.state = $("#bulkCityState").val()
+            city_obj.nation = $("#bulkCityNation").val()
+            $("#max_city_id").text(max_city_id)
+            $("#city_count").text(city_count)
+            state.addChildren(city_obj)
+            city_bn_obj.id = max_city_id
+            city_bn_obj.title = city.Name
+            city_bn_obj.state = $("#bulkCityState").val()
+            city_bn_obj.nation = $("#bulkCityNation").val()
+            cities_by_state[$("#bulkCityState").val()].push(city_obj)
+            cities_by_nation[$("#bulkCityNation").val()].push(city_bn_obj)
+            count++
+        }
+
+        $.magnificPopup.close()
+        state.sortChildren(null, true);
+        state.setFocus()
+        state.setActive()
+        state.makeVisible({scrollIntoView: true});
+        state.setExpanded(true)
+    });
+
+    $("#bulkImportStates").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-states', null)
+    })
+
+    ipcRenderer.on('bulk-state-import', (event, data) => {
+        if (JSON.parse(data).length < 1) {
+            alert("There don't appear to be any states in that file")
+            return false;
+        }
+        $("#importStatesHeader").html("Importing "+JSON.parse(data).length+" States From File")
+        $('#bulkStateContinent').empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#bulkStateContinent")
+                .append($('<option>', { value : key })
+                .text(value));
         });
+        sortDropdown("#bulkStateContinent")
+        $("#bulkStateContinent").trigger("change")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkStateImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = data
+    })
 
-        let nameK = await translate(city.Name, null, 'ko')
-        let abbrK = await translate(city.Abbreviation, null, 'ko')
-       
-        max_city_id++
-        var obj = {}
-        obj.name = city.Name
-        obj.state = $("#bulkCityState").val()
-        obj.nation = $("#bulkCityNation").val()
-        obj.continent = $("#bulkCityContinent").val()
-        cities_by_id[max_city_id] = obj
-        city_count++;
-        var city_obj = {}
-        var city_bn_obj = {}
-        city_obj.type = 'city'
-        city_obj.folder = false
-        city_obj.icon = './images/city-solid.svg'
-        city_obj.id = max_city_id
-        city_obj.title = city.Name
-        city_obj.title_korean = nameK.translation
-        city_obj.pop = city.Population
-        city_obj.lat = parseFloat(city.Lat).toFixed(5).toString()
-        city_obj.long = parseFloat(city.Long).toFixed(5).toString()
-        city_obj.abbr = city.Abbreviation
-        city_obj.altitude = 0
-        city_obj.abbr_korean = abbrK.translation
-        city_obj.time_zone = parseFloat(city.TimeZone).toFixed(2).toString()
-        city_obj.observes_dst = (city.DST.toLowerCase == "yes") ? 1 : 0
-        city_obj.state = $("#bulkCityState").val()
-        city_obj.nation = $("#bulkCityNation").val()
-        $("#max_city_id").text(max_city_id)
-        $("#city_count").text(city_count)
-        state.addChildren(city_obj)
-        city_bn_obj.id = max_city_id
-        city_bn_obj.title = city.Name
-        city_bn_obj.state = $("#bulkCityState").val()
-        city_bn_obj.nation = $("#bulkCityNation").val()
-        cities_by_state[$("#bulkCityState").val()].push(city_obj)
-        cities_by_nation[$("#bulkCityNation").val()].push(city_bn_obj)
-        count++
-    }
+    $("#bulkStateContinent").on("change", function(e) {
+        $('#bulkStateNation').empty()
+        for (nation of nations_by_continent[$("#bulkStateContinent").val()]) {
+            $('#bulkStateNation')
+                .append($('<option>', { value : nation.id })
+                .text(nation.title));
 
-    $.magnificPopup.close()
-    state.sortChildren(null, true);
-    state.setFocus()
-    state.setActive()
-    state.makeVisible({scrollIntoView: true});
-    state.setExpanded(true)
-});
+        }
+        sortDropdown("#bulkStateNation")
+        $("#bulkStateNation").trigger("change")
+    })
+
+    $("#bulkStateForm").on("submit", async function(e) {
+        e.preventDefault();
+        let json = JSON.parse(bulkImportData);
+        let nation = findNation($("#bulkStateContinent option:selected").text(), $("#bulkStateNation option:selected").text());
+        let states = nation.findFirst("States")
+        let count = 1
+        let stateNameArr = []
+        for (const state of json) {
+
+            stateNameArr.push(state.Name)
+
+            $("#stateImportProgressLabel").text("Importing "+state.Name+"...")
+
+            $('#stateImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(state.Name, null, 'ko')
+            let abbrK = await translate(state.Abbreviation, null, 'ko')
+
+            max_state_id++
+            states_by_id[max_state_id] = state.Name
+            state_count++;
+            var state_obj = {}
+            state_obj.type = 'state'
+            state_obj.folder = true
+            state_obj.icon = './images/landmark-flag-solid.svg'
+            state_obj.id = max_state_id
+            state_obj.title = state.Name
+            state_obj.title_korean = nameK.translation
+            state_obj.pop = state.Population
+            state_obj.abbr = state.Abbreviation
+            state_obj.abbr_korean = abbrK.translation
+            state_obj.time_zone = parseFloat(state.TimeZone).toFixed(2).toString()
+            state_obj.observes_dst = (state.DST.toLowerCase == "yes") ? 1 : 0
+            state_obj.lat = parseFloat(state.Lat).toFixed(5).toString()
+            state_obj.long = parseFloat(state.Lat).toFixed(5).toString()
+            $("#max_state_id").text(max_state_id)
+            $("#state_count").text(state_count)
+            states.addChildren(state_obj)
+            states_by_nation[$("#bulkStateNation").val()].push(state_obj)
+            cities_by_state[max_state_id] = []
+            count++
+        }
+
+        $.magnificPopup.close()
+
+        stateNameArr.sort()
+        
+        states.sortChildren(null, true)
+        var node = states.findFirst(stateNameArr[0])
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+    })
 
     ipcRenderer.on('version-info', (event, data) => {
         currentVersion = data
@@ -3298,6 +3427,7 @@
                         rightDivContent("#infoPanel")
                         break;
                     case "state":
+                        console.log(node)
                         var cty = 0;
                         node.visit(function(n) {
                             if (n.type == "city") { cty++ }
