@@ -22,6 +22,7 @@
     <link href="./scripts/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css" rel="stylesheet">
     <link href="./scripts/Select-1.7.0/css/select.dataTables.min.css" rel="stylesheet">
     <link href="./scripts/smart_wizard_all.min.css" rel="stylesheet" type="text/css" />
+    <link href="./scripts/jquery.lineProgressbar.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
@@ -34,6 +35,7 @@
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
     <script src="./scripts/jquery.smartWizard.min.js" type="text/javascript"></script>
     <script src="https://kit.fontawesome.com/1bfcbf3745.js" crossorigin="anonymous"></script>
+    <script src="./scripts/jquery.lineProgressbar.js" type="text/javascript"></script>
     
     <script>
         const { ipcRenderer } = require('electron');
@@ -107,6 +109,10 @@
             color: black
         } 
         
+        .percentCount {
+            font-family: 'Lato', Helvetica, sans-serif; 
+            font-weight: 700; 
+        }
     </style>
 </head>
 <body>
@@ -1512,7 +1518,7 @@
 		</div>
     </div>
     <div id="bulkCityImport" class="faq-white-popup mfp-hide">
-        <h2 style="text-align:center;">Import Cities From File</h2>
+        <h2 style="text-align:center;" id="importCitiesHeader">Import Cities From File</h2>
         <form id="bulkCityForm" action="">
         <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
             <thead style="display:none;"><tr><td></td><td></td></tr></thead>
@@ -1533,6 +1539,9 @@
         </table><br>
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import Cities">
+            <br><br>
+            <span id="cityImportProgressLabel"></span><br>
+            <div id="cityImportProgress"></div>
         </div>
         </form>
     </div>
@@ -2424,6 +2433,7 @@
     })
 
     ipcRenderer.on('bulk-city-import', (event, data) => {
+        $("#importCitiesHeader").html("Importing "+JSON.parse(data).length+" Cities From File")
         $('#bulkCityContinent').empty()
         $.each(continents_by_id, function(key, value) {
             $("#bulkCityContinent")
@@ -2464,84 +2474,66 @@
         sortDropdown("#bulkCityState")
     })
 
-    /* $("#bulkCityForm").on("submit", function(e) {
-        e.preventDefault()
-        let json = JSON.parse(bulkImportData)
-        let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text())
-        let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text())
-        json.forEach(function(city) { 
-            console.log(city.Name)
-            var nameK = ""
-            var abbrK = ""
-            translateSynchronously(city.Name)
-            max_city_id++
-            var obj = {}
-            obj.name = city.Name
-            obj.state = $("#bulkCityState").val()
-            obj.nation = $("#bulkCityNation").val()
-            obj.continent = $("#bulkCityContinent").val()
-            cities_by_id[max_city_id] = obj
-            city_count++;
-            var city_obj = {}
-            var city_bn_obj = {}
-            city_obj.type = 'city'
-            city_obj.folder = false
-            city_obj.icon = './images/city-solid.svg'
-            city_obj.id = max_city_id
-            city_obj.title = city.Name
-            city_obj.title_korean = nameK
-            city_obj.pop = city.Population
-            city_obj.lat = city.Lat
-            city_obj.long = city.Long
-            city_obj.abbr = city.Abbreviation
-            city_obj.altitude = 0
-            city_obj.abbr_korean = ""
-            city_obj.time_zone = city.TimeZone
-            city_obj.observes_dst = (city.DST.toLowerCase == "yes") ? 1 : 0
-            city_obj.state = $("#bulkCityState").val()
-            city_obj.nation = $("#bulkCityNation").val()
-            $("#max_city_id").text(max_city_id)
-            $("#city_count").text(city_count)
-            state.addChildren(city_obj)
-            //console.log(city_obj)
-        });
-    })
- */
-
  $("#bulkCityForm").on("submit", async function(e) {
     e.preventDefault();
     let json = JSON.parse(bulkImportData);
     let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text());
     let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
 
+    let count = 1
+
+    
+
     for (const city of json) {
-        let res = null
-        console.log(city.Name);
-        var nameK = "";
-        var abbrK = "";
-        
-        try {
-            res = await translateSynchronously(city.Name);
-            nameK = res.translation;
-        } catch (err) {
-            //console.error(err);
-        }
 
-        console.log(nameK)
+        $("#cityImportProgressLabel").text("Importing "+city.Name+"...")
 
-        console.log(city.Abbreviation)
+        $('#cityImportProgress').LineProgressbar({
+            duration: 100,
+            percentage: (count/json.length)*100
+        });
 
-        try {
-            res = await translateSynchronously(city.Abbreviation);
-            abbrK = res.translation;
-        } catch (err) {
-            //console.error(err);
-        }
-
-        console.log(abbrK)
-
-        // The rest of your code for each city...
+        let nameK = await translate(city.Name, null, 'ko')
+        let abbrK = await translate(city.Abbreviation, null, 'ko')
+       
+        max_city_id++
+        var obj = {}
+        obj.name = city.Name
+        obj.state = $("#bulkCityState").val()
+        obj.nation = $("#bulkCityNation").val()
+        obj.continent = $("#bulkCityContinent").val()
+        cities_by_id[max_city_id] = obj
+        city_count++;
+        var city_obj = {}
+        var city_bn_obj = {}
+        city_obj.type = 'city'
+        city_obj.folder = false
+        city_obj.icon = './images/city-solid.svg'
+        city_obj.id = max_city_id
+        city_obj.title = city.Name
+        city_obj.title_korean = nameK.translation
+        city_obj.pop = city.Population
+        city_obj.lat = parseFloat(city.Lat).toFixed(5).toString()
+        city_obj.long = parseFloat(city.Long).toFixed(5).toString()
+        city_obj.abbr = city.Abbreviation
+        city_obj.altitude = 0
+        city_obj.abbr_korean = abbrK.translation
+        city_obj.time_zone = parseFloat(city.TimeZone).toFixed(2).toString()
+        city_obj.observes_dst = (city.DST.toLowerCase == "yes") ? 1 : 0
+        city_obj.state = $("#bulkCityState").val()
+        city_obj.nation = $("#bulkCityNation").val()
+        $("#max_city_id").text(max_city_id)
+        $("#city_count").text(city_count)
+        state.addChildren(city_obj)
+        count++
     }
+
+    $.magnificPopup.close()
+    state.sortChildren(null, true);
+    state.setFocus()
+    state.setActive()
+    state.makeVisible({scrollIntoView: true});
+    state.setExpanded(true)
 });
 
     ipcRenderer.on('version-info', (event, data) => {
@@ -5673,14 +5665,7 @@
         }
     }
 
-    async function translateSynchronously(text) {
-        try {
-            const res = await translate(text, null, 'ko');
-            console.log(res.translation);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    
 
     </script>
 </html>

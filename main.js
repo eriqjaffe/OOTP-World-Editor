@@ -185,7 +185,7 @@ function isExcelFile(filePath) {
     }
   }
 
-  const template = [
+const template = [
     ...(isMac ? [{
         label: app.name,
         submenu: [
@@ -277,7 +277,7 @@ function isExcelFile(filePath) {
               accelerator: isMac ? 'Cmd+Shift+G' : 'Control+Shift+G',
               label: 'Add Region',
               enabled: true
-          },
+},
           { type: 'separator' },
           {
             label: 'Bulk  Import',
@@ -375,7 +375,7 @@ function isExcelFile(filePath) {
         } */
         ]
     }
-    ]
+]
     
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
