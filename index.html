@@ -1517,6 +1517,26 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkNationImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importNationsHeader">Import Nations From File</h2>
+        <form id="bulkNationForm" action="">
+        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+            <tbody>
+            <tr>
+                <td class="left">Continent:</td>
+                <td class="right"><select id="bulkNationContinent" style="width:99%;"></select></td>
+            </tr>
+            </tbody>
+        </table><br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Nations">
+            <br><br>
+            <span id="nationImportProgressLabel">&nbsp;</span><br>
+            <div id="nationImportProgress"></div>
+        </div>
+        </form>
+    </div>
     <div id="bulkStateImport" class="faq-white-popup mfp-hide">
         <h2 style="text-align:center;" id="importStatesHeader">Import States From File</h2>
         <form id="bulkStateForm" action="">
@@ -1582,6 +1602,7 @@
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
     <input type="button" class="button" id="bulkImportCities" value="Bulk Import Cities" style="display:none;">
     <input type="button" class="button" id="bulkImportStates" value="Bulk Import States" style="display:none;">
+    <input type="button" class="button" id="bulkImportNations" value="Bulk Import Nations" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -2521,11 +2542,14 @@
 
             let nameK = await translate(city.Name, null, 'ko')
             let abbrK = await translate(city.Abbreviation, null, 'ko')
+            let altitude = 0
 
-            if (parseInt(state.Alt) < 0) {
-                // TBD
+            if (parseInt(city.Altitude) < 0) {
+                altitude = getAltitudeEstimate(getElevationDataSync(parseFloat(city.Latitude).toFixed(5).toString(), parseFloat(city.Longitude).toFixed(5).toString()))
+            } else {
+                altitude = getAltitudeEstimate(parseInt(city.Altitude))
             }
-        
+
             max_city_id++
             var obj = {}
             obj.name = city.Name
@@ -2542,14 +2566,14 @@
             city_obj.id = max_city_id
             city_obj.title = city.Name
             city_obj.title_korean = nameK.translation
-            city_obj.pop = city.Population
-            city_obj.lat = parseFloat(city.Lat).toFixed(5).toString()
-            city_obj.long = parseFloat(city.Long).toFixed(5).toString()
+            city_obj.pop = parseInt(city.Population)
+            city_obj.lat = parseFloat(city.Latitude).toFixed(5).toString()
+            city_obj.long = parseFloat(city.Longitude).toFixed(5).toString()
             city_obj.abbr = city.Abbreviation
-            city_obj.altitude = 0
+            city_obj.altitude = altitude
             city_obj.abbr_korean = abbrK.translation
             city_obj.time_zone = parseFloat(city.TimeZone).toFixed(2).toString()
-            city_obj.observes_dst = (city.DST.toLowerCase == "yes") ? 1 : 0
+            city_obj.observes_dst = parseInt(city.DST)
             city_obj.state = $("#bulkCityState").val()
             city_obj.nation = $("#bulkCityNation").val()
             $("#max_city_id").text(max_city_id)
@@ -2647,7 +2671,7 @@
             state_obj.abbr = state.Abbreviation
             state_obj.abbr_korean = abbrK.translation
             state_obj.time_zone = parseFloat(state.TimeZone).toFixed(2).toString()
-            state_obj.observes_dst = (state.DST.toLowerCase == "yes") ? 1 : 0
+            state_obj.observes_dst = parseInt(state.DST)
             state_obj.lat = parseFloat(state.Lat).toFixed(5).toString()
             state_obj.long = parseFloat(state.Lat).toFixed(5).toString()
             $("#max_state_id").text(max_state_id)
@@ -2676,6 +2700,126 @@
         $("#currentVersion").text("Version "+currentVersion)
     })
 
+    $("#bulkImportNations").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-nations', null)
+    })
+
+    ipcRenderer.on('bulk-nation-import', (event, data) => {
+        if (JSON.parse(data).length < 1) {
+            alert("There don't appear to be any nations in that file")
+            return false;
+        }
+        $("#importNationsHeader").html("Importing "+JSON.parse(data).length+" Nations From File")
+        $('#bulkNationContinent').empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#bulkNationContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#bulkNationContinent")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkNationImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = data
+    })
+
+    $("#bulkNationForm").on("submit", async function(e) {
+        e.preventDefault();
+        let continent = findContinent($("#bulkNationContinent option:selected").text());
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let nationNameArr = []
+
+        console.log(continent)
+
+        for (const nation of json) {
+
+            //console.log(nation)
+
+            nationNameArr.push(nation.Name)
+
+            $("#nationImportProgressLabel").text("Importing "+nation.Name+"...")
+
+            $('#nationImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(nation.Name, null, 'ko')
+            let abbrK = await translate(nation.Abbreviation, null, 'ko')
+            let demK = await translate(nation.Demonym, null, 'ko')
+
+            max_nation_id++
+            nations_by_id[max_nation_id] = nation.Name
+            nation_count++;
+            var nation_obj = {}
+            nation_obj.type = 'nation'
+            nation_obj.folder = true
+            nation_obj.icon = (parseInt(nation.IsUSA) == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
+            nation_obj.id = max_nation_id
+            nation_obj.title = nation.Name
+            nation_obj.title_korean = nameK.translation
+            nation_obj.short_korean = ""
+            nation_obj.pop = parseInt(nation.Population)
+            nation_obj.etid = 0
+            nation_obj.capid = 0
+            nation_obj.gender = nation.Gender
+            nation_obj.bbqual = nation.BBQuality
+            nation_obj.abbr = nation.Abbreviation
+            nation_obj.abbr_korean = abbrK.translation
+            nation_obj.dem = nation.Demonym
+            nation_obj.dem_korean = demK.translation
+            nation_obj.time_zone = parseFloat(nation.TimeZone).toFixed(2).toString()
+            nation_obj.observes_dst = parseInt(nation.DST)
+            nation_obj.this_is_the_usa = parseInt(nation.IsUSA)
+            nation_obj.use_hardcoded_ml_player_origins = parseInt(nation.HardcodedOrigins)
+            var states_obj = {}
+            states_obj.title = "States"
+            states_obj.folder = true
+            states_obj.icon = './images/landmark-dome-solid.svg'
+            states_obj.type = "STATES_PARENT"
+            states_obj.children = ([])
+            var second_nations_obj = {}
+            second_nations_obj.title = "Second Nations"
+            second_nations_obj.folder = false
+            second_nations_obj.icon = './images/circle-plus-solid.svg'
+            second_nations_obj.type = 'second_nations'
+            second_nations_obj.subdata = []
+            var nation_eth_obj = {}
+            nation_eth_obj.title = "Ethnicities"
+            nation_eth_obj.folder = false
+            nation_eth_obj.icon = './images/user-group-solid.svg'
+            nation_eth_obj.type = 'nation_ethnicity'
+            nation_eth_obj.subdata = []
+            nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
+            //console.log(nation_obj)
+            continent.addChildren(nation_obj)
+            cities_by_nation[max_nation_id] = []
+            states_by_nation[max_nation_id] = []
+            nations_by_continent[$("#bulkNationContinent").val()].push(nation_obj)
+            $("#max_nation_id").text(max_nation_id)
+            $("#nation_count").text(nation_count)
+            $("#usa_defined_count").text(countUSA())
+            count++
+        }
+
+        $.magnificPopup.close()
+
+        nationNameArr.sort()
+
+        continent.sortChildren(null, true)
+        var node = continent.findFirst(nationNameArr[0])
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+
+    })
     ipcRenderer.on('save_xml_result', (event, data) => {
         if (data.status != "success") {
             alert(data.message)
@@ -3427,7 +3571,6 @@
                         rightDivContent("#infoPanel")
                         break;
                     case "state":
-                        console.log(node)
                         var cty = 0;
                         node.visit(function(n) {
                             if (n.type == "city") { cty++ }
@@ -5801,7 +5944,27 @@
         }
     }
 
-    
+    function getElevationDataSync(lat, lon) {
+        const url = "https://api.open-elevation.com/api/v1/lookup?locations="+lat+","+lon
 
+        const request = new XMLHttpRequest();
+        request.open('GET', url, false); // Passing `false` for synchronous
+
+        request.send();
+
+        if (request.status === 200) {
+            const data = JSON.parse(request.responseText);
+            if (data.results && data.results.length > 0) {
+                return data.results[0].elevation;
+            } else {
+                console.log("no elevation data available")
+                return 0
+            }
+        } else {
+            console.log(`Request failed with status ${request.status}`)
+            return 0
+        }
+    }
+    
     </script>
 </html>

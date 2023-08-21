@@ -51,3 +51,7 @@ ipcRenderer.on('bulk-add-cities', (event, data) => {
 ipcRenderer.on('bulk-add-states', (event, data) => {
     $("#bulkImportStates").trigger("click")
 })
+
+ipcRenderer.on('bulk-add-nations', (event, data) => {
+    $("#bulkImportNations").trigger("click")
+})

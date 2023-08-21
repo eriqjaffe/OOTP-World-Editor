@@ -48,6 +48,26 @@ ipcMain.on('get-elevation', (event, arg) => {
     })
 })
 
+ipcMain.on('get-elevation-sync', (event, arg) => {
+    let url = "https://api.open-elevation.com/api/v1/lookup?locations="+arg[0]+","+arg[1]
+    https.get(url,(res) => {
+        let body = ""
+        res.on("data", (chunk) => {
+            body += chunk
+        })
+        res.on("end", () => {
+            try {
+                let json = JSON.parse(body)
+                event.returnValue = json.elevation
+            } catch (error) {
+                event.returnValue = 0
+            }
+        })  
+    }).on("error", (error) => {
+        event.returnValue = 0
+    })
+})
+
 ipcMain.on('debug-load', (event, arg) => {
     fs.readFile('.\\debug\\world_default.xml', 'utf8', function(err, data) {
         parser.parseString(data, function (err, result) {
@@ -163,7 +183,7 @@ ipcMain.on("bulk-import-cities", (event, data) => {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0});
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 6});
                     event.sender.send('bulk-city-import', JSON.stringify(responseData))
                 } 
             } catch (err) {
@@ -190,7 +210,7 @@ ipcMain.on("bulk-import-states", (event, data) => {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0});
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 5});
                     event.sender.send('bulk-state-import', JSON.stringify(responseData))
                 } 
             } catch (err) {
@@ -199,6 +219,60 @@ ipcMain.on("bulk-import-states", (event, data) => {
             }
         } else {
             event.sender.send('bulk-state-import', 'cancelled')
+        }
+    })
+})
+
+ipcMain.on("bulk-import-nations", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let responseData = null
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 6});
+                    event.sender.send('bulk-nation-import', JSON.stringify(responseData))
+                } 
+            } catch (err) {
+                console.log(err)
+                event.sender.send('bulk-nation-import', err)
+            }
+        } else {
+            event.sender.send('bulk-nation-import', 'cancelled')
+        }
+    })
+})
+
+ipcMain.on("bulk-import-continents", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let responseData = null
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0});
+                    event.sender.send('bulk-continent-import', JSON.stringify(responseData))
+                } 
+            } catch (err) {
+                console.log(err)
+                event.sender.send('bulk-continent-import', err)
+            }
+        } else {
+            event.sender.send('bulk-continent-import', 'cancelled')
         }
     })
 })
@@ -304,9 +378,9 @@ const template = [
               accelerator: isMac ? 'Cmd+Shift+G' : 'Control+Shift+G',
               label: 'Add Region',
               enabled: true
-},
-          { type: 'separator' },
-          {
+        },
+        { type: 'separator' },
+        {
             label: 'Import From File',
             submenu: [
                 /* {
@@ -320,13 +394,13 @@ const template = [
                     click: () => mainWindow.webContents.send('bulk-add-continents','click'),
                     label: 'Import Continents',
                     enabled: true
-                },
+                }, */
                 {
                     id: 'bulkNationMenu',
                     click: () => mainWindow.webContents.send('bulk-add-nations','click'),
                     label: 'Import Nations',
                     enabled: true
-                }, */
+                },
                 {
                     id: 'bulkStateMenu',
                     click: () => mainWindow.webContents.send('bulk-add-states','click'),
@@ -346,8 +420,51 @@ const template = [
                     enabled: true
                 } */
             ]
-          }
-        ]
+        },
+        { type: 'separator' },
+        {
+            label: 'Open Template',
+            submenu: [
+                {
+                    id: 'ethnicityTemplate',
+                    //click: () => mainWindow.webContents.send('open-ethnicity-template','click'),
+                    click: () => shell.openPath(__dirname+"\\files\\ethnicity_template.csv"),
+                    label: 'Ethnicities',
+                    enabled: true
+                },
+                {
+                    id: 'continentTemplate',
+                    click: () => shell.openPath(__dirname+"\\files\\continent_template.csv"),
+                    label: 'Continents',
+                    enabled: true
+                },
+                {
+                    id: 'nationTemplate',
+                    click: () => shell.openPath(__dirname+"\\files\\nation_template.csv"),
+                    label: 'Nations',
+                    enabled: true
+                },
+                {
+                    id: 'stateTemplate',
+                    click: () => shell.openPath(__dirname+"\\files\\state_template.csv"),
+                    label: 'States',
+                    enabled: true
+                },
+                {
+                    id: 'cityTemplate',
+                    click: () => shell.openPath(__dirname+"\\files\\city_template.csv"),
+                    label: 'Cities',
+                    enabled: true
+                },
+                /* {
+                    id: 'bulkRegionMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-regions','click'),
+                    label: 'Add Regions',
+                    enabled: true
+                } */
+            ]
+        },
+    ]
     },
     {
         label: 'View',
