@@ -184,7 +184,12 @@ ipcMain.on("bulk-import-cities", (event, data) => {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
                     responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 6});
-                    event.sender.send('bulk-city-import', JSON.stringify(responseData))
+                    let dataOut = {}
+                    dataOut.continent = data[0]
+                    dataOut.nation = data[1]
+                    dataOut.state = data[2]
+                    dataOut.responseData = responseData
+                    event.sender.send('bulk-city-import', JSON.stringify(dataOut))
                 } 
             } catch (err) {
                 console.log(err)
@@ -211,7 +216,11 @@ ipcMain.on("bulk-import-states", (event, data) => {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
                     responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 5});
-                    event.sender.send('bulk-state-import', JSON.stringify(responseData))
+                    let dataOut = {}
+                    dataOut.continent = data[0]
+                    dataOut.nation = data[1]
+                    dataOut.responseData = responseData
+                    event.sender.send('bulk-state-import', JSON.stringify(dataOut))
                 } 
             } catch (err) {
                 console.log(err)
@@ -238,7 +247,10 @@ ipcMain.on("bulk-import-nations", (event, data) => {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
                     responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 6});
-                    event.sender.send('bulk-nation-import', JSON.stringify(responseData))
+                    let dataOut = {}
+                    dataOut.continent = data
+                    dataOut.responseData = responseData
+                    event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
                 } 
             } catch (err) {
                 console.log(err)
@@ -388,13 +400,13 @@ const template = [
                     click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
                     label: 'Import Ethnicities',
                     enabled: true
-                },
+                }, */
                 {
                     id: 'bulkContinentMenu',
                     click: () => mainWindow.webContents.send('bulk-add-continents','click'),
                     label: 'Import Continents',
                     enabled: true
-                }, */
+                },
                 {
                     id: 'bulkNationMenu',
                     click: () => mainWindow.webContents.send('bulk-add-nations','click'),

@@ -1517,6 +1517,18 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkContinentImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importContinentsHeader">Import Continents From File</h2>
+        <form id="bulkContinentForm" action="">
+        <br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Continents">
+            <br><br>
+            <span id="continentImportProgressLabel">&nbsp;</span><br>
+            <div id="continentImportProgress"></div>
+        </div>
+        </form>
+    </div>
     <div id="bulkNationImport" class="faq-white-popup mfp-hide">
         <h2 style="text-align:center;" id="importNationsHeader">Import Nations From File</h2>
         <form id="bulkNationForm" action="">
@@ -1603,6 +1615,7 @@
     <input type="button" class="button" id="bulkImportCities" value="Bulk Import Cities" style="display:none;">
     <input type="button" class="button" id="bulkImportStates" value="Bulk Import States" style="display:none;">
     <input type="button" class="button" id="bulkImportNations" value="Bulk Import Nations" style="display:none;">
+    <input type="button" class="button" id="bulkImportContinents" value="Bulk Import Continents" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -2473,17 +2486,18 @@
         ipcRenderer.send('save_xml',Buffer.from(tmpXML))
     })
 
-    $("#bulkImportCities").on("click", function(e) {
+    $("#bulkImportCities").on("click", function(e, c, n, s) {
         e.preventDefault()
-        ipcRenderer.send('bulk-import-cities', null)
+        ipcRenderer.send('bulk-import-cities', [c, n, s])
     })
 
     ipcRenderer.on('bulk-city-import', (event, data) => {
-        if (JSON.parse(data).length < 1) {
+        let json = JSON.parse(data)
+        if (json.responseData.length < 1) {
             alert("There don't appear to be any cities in that file")
             return false;
         }
-        $("#importCitiesHeader").html("Importing "+JSON.parse(data).length+" Cities From File")
+        $("#importCitiesHeader").html("Importing "+json.responseData.length+" Cities From File")
         $('#bulkCityContinent').empty()
         $.each(continents_by_id, function(key, value) {
             $("#bulkCityContinent")
@@ -2491,17 +2505,21 @@
                 .text(value));
         });
         sortDropdown("#bulkCityContinent")
-        $("#bulkCityContinent").trigger("change")
+        if (json.continent > 0) {
+            $("#bulkCityContinent").val(json.continent)
+        }
+
+        $("#bulkCityContinent").trigger("change", [json.nation, json.state])
         $.magnificPopup.open({
             items: {
                 src: '#bulkCityImport',
                 type: 'inline'
             }
         });
-        bulkImportData = data
+        bulkImportData = JSON.stringify(json.responseData)
     })
 
-    $("#bulkCityContinent").on("change", function(e) {
+    $("#bulkCityContinent").on("change", function(e, n, s) {      
         $('#bulkCityNation').empty()
         for (nation of nations_by_continent[$("#bulkCityContinent").val()]) {
             $('#bulkCityNation')
@@ -2510,10 +2528,13 @@
 
         }
         sortDropdown("#bulkCityNation")
-        $("#bulkCityNation").trigger("change")
+        if (n > 0) {
+            $("#bulkCityNation").val(n)
+        }
+        $("#bulkCityNation").trigger("change", s)
     })
 
-    $("#bulkCityNation").on("change", function(e) {
+    $("#bulkCityNation").on("change", function(e, s) {
         $('#bulkCityState').empty()
         for (state of states_by_nation[$("#bulkCityNation").val()]) {
             $('#bulkCityState')
@@ -2522,6 +2543,9 @@
 
         }
         sortDropdown("#bulkCityState")
+        if (s > 0) {
+            $("#bulkCityState").val(s)
+        }
     })
 
     $("#bulkCityForm").on("submit", async function(e) {
@@ -2530,8 +2554,11 @@
         let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text());
         let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
         let count = 1
+        let cityNameArr = []
 
         for (const city of json) {
+
+            cityNameArr.push(city.Name)
 
             $("#cityImportProgressLabel").text("Importing "+city.Name+"...")
 
@@ -2587,26 +2614,28 @@
             cities_by_nation[$("#bulkCityNation").val()].push(city_bn_obj)
             count++
         }
-
+        cityNameArr.sort()
         $.magnificPopup.close()
         state.sortChildren(null, true);
-        state.setFocus()
-        state.setActive()
-        state.makeVisible({scrollIntoView: true});
         state.setExpanded(true)
+        var node = state.findFirst(cityNameArr[0])
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
     });
 
-    $("#bulkImportStates").on("click", function(e) {
+    $("#bulkImportStates").on("click", function(e, c, n) {
         e.preventDefault()
-        ipcRenderer.send('bulk-import-states', null)
+        ipcRenderer.send('bulk-import-states', [c, n])
     })
 
     ipcRenderer.on('bulk-state-import', (event, data) => {
-        if (JSON.parse(data).length < 1) {
+        let json = JSON.parse(data)
+        if (json.responseData.length < 1) {
             alert("There don't appear to be any states in that file")
             return false;
         }
-        $("#importStatesHeader").html("Importing "+JSON.parse(data).length+" States From File")
+        $("#importStatesHeader").html("Importing "+json.responseData.length+" States From File")
         $('#bulkStateContinent').empty()
         $.each(continents_by_id, function(key, value) {
             $("#bulkStateContinent")
@@ -2614,26 +2643,32 @@
                 .text(value));
         });
         sortDropdown("#bulkStateContinent")
-        $("#bulkStateContinent").trigger("change")
+        if (json.continent > 0) {
+            $("#bulkStateContinent").val(json.continent)
+        }
+        $("#bulkStateContinent").trigger("change", json.nation)
         $.magnificPopup.open({
             items: {
                 src: '#bulkStateImport',
                 type: 'inline'
             }
         });
-        bulkImportData = data
+        bulkImportData = JSON.stringify(json.responseData)
     })
 
-    $("#bulkStateContinent").on("change", function(e) {
+    $("#bulkStateContinent").on("change", function(e, n) {
         $('#bulkStateNation').empty()
         for (nation of nations_by_continent[$("#bulkStateContinent").val()]) {
+            //console.log(nation.id, nation.title)
             $('#bulkStateNation')
                 .append($('<option>', { value : nation.id })
                 .text(nation.title));
 
         }
         sortDropdown("#bulkStateNation")
-        $("#bulkStateNation").trigger("change")
+        if (n > 0) {
+            $("#bulkStateNation").val(n)
+        }
     })
 
     $("#bulkStateForm").on("submit", async function(e) {
@@ -2695,22 +2730,18 @@
         node.makeVisible({scrollIntoView: true});
     })
 
-    ipcRenderer.on('version-info', (event, data) => {
-        currentVersion = data
-        $("#currentVersion").text("Version "+currentVersion)
-    })
-
-    $("#bulkImportNations").on("click", function(e) {
+    $("#bulkImportNations").on("click", function(e, src) {
         e.preventDefault()
-        ipcRenderer.send('bulk-import-nations', null)
+        ipcRenderer.send('bulk-import-nations', src)
     })
 
     ipcRenderer.on('bulk-nation-import', (event, data) => {
-        if (JSON.parse(data).length < 1) {
+        let json = JSON.parse(data)
+        if (json.responseData.length < 1) {
             alert("There don't appear to be any nations in that file")
             return false;
         }
-        $("#importNationsHeader").html("Importing "+JSON.parse(data).length+" Nations From File")
+        $("#importNationsHeader").html("Importing "+json.responseData.length+" Nations From File")
         $('#bulkNationContinent').empty()
         $.each(continents_by_id, function(key, value) {
             $("#bulkNationContinent")
@@ -2718,13 +2749,14 @@
                 .text(value));
         });
         sortDropdown("#bulkNationContinent")
+        $("#bulkNationContinent").val((json.continent > 0) ? json.continent : 1)
         $.magnificPopup.open({
             items: {
                 src: '#bulkNationImport',
                 type: 'inline'
             }
         });
-        bulkImportData = data
+        bulkImportData = JSON.stringify(json.responseData)
     })
 
     $("#bulkNationForm").on("submit", async function(e) {
@@ -2734,15 +2766,9 @@
         let count = 1
         let nationNameArr = []
 
-        console.log(continent)
-
         for (const nation of json) {
-
-            //console.log(nation)
-
             nationNameArr.push(nation.Name)
-
-            $("#nationImportProgressLabel").text("Importing "+nation.Name+"...")
+             $("#nationImportProgressLabel").text("Importing "+nation.Name+"...")
 
             $('#nationImportProgress').LineProgressbar({
                 duration: 100,
@@ -2806,11 +2832,8 @@
             $("#usa_defined_count").text(countUSA())
             count++
         }
-
         $.magnificPopup.close()
-
         nationNameArr.sort()
-
         continent.sortChildren(null, true)
         var node = continent.findFirst(nationNameArr[0])
         var tree = $.ui.fancytree.getTree("#xmlOutput")
@@ -2818,8 +2841,90 @@
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
-
     })
+
+    $("#bulkImportContinents").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-continents', null)
+    })
+
+    $("#bulkContinentForm").on("submit", async function(e) {
+        e.preventDefault();
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let continentNameArr = []
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        
+        for (const continent of json) {
+            continentNameArr.push(continent.Name)
+             $("#continentImportProgressLabel").text("Importing "+continent.Name+"...")
+
+            $('#continentImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(continent.Name, null, 'ko')
+            let abbrK = await translate(continent.Abbreviation, null, 'ko')
+            let demK = await translate(continent.Demonym, null, 'ko')
+
+            max_continent_id++
+            continents_by_id[max_continent_id] = continent.Name
+            continent_count++;
+
+            var continent_obj = {}
+            continent_obj.type = 'continent'
+            continent_obj.folder = true
+            continent_obj.icon = './images/earth-americas-solid.svg'
+            continent_obj.id = max_continent_id
+            continent_obj.title = continent.Name
+            continent_obj.title_korean = nameK.translation
+            continent_obj.pop = continent.Population
+            continent_obj.etid = 0
+            continent_obj.abbr = continent.Abbreviation
+            continent_obj.dem = continent.Demonym
+            continent_obj.abbr_korean =  abbrK.translation
+            continent_obj.dem_korean = demK.translation
+            nations_by_continent[max_continent_id] = []
+            
+            world.addChildren(continent_obj)
+            count++
+        }
+        $.magnificPopup.close()
+        continentNameArr.sort()
+        world.sortChildren(null, true);
+        var continent = world.findFirst(continentNameArr[0])
+        world.setExpanded()
+        tree.activateKey(false)
+        continent.setFocus()
+        continent.setActive()
+        
+        $("#max_continent_id").text(max_continent_id)
+        $("#continent_count").text(continent_count)
+    })
+
+    ipcRenderer.on('bulk-continent-import', (event, data) => {
+        if (JSON.parse(data).length < 1) {
+            alert("There don't appear to be any continents in that file")
+            return false;
+        }
+        $("#importContinentsHeader").html("Importing "+JSON.parse(data).length+" Continents From File")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkContinentImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = data
+    })
+    
+    ipcRenderer.on('version-info', (event, data) => {
+        currentVersion = data
+        $("#currentVersion").text("Version "+currentVersion)
+    })
+
     ipcRenderer.on('save_xml_result', (event, data) => {
         if (data.status != "success") {
             alert(data.message)
@@ -3448,7 +3553,6 @@
                         })
                         break;
                     case "nation":
-                        console.log(node)
                         var stt = 0;
                         var cty = 0;
                         var eth = 0;
@@ -4253,7 +4357,8 @@
                         break;  
                     case "CONTINENTS_PARENT":
                         cmItems = {
-                            "add": {name: "Add Continent", icon: 'fa-plus'}
+                            "add": {name: "Add Continent", icon: 'fa-plus'},
+                            "file": {name: "Add Continents From File", icon: 'fa-plus'}
                         }
                         break;  
                     case "REGIONS_PARENT":
@@ -4266,6 +4371,7 @@
                             "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
                             "add": {name: "Add Nation", icon: 'fa-plus'},
+                            "file": {name: "Add Nations From File", icon: 'fa-plus'},
                             "sep2": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
@@ -4277,6 +4383,7 @@
                             "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
                             "addState": {name: "Add State", icon: 'fa-plus'},
+                            "addStatesFromFile": {name: "Add States From File", icon: 'fa-plus'},
                             "addSecondNation": {name: "Add Second Nation", icon: 'fa-plus'},
                             "addEthnicity": {name: "Add Ethnicity", icon: 'fa-plus'},
                             "sep3": "----",
@@ -4286,6 +4393,7 @@
                     case "STATES_PARENT":
                         cmItems = {
                             "add": {name: "Add State", icon: 'fa-plus'},
+                            "file": {name: "Add States From File", icon: 'fa-plus'},
                         }
                         break;
                     case "state":
@@ -4295,6 +4403,7 @@
                             "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
                             "add": {name: "Add City", icon: 'fa-plus'},
+                            "file": {name: "Add Cities From File", icon: 'fa-plus'},
                             "sep3": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
@@ -4352,6 +4461,9 @@
                                     case "add":
                                         $("#addContinentTrigger").click()
                                         break;
+                                    case "file":
+                                        $("#bulkImportContinents").trigger("click")
+                                        break;
                                 }
                                 break;  
                             case "REGIONS_PARENT":
@@ -4363,6 +4475,9 @@
                                 switch (key) {
                                     case "add":
                                         addNation(node.data.id)
+                                        break;
+                                    case "file":
+                                        addNationsFromFile(node.data.id);
                                         break;
                                     case "delete":
                                         if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s nations, states and cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
@@ -4383,6 +4498,9 @@
                                         addState(node.parent.data.id,node.data.id)
                                         //$("#addStateTrigger").click()
                                         break;
+                                    case "addStatesFromFile":
+                                        $("#bulkImportStates").trigger("click", [node.parent.data.id, node.data.id])
+                                        break;
                                     case "addSecondNation":
                                         addSecondNation(node.id)
                                         break;
@@ -4400,8 +4518,14 @@
                                 }
                                 break;
                             case "STATES_PARENT":
-                                addState(node.parent.parent.data.id,node.parent.data.id)
-                                break;
+                                switch (key) {
+                                    case "add":
+                                        addState(node.parent.parent.data.id,node.parent.data.id)
+                                        break;
+                                    case "file":
+                                        $("#bulkImportStates").trigger("click", [node.parent.parent.data.id, node.parent.data.id])
+                                        break;
+                                }
                             case "state":
                                 switch (key) {
                                     case "edit":
@@ -4410,6 +4534,9 @@
                                     case "add":
                                         //$("#addCityTrigger").click()
                                         addCity(node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id)
+                                        break;
+                                    case "file":
+                                        $("#bulkImportCities").trigger("click", [node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id])
                                         break;
                                     case "delete":
                                         if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
@@ -4888,6 +5015,11 @@
         $("#newNationUSA :nth-child(1)").prop('selected', true);
 
         rightDivContent("#addNation")
+    }
+
+    function addNationsFromFile(continent) {
+        $("#bulkImportNations").trigger("click", continent)
+        $("#bulkNationContinent").val(continent).trigger("change")
     }
 
     function addState(continent,nation) {
