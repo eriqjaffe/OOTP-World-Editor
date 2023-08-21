@@ -1,1 +1,7 @@
-Name,Abb,Demonym,Population,Gender,BBQual,DST,IsUSA,HardcodedOrigins,TimeZone
+//,,,,,,,,,
+"// Gender should be a numerical value - set to 0 for Male and 1 for Female.  If set to anything besides 1, the app will assume Male.",,,,,,,,,
+"// BBQuality must be a numerical value on a scale of 0 to 5, with 0 being ""Non-Existent"" and 5 being ""Excellent"".",,,,,,,,,
+"// DST, IsUSA, and HardcodedOrigins must be numerical values.  Set to 1 for Yes and 0 for No.",,,,,,,,,
+"// TimeZone should be the GMT offset.  Chicago, for example, would simply be -6",,,,,,,,,
+//,,,,,,,,,
+Name,Abbreviation,Demonym,Population,Gender,BBQuality,DST,IsUSA,HardcodedOrigins,TimeZone
