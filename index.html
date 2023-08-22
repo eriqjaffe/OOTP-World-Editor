@@ -2765,6 +2765,7 @@
         let json = JSON.parse(bulkImportData);
         let count = 1
         let nationNameArr = []
+        var newUSAName = null;
 
         for (const nation of json) {
             nationNameArr.push(nation.Name)
@@ -2830,8 +2831,27 @@
             $("#max_nation_id").text(max_nation_id)
             $("#nation_count").text(nation_count)
             $("#usa_defined_count").text(countUSA())
+            if (parseInt(nation.IsUSA) == 1) {
+                newUSAName = nation.Name
+            }
             count++
         }
+
+        if (newUSAName != null) {
+            var oldUSA = findNationFromScratch(usa)
+            var newUSA = continent.findFirst(newUSAName)
+            if (!confirm(oldUSA.title+" is already defined as the USA.\n\nAre you sure you want to change it to "+newUSAName+"?")) {
+                newUSA.data.this_is_the_usa = 0
+                newUSA.renderTitle()
+            } else {
+                oldUSA.data.this_is_the_usa = 0
+                oldUSA.icon = './images/flag-solid.svg'
+                oldUSA.renderTitle()
+                newUSA.icon = './images/flag-usa-solid.svg'
+                newUSA.renderTitle()
+            }
+        }
+
         $.magnificPopup.close()
         nationNameArr.sort()
         continent.sortChildren(null, true)
@@ -3126,7 +3146,11 @@
                                 var city_bn_obj = {}
                                 city_obj.type = 'city'
                                 city_obj.folder = false
-                                city_obj.icon = './images/city-solid.svg'
+                                if (nation.$.capid == city.$.id) {
+                                    city_obj.icon = './images/star-solid.svg'
+                                } else {
+                                    city_obj.icon = './images/city-solid.svg'
+                                }
                                 city_obj.id = city.$.id
                                 city_obj.title = city.$.name
                                 city_obj.title_korean = (city.$.name_korean != undefined) ? city.$.name_korean : ""
@@ -3597,7 +3621,7 @@
                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+pop+'</td></tr>\n'
-                                + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" ><span id="capDisplaySpan">'+cap+'<span></td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
@@ -3706,6 +3730,7 @@
                         })
                         break;
                     case "city":
+                        console.log(node)
                         var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
                         var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
                         var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
@@ -4414,6 +4439,8 @@
                             "sep1": "----",
                             "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
+                            "setCap": {name: "Set \""+node.title +"\" as Captiol", icon: 'fa-arrow-right-arrow-left'},
+                            "sep3": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
                         break;
@@ -4560,6 +4587,12 @@
                                         break;
                                     case "move":
                                         moveCity(node)
+                                        break;
+                                    case "setCap":
+                                        //console.log(node.data.id, node.title)
+                                        node.parent.parent.parent.data.capid = node.data.id
+                                        //console.log(node.parent.parent.parent.data)
+                                        resetCaptiol(node.parent.parent.parent)   
                                         break;
                                 }
                                 break;
@@ -5073,7 +5106,7 @@
     $("#newStateNation").on("change",function() {
         n = findNation($("#newStateContinent option:selected").text(), $("#newStateNation option:selected" ).text())
         $("#newStateTimeZone").val(n.data.time_zone)
-    })
+    })  
 
     function addSecondNation(nation) {
         console.log(nation)
@@ -5705,6 +5738,10 @@
         city_obj.observes_dst = $("#newCityDST").val()
         city_obj.state = $("#newCityState").val()
         city_obj.nation = $("#newCityNation").val()
+        city_bn_obj.id = $("#newCityId").val()
+        city_bn_obj.title = $("#newCityName").val()
+        city_bn_obj.state = $("#newCityState").val()
+        city_bn_obj.nation = $("#newCityNation").val()
         if (parseInt($("#newCityId").val()) > max_city_id) { max_city_id = parseInt($("#newCityId").val()) }
         $("#max_city_id").text(max_city_id)
         $("#city_count").text(city_count)
@@ -5720,6 +5757,7 @@
         cities_by_nation[$("#newCityNation").val()].push(city_bn_obj)
         if ($("#newCityCapitol").val() == 1) {
             nation.data.capid = $("#newCityId").val()
+            resetCaptiol(nation)
         }
     })
 
@@ -5827,6 +5865,7 @@
         nodeToEdit.title_korean = $("#editCityNameK").val()
         if ($("#editCityCapitol").val() == "1") {
             nodeToEdit.parent.parent.parent.data.capid = $("#editCityId").val()
+            resetCaptiol(nodeToEdit.parent.parent.parent)
         }
         scrollToEditedNode("CONTINENTS")
         var tree = $.ui.fancytree.getTree("#xmlOutput")
@@ -5834,6 +5873,27 @@
         nodeToEdit.setFocus()
         nodeToEdit.setActive()
     })
+
+    function resetCaptiol (nation) {
+        nation.visit(function(n){
+            if (n.type == "city") {
+                if (n.data.id == nation.data.capid) {
+                    n.icon = './images/star-solid.svg'
+                } else {
+                    n.icon = './images/city-solid.svg'
+                }
+                n.renderTitle()
+            }
+        });
+        // if the nation is the "active" node, update the capitol display span
+        var city = cities_by_nation[nation.data.id].find( function( city ){
+            return city.id === nation.data.capid;
+        } );
+        if (city != null) {
+            $("#capDisplaySpan").text(city.title+", "+states_by_id[city.state])
+            //cap = city.title+",&nbsp;"+states_by_id[city.state]
+        }
+    }
 
     $("#moveNationForm").on("submit", function(e) {
         e.preventDefault()
