@@ -2555,6 +2555,7 @@
         let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
         let count = 1
         let cityNameArr = []
+        let newCap = -1
 
         for (const city of json) {
 
@@ -2570,7 +2571,7 @@
             let nameK = await translate(city.Name, null, 'ko')
             let abbrK = await translate(city.Abbreviation, null, 'ko')
             let altitude = 0
-
+            
             if (parseInt(city.Altitude) < 0) {
                 altitude = getAltitudeEstimate(getElevationDataSync(parseFloat(city.Latitude).toFixed(5).toString(), parseFloat(city.Longitude).toFixed(5).toString()))
             } else {
@@ -2589,7 +2590,12 @@
             var city_bn_obj = {}
             city_obj.type = 'city'
             city_obj.folder = false
-            city_obj.icon = './images/city-solid.svg'
+            if (parseInt(city.Capitol) == 1) {
+                city_obj.icon = './images/star-solid.svg'
+                newCap = max_city_id
+            } else {
+                city_obj.icon = './images/city-solid.svg'
+            }
             city_obj.id = max_city_id
             city_obj.title = city.Name
             city_obj.title_korean = nameK.translation
@@ -2622,6 +2628,10 @@
         node.setFocus()
         node.setActive()
         node.makeVisible({scrollIntoView: true});
+        if (newCap > 0) {
+            nation.data.capid = newCap
+            resetCaptiol(nation)
+        }
     });
 
     $("#bulkImportStates").on("click", function(e, c, n) {
