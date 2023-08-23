@@ -63,3 +63,7 @@ ipcRenderer.on('bulk-add-continents', (event, data) => {
 ipcRenderer.on('bulk-add-ethnicities', (event, data) => {
     $("#bulkImportEthnicities").trigger("click")
 })
+
+ipcRenderer.on('bulk-add-regions', (event, data) => {
+    $("#bulkImportRegions").trigger("click")
+})

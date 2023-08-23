@@ -1517,6 +1517,18 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkRegionImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importRegionsHeader">Import Regions From File</h2>
+        <form id="bulkRegionForm" action="">
+        <br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Region">
+            <br><br>
+            <span id="regionImportProgressLabel">&nbsp;</span><br>
+            <div id="regionImportProgress"></div>
+        </div>
+        </form>
+    </div>
     <div id="bulkEthnicityImport" class="faq-white-popup mfp-hide">
         <h2 style="text-align:center;" id="importEthnicitiesHeader">Import Ethnicities From File</h2>
         <form id="bulkEthnicityForm" action="">
@@ -1629,6 +1641,7 @@
     <input type="button" class="button" id="bulkImportNations" value="Bulk Import Nations" style="display:none;">
     <input type="button" class="button" id="bulkImportContinents" value="Bulk Import Continents" style="display:none;">
     <input type="button" class="button" id="bulkImportEthnicities" value="Bulk Import Ethnicities" style="display:none;">
+    <input type="button" class="button" id="bulkImportRegions" value="Bulk Import Regions" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -3029,6 +3042,117 @@
         $.magnificPopup.open({
             items: {
                 src: '#bulkEthnicityImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = data
+    })
+
+    $("#bulkImportRegions").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-regions', null)
+    })
+
+    $("#bulkRegionForm").on("submit", async function(e) {
+        e.preventDefault()
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let regionNameArr = []
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("REGIONS")
+        
+        for (const region of json) {
+            regionNameArr.push(region.Name)
+            $("#regionImportProgressLabel").text("Importing "+region.Name+"...")
+
+            $('#regionImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(region.Name, null, 'ko')
+
+            max_region_id++
+            regions_by_id[max_region_id] = region.Name
+            region_count++;
+
+            let cities = (region.Cities != undefined) ? region.Cities.split("x") : []
+            let states = (region.States != undefined) ? region.States.split("x") : []
+            let nations = (region.Nations != undefined) ? region.Nations.split("x") : []
+
+            console.log(nations)
+
+            var region_obj = {}
+            region_obj.type = 'region'
+            region_obj.folder = true
+            region_obj.icon = "./images/map-location-dot-solid.svg"
+            region_obj.id = max_region_id
+            region_obj.title = region.Name
+            region_obj.sort_order = 0
+            region_obj.name_korean = nameK.translation
+            var city_arr = []
+            var state_arr = []
+            var nation_arr = []
+            try {
+                for (city of cities) {
+                    if (cities_by_id[city] != undefined) {
+                        var city_obj ={}
+                        city_obj.title = cities_by_id[city].name
+                        city_obj.id = city
+                        city_arr.push(city_obj)
+                    }
+                }
+            } catch (err) {}
+            try {
+                for (state of states) {
+                    if (states_by_id[state] != undefined) {
+                        var state_obj = {}
+                        state_obj.title = states_by_id[state]
+                        state_obj.id = state
+                        state_arr.push(state_obj)
+                    }
+                }
+            } catch (err) {}
+            try {
+                for (nation of nations) {
+                    if (nations_by_id[nation] != undefined) {
+                        var nation_obj = {}
+                        nation_obj.title = nations_by_id[nation]
+                        nation_obj.id = nation
+                        nation_arr.push(nation_obj)
+                    }
+                }
+            } catch (err) {}
+            region_obj.nations = nation_arr
+            region_obj.states = state_arr
+            region_obj.cities = city_arr
+            
+            world.addChildren(region_obj)
+            count++
+        }
+        $.magnificPopup.close()
+        regionNameArr.sort()
+        world.sortChildren(null, true);
+        var region = world.findFirst(regionNameArr[0])
+        world.setExpanded()
+        tree.activateKey(false)
+        region.setFocus()
+        region.setActive()
+        
+        $("#max_region_id").text(max_region_id)
+        $("#region_count").text(region_count)
+    })
+
+    ipcRenderer.on('bulk-region-import', (event, data) => {
+        if (JSON.parse(data).length < 1) {
+            alert("There don't appear to be any regions in that file")
+            return false;
+        }
+        $("#importRegionsHeader").html("Importing "+JSON.parse(data).length+" Regions From File")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkRegionImport',
                 type: 'inline'
             }
         });

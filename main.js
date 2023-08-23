@@ -316,6 +316,33 @@ ipcMain.on("bulk-import-ethnicities", (event, data) => {
     })
 })
 
+ipcMain.on("bulk-import-regions", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let responseData = null
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 3, raw: true, cellDates: false});
+                    event.sender.send('bulk-region-import', JSON.stringify(responseData))
+                } 
+            } catch (err) {
+                console.log(err)
+                event.sender.send('bulk-region-import', err)
+            }
+        } else {
+            event.sender.send('bulk-region-import', 'cancelled')
+        }
+    })
+})
+
 function isExcelFile(filePath) {
     try {
       const workbook = xlsx.readFile(filePath);
@@ -377,13 +404,6 @@ const template = [
         label: 'Action',
         submenu: [
           {
-              id: 'addEthnicityMenu',
-              click: () => mainWindow.webContents.send('add-ethnicity','click'),
-              accelerator: isMac ? 'Cmd+Shift+E' : 'Control+Shift+E',
-              label: 'Add Ethnicity',
-              enabled: true
-          },
-          {
               id: 'addContinentMenu',
               click: () => mainWindow.webContents.send('add-continent','click'),
               accelerator: isMac ? 'Cmd+Shift+C' : 'Control+Shift+C',
@@ -411,6 +431,14 @@ const template = [
               label: 'Add City',
               enabled: true
           },
+          { type: 'separator' },
+          {
+            id: 'addEthnicityMenu',
+            click: () => mainWindow.webContents.send('add-ethnicity','click'),
+            accelerator: isMac ? 'Cmd+Shift+E' : 'Control+Shift+E',
+            label: 'Add Ethnicity',
+            enabled: true
+            },
           {
               id: 'addRegionMenu',
               click: () => mainWindow.webContents.send('add-region','click'),
@@ -422,12 +450,6 @@ const template = [
         {
             label: 'Import From File',
             submenu: [
-                {
-                    id: 'bulkEthnicityMenu',
-                    click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
-                    label: 'Import Ethnicities',
-                    enabled: true
-                },
                 {
                     id: 'bulkContinentMenu',
                     click: () => mainWindow.webContents.send('bulk-add-continents','click'),
@@ -452,55 +474,62 @@ const template = [
                     label: 'Import Cities',
                     enabled: true
                 },
-                /* {
+                { type: 'separator' },
+                {
+                    id: 'bulkEthnicityMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
+                    label: 'Import Ethnicities',
+                    enabled: true
+                },
+                {
                     id: 'bulkRegionMenu',
                     click: () => mainWindow.webContents.send('bulk-add-regions','click'),
-                    label: 'Add Regions',
+                    label: 'Import Regions',
                     enabled: true
-                } */
+                }
             ]
         },
         { type: 'separator' },
         {
             label: 'Open Template',
-            submenu: [
-                {
-                    id: 'ethnicityTemplate',
-                    //click: () => mainWindow.webContents.send('open-ethnicity-template','click'),
-                    click: () => shell.openPath(__dirname+"\\files\\ethnicity_template.csv"),
-                    label: 'Ethnicities',
-                    enabled: true
-                },
+            submenu: [     
                 {
                     id: 'continentTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\continent_template.csv"),
+                    click: () => shell.openPath(__dirname+"\\files\\continents_template.csv"),
                     label: 'Continents',
                     enabled: true
                 },
                 {
                     id: 'nationTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\nation_template.csv"),
+                    click: () => shell.openPath(__dirname+"\\files\\nations_template.csv"),
                     label: 'Nations',
                     enabled: true
                 },
                 {
                     id: 'stateTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\state_template.csv"),
+                    click: () => shell.openPath(__dirname+"\\files\\states_template.csv"),
                     label: 'States',
                     enabled: true
                 },
                 {
                     id: 'cityTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\city_template.csv"),
+                    click: () => shell.openPath(__dirname+"\\files\\cities_template.csv"),
                     label: 'Cities',
                     enabled: true
                 },
-                /* {
-                    id: 'bulkRegionMenu',
-                    click: () => mainWindow.webContents.send('bulk-add-regions','click'),
-                    label: 'Add Regions',
+                { type: 'separator' },
+                {
+                    id: 'ethnicityTemplate',
+                    click: () => shell.openPath(__dirname+"\\files\\ethnicities_template.csv"),
+                    label: 'Ethnicities',
                     enabled: true
-                } */
+                },
+                {
+                    id: 'regionTemplate',
+                    click: () => shell.openPath(__dirname+"\\files\\regions_template.csv"),
+                    label: 'Ethnicities',
+                    enabled: true
+                },
             ]
         },
     ]
