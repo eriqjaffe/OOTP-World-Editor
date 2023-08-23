@@ -1517,6 +1517,18 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkEthnicityImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importEthnicitiesHeader">Import Ethnicities From File</h2>
+        <form id="bulkEthnicityForm" action="">
+        <br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Ethnicities">
+            <br><br>
+            <span id="ethnicityImportProgressLabel">&nbsp;</span><br>
+            <div id="ethnicityImportProgress"></div>
+        </div>
+        </form>
+    </div>
     <div id="bulkContinentImport" class="faq-white-popup mfp-hide">
         <h2 style="text-align:center;" id="importContinentsHeader">Import Continents From File</h2>
         <form id="bulkContinentForm" action="">
@@ -1616,6 +1628,7 @@
     <input type="button" class="button" id="bulkImportStates" value="Bulk Import States" style="display:none;">
     <input type="button" class="button" id="bulkImportNations" value="Bulk Import Nations" style="display:none;">
     <input type="button" class="button" id="bulkImportContinents" value="Bulk Import Continents" style="display:none;">
+    <input type="button" class="button" id="bulkImportEthnicities" value="Bulk Import Ethnicities" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -2950,6 +2963,78 @@
         bulkImportData = data
     })
     
+    $("#bulkImportEthnicities").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-ethnicities', null)
+    })
+
+    $("#bulkEthnicityForm").on("submit", async function(e) {
+        e.preventDefault()
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let ethnicityNameArr = []
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("ETHNICITIES")
+        
+        for (const ethnicity of json) {
+            ethnicityNameArr.push(ethnicity.Name)
+             $("#ethnicityImportProgressLabel").text("Importing "+ethnicity.Name+"...")
+
+            $('#ethnicityImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(ethnicity.Name, null, 'ko')
+
+            max_ethnicity_id++
+            ethnicities_by_id[max_ethnicity_id] = ethnicity.Name
+            ethnicity_count++;
+
+            var ethnicity_obj = {}
+            ethnicity_obj.type = 'ethnicity'
+            ethnicity_obj.icon = './images/user-group-solid.svg'
+            ethnicity_obj.title = ethnicity.Name
+            ethnicity_obj.name_korean = nameK.translation
+            ethnicity_obj.id = max_ethnicity_id
+            ethnicity_obj.african = ethnicity.African
+            ethnicity_obj.asian = ethnicity.Asian
+            ethnicity_obj.east_indian = ethnicity.EastIndian
+            ethnicity_obj.caucasian = ethnicity.Caucasian
+            ethnicity_obj.hispanic = ethnicity.Hispanic
+            
+            world.addChildren(ethnicity_obj)
+            count++
+        }
+        $.magnificPopup.close()
+        ethnicityNameArr.sort()
+        world.sortChildren(null, true);
+        var ethnicity = world.findFirst(ethnicityNameArr[0])
+        world.setExpanded()
+        tree.activateKey(false)
+        ethnicity.setFocus()
+        ethnicity.setActive()
+        
+        $("#max_ethnicity_id").text(max_ethnicity_id)
+        $("#ethnicity_count").text(ethnicity_count)
+    })
+
+    ipcRenderer.on('bulk-ethnicity-import', (event, data) => {
+        if (JSON.parse(data).length < 1) {
+            alert("There don't appear to be any ethnicities in that file")
+            return false;
+        }
+        $("#importEthnicitiesHeader").html("Importing "+JSON.parse(data).length+" Ethnicities From File")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkEthnicityImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = data
+    })
+
     ipcRenderer.on('version-info', (event, data) => {
         currentVersion = data
         $("#currentVersion").text("Version "+currentVersion)
@@ -3443,6 +3528,7 @@
                         }
                         break;
                     case "ethnicity":
+                        console.log(node)
                         html = '<h2 style="text-align:center;"><img src="./images/people-group-solid.svg">Ethhnicities&nbsp;&rarr;&nbsp;<img src="./images/user-group-solid.svg">'+node.title+'</h2>\n'
                                 + "<div id='pieChart'>\n"
                                 + "<div data-lcolor='#623A17'>"+node.data.african/10+"<span>African</span></div>\n"
@@ -4387,7 +4473,8 @@
                 switch (node.type) {
                     case "ETHNICITIES_PARENT":
                         cmItems = {
-                            "add": {name: "Add Ethnicity", icon: 'fa-plus'}
+                            "add": {name: "Add Ethnicity", icon: 'fa-plus'},
+                            "file": {name: "Add Ethnicities From File", icon: 'fa-file-circle-plus'}
                         }
                         break;  
                     case "CONTINENTS_PARENT":
@@ -4491,8 +4578,15 @@
                         var m = "clicked: "+key
                         switch (node.type) {
                             case "ETHNICITIES_PARENT":
-                                $("#addEthnicityTrigger").click()
-                                break;  
+                                switch (key) {
+                                    case "add":
+                                        $("#addEthnicityTrigger").click()
+                                        break;
+                                    case "file":
+                                        $("#bulkImportEthnicities").trigger("click")
+                                        break;
+                                }
+                                break;
                             case "CONTINENTS_PARENT":
                                 switch (key) {
                                     case "add":

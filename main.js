@@ -289,6 +289,33 @@ ipcMain.on("bulk-import-continents", (event, data) => {
     })
 })
 
+ipcMain.on("bulk-import-ethnicities", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let responseData = null
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 3});
+                    event.sender.send('bulk-ethnicity-import', JSON.stringify(responseData))
+                } 
+            } catch (err) {
+                console.log(err)
+                event.sender.send('bulk-ethnicity-import', err)
+            }
+        } else {
+            event.sender.send('bulk-ethnicity-import', 'cancelled')
+        }
+    })
+})
+
 function isExcelFile(filePath) {
     try {
       const workbook = xlsx.readFile(filePath);
@@ -395,12 +422,12 @@ const template = [
         {
             label: 'Import From File',
             submenu: [
-                /* {
+                {
                     id: 'bulkEthnicityMenu',
                     click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
                     label: 'Import Ethnicities',
                     enabled: true
-                }, */
+                },
                 {
                     id: 'bulkContinentMenu',
                     click: () => mainWindow.webContents.send('bulk-add-continents','click'),
