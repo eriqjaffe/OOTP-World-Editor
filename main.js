@@ -458,6 +458,17 @@ function isExcelFile(filePath) {
     }
 }
 
+function openTemplate(filepath) {
+    let xlsx = path.join(filepath);
+    let xlsxtmp = path.join(app.getPath('temp', path.basename(xlsx)))
+    let tmpFile = path.join(xlsxtmp+"\\"+path.basename(xlsx))
+    let ws = fs.createWriteStream(tmpFile)
+    fs.createReadStream(filepath).pipe(ws)
+    ws.on('finish', () => {
+        shell.openPath(tmpFile);
+    })
+}
+
 const template = [
     ...(isMac ? [{
         label: app.name,
@@ -601,39 +612,39 @@ const template = [
             submenu: [     
                 {
                     id: 'continentTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\continents_template.csv"),
+                    click: () => openTemplate(path.join(__dirname,'/files/continents_template.csv')),
                     label: 'Continents',
                     enabled: true
                 },
                 {
                     id: 'nationTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\nations_template.csv"),
+                    click: () => openTemplate(path.join(__dirname+"\\files\\nations_template.csv")),
                     label: 'Nations',
                     enabled: true
                 },
                 {
                     id: 'stateTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\states_template.csv"),
+                    click: () => openTemplate(path.join(__dirname+"\\files\\states_template.csv")),
                     label: 'States',
                     enabled: true
                 },
                 {
                     id: 'cityTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\cities_template.csv"),
+                    click: () => openTemplate(path.join(__dirname+"\\files\\cities_template.csv")),
                     label: 'Cities',
                     enabled: true
                 },
                 { type: 'separator' },
                 {
                     id: 'ethnicityTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\ethnicities_template.csv"),
+                    click: () => openTemplate(path.join(__dirname+"\\files\\ethnicities_template.csv")),
                     label: 'Ethnicities',
                     enabled: true
                 },
                 {
                     id: 'regionTemplate',
-                    click: () => shell.openPath(__dirname+"\\files\\regions_template.csv"),
-                    label: 'Ethnicities',
+                    click: () => openTemplate(path.join(__dirname+"\\files\\regions_template.csv")),
+                    label: 'Regions',
                     enabled: true
                 },
             ]
