@@ -1,6 +1,6 @@
 {
   "name": "OOTP-World-Editor",
-  "version": "0.1.1-beta",
+  "version": "0.1.2-beta",
   "description": "A world_default.xml editor for OOTP Baseball",
   "main": "main.js",
   "author": "Eriq P Jaffe",
