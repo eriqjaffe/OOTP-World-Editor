@@ -43,3 +43,27 @@ ipcRenderer.on('close-xml', (event, data) => {
 ipcRenderer.on('about', (event, data) => {
     $("#about").trigger("click")
 });
+
+ipcRenderer.on('bulk-add-cities', (event, data) => {
+    $("#bulkImportCities").trigger("click", [-1, -1, -1])
+})
+
+ipcRenderer.on('bulk-add-states', (event, data) => {
+    $("#bulkImportStates").trigger("click", [-1, -1])
+})
+
+ipcRenderer.on('bulk-add-nations', (event, data) => {
+    $("#bulkImportNations").trigger("click", -1)
+})
+
+ipcRenderer.on('bulk-add-continents', (event, data) => {
+    $("#bulkImportContinents").trigger("click")
+})
+
+ipcRenderer.on('bulk-add-ethnicities', (event, data) => {
+    $("#bulkImportEthnicities").trigger("click")
+})
+
+ipcRenderer.on('bulk-add-regions', (event, data) => {
+    $("#bulkImportRegions").trigger("click")
+})

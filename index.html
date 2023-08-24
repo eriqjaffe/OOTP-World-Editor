@@ -22,6 +22,7 @@
     <link href="./scripts/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css" rel="stylesheet">
     <link href="./scripts/Select-1.7.0/css/select.dataTables.min.css" rel="stylesheet">
     <link href="./scripts/smart_wizard_all.min.css" rel="stylesheet" type="text/css" />
+    <link href="./scripts/jquery.lineProgressbar.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="./scripts/jquery.listtopie.css"/>
     <script type="text/javascript" src="./scripts/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="./scripts/jquery.fancytree.contextMenu.js"></script>
@@ -34,6 +35,7 @@
     <script type="text/javascript" src="./scripts/chroma.min.js"></script>
     <script src="./scripts/jquery.smartWizard.min.js" type="text/javascript"></script>
     <script src="https://kit.fontawesome.com/1bfcbf3745.js" crossorigin="anonymous"></script>
+    <script src="./scripts/jquery.lineProgressbar.js" type="text/javascript"></script>
     
     <script>
         const { ipcRenderer } = require('electron');
@@ -56,11 +58,13 @@
         const tzDisplay = { "-12.00": "(GMT-12:00) International Date Line West", "-11.00": "(GMT-11:00) Midway Island, Samoa", "-10.00": "(GMT-10:00) Hawaii", "-9.00": "(GMT-09:00) Alaska", "-8.00": "(GMT-08:00) Pacific Time (US &amp; Canada)", "-7.00": "(GMT-07:00) Mountain Time (US &amp; Canada)", "-6.00": "(GMT-06:00) Central Time (US &amp; Canada)", "-5.00": "(GMT-05:00) Eastern Time (US &amp; Canada)", "-4.00": "(GMT-04:00) Atlantic Time (Canada)", "-3.50": "(GMT-03:30) Newfoundland", "-3.00": "(GMT-03:00) Brasilia", "-2.00": "(GMT-02:00) Mid-Atlantic", "-1.00": "(GMT-01:00) Cape Verde Is." , "0.00": "(GMT+00:00) Greenwich Mean Time - Dublin, Edinburgh, Lisbon, London", "1.00": "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna" , "2.00": "(GMT+02:00) Cairo", "3.00": "(GMT+03:00) Moscow, St. Petersburg, Volgograd", "3.50": "(GMT+03:30) Tehran", "4.00": "(GMT+04:00) Abu Dhabi, Muscat" , "4.50": "(GMT+04:30) Kabul" , "5.00": "(GMT+05:00) Islamabad, Karachi, Tashkent", "5.50": "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi", "5.75": "(GMT+05:45) Kathmandu", "6.00": "(GMT+06:00) Almaty, Novosibirsk", "6.50": "(GMT+06:30) Yangon (Rangoon)", "7.00": "(GMT+07:00) Bangkok, Hanoi, Jakarta", "8.00": "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi" , "9.00": "(GMT+09:00) Osaka, Sapporo, Tokyo", "9.50": "(GMT+09:30) Adelaide, Darwin" , "10.00": "(GMT+10:00) Canberra, Melbourne, Sydney", "11.00": "(GMT+11:00) Magadan, Solomon Is., New Caledonia", "12.00": "(GMT+12:00) Auckland, Wellington" }
         const baseballQuality = { 0: "Non-Existent", 1: "Poor", 2: "Fair", 3: "Average", 4: "Good", 5: "Excellent" }
         const usa = { 0: "No", 1: "Yes" }
+        const hardcoded = { 0: "No", 1: "Yes" }
         const gender = { 0: "Male", 1: "Female" }
         const dst = { 0: "No", 1: "Yes"}
         const altitudes = { 0: "~0 m", 1: "~500 m", 2: "~1000 m", 3: "~1500 m", 4: "~2000 m", 5: "~2500 m", 6: "~3000 m" }
         let currentVersion = ""
         let newXML = false
+        let bulkImportData = null
 
         $.extend( $.fn.dataTable.defaults, {
             searching: false,
@@ -105,6 +109,10 @@
             color: black
         } 
         
+        .percentCount {
+            font-family: 'Lato', Helvetica, sans-serif; 
+            font-weight: 700; 
+        }
     </style>
 </head>
 <body>
@@ -297,6 +305,15 @@
                             </td>
                         </tr>
                         <tr>
+                            <td class="left">Use Hardcoded ML Player Origins</td>
+                            <td class="right">
+                                <select id="newNationHardcoded" class="defineHardcoded style="width:99%;">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="left">Name (Korean):</td>
                             <td class="right"><input type="text" class="centerText" id="newNationNameK" value=""></td>
                         </tr>
@@ -470,11 +487,11 @@
                         </tr>
                         <tr>
                             <td class="left">Latitude:</td>
-                            <td class="right"><input type="text" style="width:97%;" id="newCityLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                            <td class="right"><input type="text" style="width:97%;" class="newCityAltCalc" id="newCityLatitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
                         </tr>
                         <tr>
                             <td class="left">Longitude:</td>
-                            <td><input type="text" style="width:97%;" id="newCityLongitude" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
+                            <td><input type="text" style="width:97%;" id="newCityLongitude" class="newCityAltCalc" value="00.00000" pattern="-?\d{1,3}\.\d+"></td>
                         </tr>
                         <tr>
                             <td class="left">Altitude:</td>
@@ -768,6 +785,15 @@
                             <td class="left">"This Is The USA"?</td>
                             <td class="right">
                                 <select id="editNationUSA" class="defineUSA" style="width:99%;">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">Use Hardcoded ML Player Origins</td>
+                            <td class="right">
+                                <select id="editNationHardcoded" class="defineHardcoded" style="width:99%;">
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
                                 </select>
@@ -1118,10 +1144,6 @@
         </table>    
     </div>
 
-    <div id="wizardSplash" class="white-popup mfp-hide">
-        The wizard splash screen will go here!
-        <input type='button' id="wizardInit" value="Let's Go!">
-    </div>
     <div id="wizardContainer" class="white-popup mfp-hide">
         <div id="smartwizard">
             <ul class="nav">
@@ -1294,6 +1316,15 @@
                                 <td class="left">"This Is The USA"?</td>
                                 <td class="right">
                                     <select id="firstNationUSA" class="defineUSA" style="width:99%;">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left">Use Hardcoded ML Player Origins</td>
+                                <td class="right">
+                                    <select id="firstNationHardcoded" class="defineHardcoded" style="width:99%;">
                                         <option value="0">No</option>
                                         <option value="1">Yes</option>
                                     </select>
@@ -1486,6 +1517,114 @@
             <input type="button" id="warningAck" value="OK, OK, OK, I get it already.  Sheesh!">
 		</div>
     </div>
+    <div id="bulkRegionImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importRegionsHeader">Import Regions From File</h2>
+        <form id="bulkRegionForm" action="">
+        <br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Region">
+            <br><br>
+            <span id="regionImportProgressLabel">&nbsp;</span><br>
+            <div id="regionImportProgress"></div>
+        </div>
+        </form>
+    </div>
+    <div id="bulkEthnicityImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importEthnicitiesHeader">Import Ethnicities From File</h2>
+        <form id="bulkEthnicityForm" action="">
+        <br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Ethnicities">
+            <br><br>
+            <span id="ethnicityImportProgressLabel">&nbsp;</span><br>
+            <div id="ethnicityImportProgress"></div>
+        </div>
+        </form>
+    </div>
+    <div id="bulkContinentImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importContinentsHeader">Import Continents From File</h2>
+        <form id="bulkContinentForm" action="">
+        <br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Continents">
+            <br><br>
+            <span id="continentImportProgressLabel">&nbsp;</span><br>
+            <div id="continentImportProgress"></div>
+        </div>
+        </form>
+    </div>
+    <div id="bulkNationImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importNationsHeader">Import Nations From File</h2>
+        <form id="bulkNationForm" action="">
+        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+            <tbody>
+            <tr>
+                <td class="left">Continent:</td>
+                <td class="right"><select id="bulkNationContinent" style="width:99%;"></select></td>
+            </tr>
+            </tbody>
+        </table><br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Nations">
+            <br><br>
+            <span id="nationImportProgressLabel">&nbsp;</span><br>
+            <div id="nationImportProgress"></div>
+        </div>
+        </form>
+    </div>
+    <div id="bulkStateImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importStatesHeader">Import States From File</h2>
+        <form id="bulkStateForm" action="">
+        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+            <tbody>
+            <tr>
+                <td class="left">Continent:</td>
+                <td class="right"><select id="bulkStateContinent" style="width:99%;"></select></td>
+            </tr>
+            <tr>
+                <td class="left">Nation:</td>
+                <td class="right"><select id="bulkStateNation" style="width:99%;"></select></td>
+            </tr>
+            </tbody>
+        </table><br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import States">
+            <br><br>
+            <span id="stateImportProgressLabel">&nbsp;</span><br>
+            <div id="stateImportProgress"></div>
+        </div>
+        </form>
+    </div>
+    <div id="bulkCityImport" class="faq-white-popup mfp-hide">
+        <h2 style="text-align:center;" id="importCitiesHeader">Import Cities From File</h2>
+        <form id="bulkCityForm" action="">
+        <table class="headlessTable cell-border compact stripe" style="width:80%; margin:0 auto;">
+            <thead style="display:none;"><tr><td></td><td></td></tr></thead>
+            <tbody>
+            <tr>
+                <td class="left">Continent:</td>
+                <td class="right"><select id="bulkCityContinent" style="width:99%;"></select></td>
+            </tr>
+            <tr>
+                <td class="left">Nation:</td>
+                <td class="right"><select id="bulkCityNation" style="width:99%;"></select></td>
+            </tr>
+            <tr>
+                <td class="left">State:</td>
+                <td class="right"><select id="bulkCityState" style="width:99%;"></select></td>
+            </tr>
+            </tbody>
+        </table><br>
+        <div style="text-align:center;">
+            <input type="submit" class="submit" value="Import Cities">
+            <br><br>
+            <span id="cityImportProgressLabel"></span><br>
+            <div id="cityImportProgress"></div>
+        </div>
+        </form>
+    </div>
     <input type="button" id="loadXML" value="Load XML file" style="display: none;">
     <input type="button" id="saveXML" value="Save XML file" style="display: none;">
     <input type="button" id="closeXML" value="Close XML file" style="display: none;">
@@ -1497,6 +1636,12 @@
     <input type="button" class="button" id="addCityTrigger" value="Add City" style="display:none;">
     <input type="button" class="button" id="addRegionTrigger" value="Add Region" style="display:none;">
     <input type="button" class="button" id="about" value="About World Editor" style="display:none;">
+    <input type="button" class="button" id="bulkImportCities" value="Bulk Import Cities" style="display:none;">
+    <input type="button" class="button" id="bulkImportStates" value="Bulk Import States" style="display:none;">
+    <input type="button" class="button" id="bulkImportNations" value="Bulk Import Nations" style="display:none;">
+    <input type="button" class="button" id="bulkImportContinents" value="Bulk Import Continents" style="display:none;">
+    <input type="button" class="button" id="bulkImportEthnicities" value="Bulk Import Ethnicities" style="display:none;">
+    <input type="button" class="button" id="bulkImportRegions" value="Bulk Import Regions" style="display:none;">
     <div style="display:none;"><img src="./images/trash-solid.svg" id="rejectDrop" height="10px"></div>
     
 <script>
@@ -1504,22 +1649,30 @@
 
     var fancyTreeReady = false;
 
+    ipcRenderer.on('open-warning', (event, data) => {
+        $.magnificPopup.open({
+            items: {
+                src: '#warning',
+                type: 'inline'
+            },
+            focus: '#warningAck',
+            closeOnBgClick: false,
+            enableEscapeKey: false,
+            showCloseBtn:false
+        });
+    }) 
+
+     ipcRenderer.on('load-debug', (event, data) => {
+        console.log("loading debug!")
+        ipcRenderer.send('debug-load', null)
+    })
+
     $(document).ready(function() {
 
-        $.magnificPopup.open({
-		items: {
-			src: '#warning',
-			type: 'inline'
-		},
-        focus: '#warningAck',
-        closeOnBgClick: false,
-        enableEscapeKey: false,
-        showCloseBtn:false
-	});
+        ipcRenderer.send('check-for-debug', null)
 
         ipcRenderer.send('get-version', null)
-
-        //ipcRenderer.send('debug-load', null)
+        
         for (z of time_zones) {
             $(".tzSelect").each(function() {
                 $(this).append($('<option>', { value : z.tz })
@@ -1796,15 +1949,21 @@
     $("#newXML").on("click", function() {
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         if (tree != null) {
-            if (confirm("Do you want to save your current file?")) {
-                newXML = true
-                $("#saveXML").trigger("click")
-                //startNewXML()
+            if (confirm("Are you sure?  You currently have a file open.")) {
+                if (confirm("Do you want to save your current file?")) {
+                    newXML = true
+                    $("#saveXML").trigger("click")
+                    //startNewXML()
+                } else {
+                    newXML = false
+                    startNewXML()
+                    return
+                }        
             } else {
                 newXML = false
-                startNewXML()
-                return
-            }           
+            }
+        } else {
+            startNewXML()
         }
     })
 
@@ -1837,7 +1996,9 @@
         $("#max_ethnicity_id").text(max_ethnicity_id)
         $("#max_region_id").text(max_region_id)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
-        tree.destroy()
+        if (tree != null) { 
+            tree.destroy() 
+        }
 
         $.magnificPopup.open({
             items: {
@@ -2302,41 +2463,44 @@
         
         var regions = tree.findFirst("REGIONS")
         var reg = regions.toDict(true)
-        for (r of reg.children) {
-            xw.startElement("REGION")
-            .writeAttribute("id", r.data.id)
-            .writeAttribute("sort_order", r.data.sort_order)
-            .writeAttribute("name", r.title)
-            .writeAttribute("name_korean", r.data.title_korean)
-            if (r.data.cities.length > 0) {
-                xw.startElement("REGION_CITIES")
-                for (st of r.data.cities) {
-                    xw.startElement("REGION_CITY")
-                      .writeAttribute("id", st.id)
-                    .endElement()
+        if (reg.children != undefined) {
+            for (r of reg.children) {
+                xw.startElement("REGION")
+                .writeAttribute("id", r.data.id)
+                .writeAttribute("sort_order", r.data.sort_order)
+                .writeAttribute("name", r.title)
+                .writeAttribute("name_korean", r.data.title_korean)
+                if (r.data.cities.length > 0) {
+                    xw.startElement("REGION_CITIES")
+                    for (st of r.data.cities) {
+                        xw.startElement("REGION_CITY")
+                        .writeAttribute("id", st.id)
+                        .endElement()
+                    }
+                    xw.endElement()
+                }
+                if (r.data.states.length > 0) {
+                    xw.startElement("REGION_STATES")
+                    for (st of r.data.states) {
+                        xw.startElement("REGION_STATE")
+                        .writeAttribute("id", st.id)
+                        .endElement()
+                    }
+                    xw.endElement()
+                }
+                if (r.data.nations.length) {
+                    xw.startElement("REGION_NATIONS")
+                    for (st of r.data.nations) {
+                        xw.startElement("REGION_NATION")
+                        .writeAttribute("id", st.id)
+                        .endElement()
+                    }
+                    xw.endElement()
                 }
                 xw.endElement()
             }
-            if (r.data.states.length > 0) {
-                xw.startElement("REGION_STATES")
-                for (st of r.data.states) {
-                    xw.startElement("REGION_STATE")
-                      .writeAttribute("id", st.id)
-                    .endElement()
-                }
-                xw.endElement()
-            }
-            if (r.data.nations.length) {
-                xw.startElement("REGION_NATIONS")
-                for (st of r.data.nations) {
-                    xw.startElement("REGION_NATION")
-                      .writeAttribute("id", st.id)
-                    .endElement()
-                }
-                xw.endElement()
-            }
-            xw.endElement()
         }
+        
 
         xw.endElement()
 
@@ -2346,6 +2510,682 @@
         tmpXML = tmpXML.replace("-->","-->\n")
 
         ipcRenderer.send('save_xml',Buffer.from(tmpXML))
+    })
+
+    $("#bulkImportCities").on("click", function(e, c, n, s) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-cities', [c, n, s])
+    })
+
+    ipcRenderer.on('bulk-city-import', (event, data) => {
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any cities in that file")
+            return false;
+        }
+        $("#importCitiesHeader").html("Importing "+json.responseData.length+" Cities From File")
+        $('#bulkCityContinent').empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#bulkCityContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#bulkCityContinent")
+        if (json.continent > 0) {
+            $("#bulkCityContinent").val(json.continent)
+        }
+
+        $("#bulkCityContinent").trigger("change", [json.nation, json.state])
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkCityImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = JSON.stringify(json.responseData)
+    })
+
+    $("#bulkCityContinent").on("change", function(e, n, s) {      
+        $('#bulkCityNation').empty()
+        for (nation of nations_by_continent[$("#bulkCityContinent").val()]) {
+            $('#bulkCityNation')
+                .append($('<option>', { value : nation.id })
+                .text(nation.title));
+
+        }
+        sortDropdown("#bulkCityNation")
+        if (n > 0) {
+            $("#bulkCityNation").val(n)
+        }
+        $("#bulkCityNation").trigger("change", s)
+    })
+
+    $("#bulkCityNation").on("change", function(e, s) {
+        $('#bulkCityState').empty()
+        for (state of states_by_nation[$("#bulkCityNation").val()]) {
+            $('#bulkCityState')
+                .append($('<option>', { value : state.id })
+                .text(state.title));
+
+        }
+        sortDropdown("#bulkCityState")
+        if (s > 0) {
+            $("#bulkCityState").val(s)
+        }
+    })
+
+    $("#bulkCityForm").on("submit", async function(e) {
+        e.preventDefault();
+        let json = JSON.parse(bulkImportData);
+        let nation = findNation($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text());
+        let state = findState($("#bulkCityContinent option:selected").text(), $("#bulkCityNation option:selected").text(), $("#bulkCityState option:selected").text());
+        let count = 1
+        let cityNameArr = []
+        let newCap = -1
+
+        for (const city of json) {
+
+            cityNameArr.push(city.Name)
+
+            $("#cityImportProgressLabel").text("Importing "+city.Name+"...")
+
+            $('#cityImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(city.Name, null, 'ko')
+            let abbrK = await translate(city.Abbreviation, null, 'ko')
+            let altitude = 0
+            
+            if (parseInt(city.Altitude) < 0) {
+                altitude = getAltitudeEstimate(getElevationDataSync(parseFloat(city.Latitude).toFixed(5).toString(), parseFloat(city.Longitude).toFixed(5).toString()))
+            } else {
+                altitude = getAltitudeEstimate(parseInt(city.Altitude))
+            }
+
+            max_city_id++
+            var obj = {}
+            obj.name = city.Name
+            obj.state = $("#bulkCityState").val()
+            obj.nation = $("#bulkCityNation").val()
+            obj.continent = $("#bulkCityContinent").val()
+            cities_by_id[max_city_id] = obj
+            city_count++;
+            var city_obj = {}
+            var city_bn_obj = {}
+            city_obj.type = 'city'
+            city_obj.folder = false
+            if (parseInt(city.Capitol) == 1) {
+                city_obj.icon = './images/star-solid.svg'
+                newCap = max_city_id
+            } else {
+                city_obj.icon = './images/city-solid.svg'
+            }
+            city_obj.id = max_city_id
+            city_obj.title = city.Name
+            city_obj.title_korean = nameK.translation
+            city_obj.pop = parseInt(city.Population)
+            city_obj.lat = parseFloat(city.Latitude).toFixed(5).toString()
+            city_obj.long = parseFloat(city.Longitude).toFixed(5).toString()
+            city_obj.abbr = city.Abbreviation
+            city_obj.altitude = altitude
+            city_obj.abbr_korean = abbrK.translation
+            city_obj.time_zone = parseFloat(city.TimeZone).toFixed(2).toString()
+            city_obj.observes_dst = parseInt(city.DST)
+            city_obj.state = $("#bulkCityState").val()
+            city_obj.nation = $("#bulkCityNation").val()
+            $("#max_city_id").text(max_city_id)
+            $("#city_count").text(city_count)
+            state.addChildren(city_obj)
+            city_bn_obj.id = max_city_id
+            city_bn_obj.title = city.Name
+            city_bn_obj.state = $("#bulkCityState").val()
+            city_bn_obj.nation = $("#bulkCityNation").val()
+            cities_by_state[$("#bulkCityState").val()].push(city_obj)
+            cities_by_nation[$("#bulkCityNation").val()].push(city_bn_obj)
+            count++
+        }
+        cityNameArr.sort()
+        $.magnificPopup.close()
+        state.sortChildren(null, true);
+        state.setExpanded(true)
+        var node = state.findFirst(cityNameArr[0])
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+        if (newCap > 0) {
+            nation.data.capid = newCap
+            resetCaptiol(nation)
+        }
+    });
+
+    $("#bulkImportStates").on("click", function(e, c, n) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-states', [c, n])
+    })
+
+    ipcRenderer.on('bulk-state-import', (event, data) => {
+        console.log(JSON.parse(data))
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any states in that file")
+            return false;
+        }
+        $("#importStatesHeader").html("Importing "+json.responseData.length+" States From File")
+        $('#bulkStateContinent').empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#bulkStateContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#bulkStateContinent")
+        if (json.continent > 0) {
+            $("#bulkStateContinent").val(json.continent)
+        }
+        $("#bulkStateContinent").trigger("change", json.nation)
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkStateImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = JSON.stringify(json.responseData)
+    })
+
+    $("#bulkStateContinent").on("change", function(e, n) {
+        $('#bulkStateNation').empty()
+        for (nation of nations_by_continent[$("#bulkStateContinent").val()]) {
+            //console.log(nation.id, nation.title)
+            $('#bulkStateNation')
+                .append($('<option>', { value : nation.id })
+                .text(nation.title));
+
+        }
+        sortDropdown("#bulkStateNation")
+        if (n > 0) {
+            $("#bulkStateNation").val(n)
+        }
+    })
+
+    $("#bulkStateForm").on("submit", async function(e) {
+        e.preventDefault();
+        let json = JSON.parse(bulkImportData);
+        let nation = findNation($("#bulkStateContinent option:selected").text(), $("#bulkStateNation option:selected").text());
+        let states = nation.findFirst("States")
+        let count = 1
+        let stateNameArr = []
+        for (const state of json) {
+
+            stateNameArr.push(state.Name)
+
+            $("#stateImportProgressLabel").text("Importing "+state.Name+"...")
+
+            $('#stateImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(state.Name, null, 'ko')
+            let abbrK = await translate(state.Abbreviation, null, 'ko')
+
+            max_state_id++
+            states_by_id[max_state_id] = state.Name
+            state_count++;
+            var state_obj = {}
+            state_obj.type = 'state'
+            state_obj.folder = true
+            state_obj.icon = './images/landmark-flag-solid.svg'
+            state_obj.id = max_state_id
+            state_obj.title = state.Name
+            state_obj.title_korean = nameK.translation
+            state_obj.pop = state.Population
+            state_obj.abbr = state.Abbreviation
+            state_obj.abbr_korean = abbrK.translation
+            state_obj.time_zone = parseFloat(state.TimeZone).toFixed(2).toString()
+            state_obj.observes_dst = parseInt(state.DST)
+            state_obj.lat = parseFloat(state.Lat).toFixed(5).toString()
+            state_obj.long = parseFloat(state.Lat).toFixed(5).toString()
+            $("#max_state_id").text(max_state_id)
+            $("#state_count").text(state_count)
+            states.addChildren(state_obj)
+            states_by_nation[$("#bulkStateNation").val()].push(state_obj)
+            cities_by_state[max_state_id] = []
+            count++
+        }
+
+        $.magnificPopup.close()
+
+        stateNameArr.sort()
+        
+        states.sortChildren(null, true)
+        var node = states.findFirst(stateNameArr[0])
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+    })
+
+    $("#bulkImportNations").on("click", function(e, src) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-nations', src)
+    })
+
+    ipcRenderer.on('bulk-nation-import', (event, data) => {
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any nations in that file")
+            return false;
+        }
+        $("#importNationsHeader").html("Importing "+json.responseData.length+" Nations From File")
+        $('#bulkNationContinent').empty()
+        $.each(continents_by_id, function(key, value) {
+            $("#bulkNationContinent")
+                .append($('<option>', { value : key })
+                .text(value));
+        });
+        sortDropdown("#bulkNationContinent")
+        $("#bulkNationContinent").val((json.continent > 0) ? json.continent : 1)
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkNationImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = JSON.stringify(json.responseData)
+    })
+
+    $("#bulkNationForm").on("submit", async function(e) {
+        e.preventDefault();
+        let continent = findContinent($("#bulkNationContinent option:selected").text());
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let nationNameArr = []
+        var newUSAName = null;
+
+        for (const nation of json) {
+            nationNameArr.push(nation.Name)
+             $("#nationImportProgressLabel").text("Importing "+nation.Name+"...")
+
+            $('#nationImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(nation.Name, null, 'ko')
+            let abbrK = await translate(nation.Abbreviation, null, 'ko')
+            let demK = await translate(nation.Demonym, null, 'ko')
+
+            max_nation_id++
+            nations_by_id[max_nation_id] = nation.Name
+            nation_count++;
+            var nation_obj = {}
+            nation_obj.type = 'nation'
+            nation_obj.folder = true
+            nation_obj.icon = (parseInt(nation.IsUSA) == 1) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
+            nation_obj.id = max_nation_id
+            nation_obj.title = nation.Name
+            nation_obj.title_korean = nameK.translation
+            nation_obj.short_korean = ""
+            nation_obj.pop = parseInt(nation.Population)
+            nation_obj.etid = 0
+            nation_obj.capid = 0
+            nation_obj.gender = nation.Gender
+            nation_obj.bbqual = nation.BBQuality
+            nation_obj.abbr = nation.Abbreviation
+            nation_obj.abbr_korean = abbrK.translation
+            nation_obj.dem = nation.Demonym
+            nation_obj.dem_korean = demK.translation
+            nation_obj.time_zone = parseFloat(nation.TimeZone).toFixed(2).toString()
+            nation_obj.observes_dst = parseInt(nation.DST)
+            nation_obj.this_is_the_usa = parseInt(nation.IsUSA)
+            nation_obj.use_hardcoded_ml_player_origins = parseInt(nation.HardcodedOrigins)
+            var states_obj = {}
+            states_obj.title = "States"
+            states_obj.folder = true
+            states_obj.icon = './images/landmark-dome-solid.svg'
+            states_obj.type = "STATES_PARENT"
+            states_obj.children = ([])
+            var second_nations_obj = {}
+            second_nations_obj.title = "Second Nations"
+            second_nations_obj.folder = false
+            second_nations_obj.icon = './images/circle-plus-solid.svg'
+            second_nations_obj.type = 'second_nations'
+            second_nations_obj.subdata = []
+            var nation_eth_obj = {}
+            nation_eth_obj.title = "Ethnicities"
+            nation_eth_obj.folder = false
+            nation_eth_obj.icon = './images/user-group-solid.svg'
+            nation_eth_obj.type = 'nation_ethnicity'
+            nation_eth_obj.subdata = []
+            nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
+            //console.log(nation_obj)
+            continent.addChildren(nation_obj)
+            cities_by_nation[max_nation_id] = []
+            states_by_nation[max_nation_id] = []
+            nations_by_continent[$("#bulkNationContinent").val()].push(nation_obj)
+            $("#max_nation_id").text(max_nation_id)
+            $("#nation_count").text(nation_count)
+            $("#usa_defined_count").text(countUSA())
+            if (parseInt(nation.IsUSA) == 1) {
+                newUSAName = nation.Name
+            }
+            count++
+        }
+
+        if (newUSAName != null) {
+            var oldUSA = findNationFromScratch(usa)
+            var newUSA = continent.findFirst(newUSAName)
+            if (!confirm(oldUSA.title+" is already defined as the USA.\n\nAre you sure you want to change it to "+newUSAName+"?")) {
+                newUSA.data.this_is_the_usa = 0
+                newUSA.renderTitle()
+            } else {
+                oldUSA.data.this_is_the_usa = 0
+                oldUSA.icon = './images/flag-solid.svg'
+                oldUSA.renderTitle()
+                newUSA.icon = './images/flag-usa-solid.svg'
+                newUSA.renderTitle()
+            }
+        }
+
+        $.magnificPopup.close()
+        nationNameArr.sort()
+        continent.sortChildren(null, true)
+        var node = continent.findFirst(nationNameArr[0])
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        tree.activateKey(false)
+        node.setFocus()
+        node.setActive()
+        node.makeVisible({scrollIntoView: true});
+    })
+
+    $("#bulkImportContinents").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-continents', null)
+    })
+
+    $("#bulkContinentForm").on("submit", async function(e) {
+        e.preventDefault();
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let continentNameArr = []
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("CONTINENT")
+        
+        for (const continent of json) {
+            continentNameArr.push(continent.Name)
+             $("#continentImportProgressLabel").text("Importing "+continent.Name+"...")
+
+            $('#continentImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(continent.Name, null, 'ko')
+            let abbrK = await translate(continent.Abbreviation, null, 'ko')
+            let demK = await translate(continent.Demonym, null, 'ko')
+
+            max_continent_id++
+            continents_by_id[max_continent_id] = continent.Name
+            continent_count++;
+
+            var continent_obj = {}
+            continent_obj.type = 'continent'
+            continent_obj.folder = true
+            continent_obj.icon = './images/earth-americas-solid.svg'
+            continent_obj.id = max_continent_id
+            continent_obj.title = continent.Name
+            continent_obj.title_korean = nameK.translation
+            continent_obj.pop = continent.Population
+            continent_obj.etid = 0
+            continent_obj.abbr = continent.Abbreviation
+            continent_obj.dem = continent.Demonym
+            continent_obj.abbr_korean =  abbrK.translation
+            continent_obj.dem_korean = demK.translation
+            nations_by_continent[max_continent_id] = []
+            
+            world.addChildren(continent_obj)
+            count++
+        }
+        $.magnificPopup.close()
+        continentNameArr.sort()
+        world.sortChildren(null, true);
+        var continent = world.findFirst(continentNameArr[0])
+        world.setExpanded()
+        tree.activateKey(false)
+        continent.setFocus()
+        continent.setActive()
+        
+        $("#max_continent_id").text(max_continent_id)
+        $("#continent_count").text(continent_count)
+    })
+
+    ipcRenderer.on('bulk-continent-import', (event, data) => {
+        let json = JSON.parse(data)
+        console.log(json)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any nations in that file")
+            return false;
+        }
+        $("#importContinentsHeader").html("Importing "+json.responseData.length+" Continents From File")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkContinentImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = JSON.stringify(json.responseData)
+    })
+    
+    $("#bulkImportEthnicities").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-ethnicities', null)
+    })
+
+    $("#bulkEthnicityForm").on("submit", async function(e) {
+        e.preventDefault()
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let ethnicityNameArr = []
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("ETHNICITIES")
+        
+        for (const ethnicity of json) {
+            ethnicityNameArr.push(ethnicity.Name)
+             $("#ethnicityImportProgressLabel").text("Importing "+ethnicity.Name+"...")
+
+            $('#ethnicityImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(ethnicity.Name, null, 'ko')
+
+            max_ethnicity_id++
+            ethnicities_by_id[max_ethnicity_id] = ethnicity.Name
+            ethnicity_count++;
+
+            var ethnicity_obj = {}
+            ethnicity_obj.type = 'ethnicity'
+            ethnicity_obj.icon = './images/user-group-solid.svg'
+            ethnicity_obj.title = ethnicity.Name
+            ethnicity_obj.name_korean = nameK.translation
+            ethnicity_obj.id = max_ethnicity_id
+            ethnicity_obj.african = ethnicity.African
+            ethnicity_obj.asian = ethnicity.Asian
+            ethnicity_obj.east_indian = ethnicity.EastIndian
+            ethnicity_obj.caucasian = ethnicity.Caucasian
+            ethnicity_obj.hispanic = ethnicity.Hispanic
+            
+            world.addChildren(ethnicity_obj)
+            count++
+        }
+        $.magnificPopup.close()
+        ethnicityNameArr.sort()
+        world.sortChildren(null, true);
+        var ethnicity = world.findFirst(ethnicityNameArr[0])
+        world.setExpanded()
+        tree.activateKey(false)
+        ethnicity.setFocus()
+        ethnicity.setActive()
+        
+        $("#max_ethnicity_id").text(max_ethnicity_id)
+        $("#ethnicity_count").text(ethnicity_count)
+    })
+
+    ipcRenderer.on('bulk-ethnicity-import', (event, data) => {
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any ethnicities in that file")
+            return false;
+        }
+        $("#importEthnicitiesHeader").html("Importing "+json.responseData.length+" Ethnicities From File")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkEthnicityImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = JSON.stringify(json.responseData)
+    })
+
+    $("#bulkImportRegions").on("click", function(e) {
+        e.preventDefault()
+        ipcRenderer.send('bulk-import-regions', null)
+    })
+
+    $("#bulkRegionForm").on("submit", async function(e) {
+        e.preventDefault()
+        let json = JSON.parse(bulkImportData);
+        let count = 1
+        let regionNameArr = []
+
+        var tree = $.ui.fancytree.getTree("#xmlOutput")
+        var world = tree.findFirst("REGIONS")
+        
+        for (const region of json) {
+            regionNameArr.push(region.Name)
+            $("#regionImportProgressLabel").text("Importing "+region.Name+"...")
+
+            $('#regionImportProgress').LineProgressbar({
+                duration: 100,
+                percentage: (count/json.length)*100
+            });
+
+            let nameK = await translate(region.Name, null, 'ko')
+
+            max_region_id++
+            regions_by_id[max_region_id] = region.Name
+            region_count++;
+
+            let cities = (region.Cities != undefined) ? region.Cities.split("x") : []
+            let states = (region.States != undefined) ? region.States.split("x") : []
+            let nations = (region.Nations != undefined) ? region.Nations.split("x") : []
+
+            console.log(nations)
+
+            var region_obj = {}
+            region_obj.type = 'region'
+            region_obj.folder = true
+            region_obj.icon = "./images/map-location-dot-solid.svg"
+            region_obj.id = max_region_id
+            region_obj.title = region.Name
+            region_obj.sort_order = 0
+            region_obj.name_korean = nameK.translation
+            var city_arr = []
+            var state_arr = []
+            var nation_arr = []
+            try {
+                for (city of cities) {
+                    if (cities_by_id[city] != undefined) {
+                        var city_obj ={}
+                        city_obj.title = cities_by_id[city].name
+                        city_obj.id = city
+                        city_arr.push(city_obj)
+                    }
+                }
+            } catch (err) {}
+            try {
+                for (state of states) {
+                    if (states_by_id[state] != undefined) {
+                        var state_obj = {}
+                        state_obj.title = states_by_id[state]
+                        state_obj.id = state
+                        state_arr.push(state_obj)
+                    }
+                }
+            } catch (err) {}
+            try {
+                for (nation of nations) {
+                    if (nations_by_id[nation] != undefined) {
+                        var nation_obj = {}
+                        nation_obj.title = nations_by_id[nation]
+                        nation_obj.id = nation
+                        nation_arr.push(nation_obj)
+                    }
+                }
+            } catch (err) {}
+            region_obj.nations = nation_arr
+            region_obj.states = state_arr
+            region_obj.cities = city_arr
+            
+            world.addChildren(region_obj)
+            count++
+        }
+        $.magnificPopup.close()
+        regionNameArr.sort()
+        world.sortChildren(null, true);
+        var region = world.findFirst(regionNameArr[0])
+        world.setExpanded()
+        tree.activateKey(false)
+        region.setFocus()
+        region.setActive()
+        
+        $("#max_region_id").text(max_region_id)
+        $("#region_count").text(region_count)
+    })
+
+    ipcRenderer.on('bulk-region-import', (event, data) => {
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any regions in that file")
+            return false;
+        }
+        $("#importRegionsHeader").html("Importing "+json.responseData.length+" Regions From File")
+        $.magnificPopup.open({
+            items: {
+                src: '#bulkRegionImport',
+                type: 'inline'
+            }
+        });
+        bulkImportData = JSON.stringify(json.responseData)
     })
 
     ipcRenderer.on('version-info', (event, data) => {
@@ -2479,7 +3319,8 @@
                     nation_obj.dem_korean = (nation.$.dem_korean != undefined) ? nation.$.dem_korean : ""
                     nation_obj.time_zone = parseFloat(nation.$.time_zone).toFixed(2).toString()
                     nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
-                    nation_obj.this_is_the_usa = (usa != undefined) ? 1 : 0
+                    nation_obj.this_is_the_usa = (usa != undefined) ? "1" : "0"
+                    nation_obj.use_hardcoded_ml_player_origins = (nation.$.use_hardcoded_ml_player_origins != undefined) ? nation.$.use_hardcoded_ml_player_origins : "0"
                     if (nation_obj.this_is_the_usa == 1) { usa_defined.push(nation_obj.id) }
                     if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
                     var second_nations_obj = {}
@@ -2488,7 +3329,7 @@
                     second_nations_obj.icon = './images/circle-plus-solid.svg'
                     second_nations_obj.type = 'second_nations'
                     var second_nations_arr = []
-                    if (nation.SECOND_NATIONS != undefined) {
+                    if (nation.SECOND_NATIONS != undefined && nation.SECOND_NATIONS[0].SECOND_NATIONS != undefined) {
                         for (sn of nation.SECOND_NATIONS[0].SECOND_NATIONS) {
                             var sn_obj = {}
                             sn_obj.id = sn.$.id
@@ -2553,7 +3394,11 @@
                                 var city_bn_obj = {}
                                 city_obj.type = 'city'
                                 city_obj.folder = false
-                                city_obj.icon = './images/city-solid.svg'
+                                if (nation.$.capid == city.$.id) {
+                                    city_obj.icon = './images/star-solid.svg'
+                                } else {
+                                    city_obj.icon = './images/city-solid.svg'
+                                }
                                 city_obj.id = city.$.id
                                 city_obj.title = city.$.name
                                 city_obj.title_korean = (city.$.name_korean != undefined) ? city.$.name_korean : ""
@@ -2654,6 +3499,11 @@
             alert("cancelled!")
         }
     });
+
+    ipcRenderer.on('elevation-retrieved', (event, result) => {
+        var json = JSON.parse(result)
+        $(json.target).val(getAltitudeEstimate(json.results[0].elevation))
+    })
 
     function initTree(json) {
         $("#xmlOutput").fancytree({
@@ -2831,6 +3681,7 @@
                         }
                         break;
                     case "ethnicity":
+                        console.log(node)
                         html = '<h2 style="text-align:center;"><img src="./images/people-group-solid.svg">Ethhnicities&nbsp;&rarr;&nbsp;<img src="./images/user-group-solid.svg">'+node.title+'</h2>\n'
                                 + "<div id='pieChart'>\n"
                                 + "<div data-lcolor='#623A17'>"+node.data.african/10+"<span>African</span></div>\n"
@@ -3019,11 +3870,12 @@
                                 + '<tr class="blank"><td class="left_float">Abbreviation:</td><td class="right_float">'+node.data.abbr+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Demonym:</td><td class="right_float" >'+node.data.dem+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Population:</td><td class="right_float" >'+pop+'</td></tr>\n'
-                                + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" >'+cap+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Capitol:</td><td class="right_float" ><span id="capDisplaySpan">'+cap+'<span></td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Time Zone:</td><td class="right_float" >'+tzDisplay[node.data.time_zone]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Ethnicity ID:</td><td class="right_float" >'+node.data.etid+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Baseball Quality:</td><td class="right_float" >'+baseballQuality[node.data.bbqual]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">This is the USA:</td><td class="right_float" >'+usa[node.data.this_is_the_usa]+'</td></tr>\n'
+                                + '<tr class="blank"><td class="left_float">Use Hardcoded ML Player Origins:</td><td class="right_float" >'+hardcoded[node.data.this_is_the_usa]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Gender:</td><td class="right_float" >'+gender[node.data.gender]+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Name (Korean):</td><td class="right_float" >'+node.data.title_korean+'</td></tr>\n'
                                 + '<tr class="blank"><td class="left_float">Short (Korean):</td><td class="right_float" >'+node.data.short_korean+'</td></tr>\n'
@@ -3127,6 +3979,7 @@
                         })
                         break;
                     case "city":
+                        console.log(node)
                         var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
                         var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
                         var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
@@ -3773,12 +4626,14 @@
                 switch (node.type) {
                     case "ETHNICITIES_PARENT":
                         cmItems = {
-                            "add": {name: "Add Ethnicity", icon: 'fa-plus'}
+                            "add": {name: "Add Ethnicity", icon: 'fa-plus'},
+                            "file": {name: "Add Ethnicities From File", icon: 'fa-file-circle-plus'}
                         }
                         break;  
                     case "CONTINENTS_PARENT":
                         cmItems = {
-                            "add": {name: "Add Continent", icon: 'fa-plus'}
+                            "add": {name: "Add Continent", icon: 'fa-plus'},
+                            "file": {name: "Add Continents From File", icon: 'fa-file-circle-plus'}
                         }
                         break;  
                     case "REGIONS_PARENT":
@@ -3791,6 +4646,7 @@
                             "edit": {name: "Edit \""+node.title +"\"", icon: 'fa-pen-to-square'},
                             "sep1": "----",
                             "add": {name: "Add Nation", icon: 'fa-plus'},
+                            "file": {name: "Add Nations From File", icon: 'fa-file-circle-plus'},
                             "sep2": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
@@ -3802,6 +4658,7 @@
                             "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
                             "addState": {name: "Add State", icon: 'fa-plus'},
+                            "addStatesFromFile": {name: "Add States From File", icon: 'fa-file-circle-plus'},
                             "addSecondNation": {name: "Add Second Nation", icon: 'fa-plus'},
                             "addEthnicity": {name: "Add Ethnicity", icon: 'fa-plus'},
                             "sep3": "----",
@@ -3811,6 +4668,7 @@
                     case "STATES_PARENT":
                         cmItems = {
                             "add": {name: "Add State", icon: 'fa-plus'},
+                            "file": {name: "Add States From File", icon: 'fa-file-circle-plus'},
                         }
                         break;
                     case "state":
@@ -3820,6 +4678,7 @@
                             "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
                             "add": {name: "Add City", icon: 'fa-plus'},
+                            "file": {name: "Add Cities From File", icon: 'fa-file-circle-plus'},
                             "sep3": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
@@ -3830,6 +4689,8 @@
                             "sep1": "----",
                             "move": {name: "Move \""+node.title +"\"", icon: 'fa-arrow-right-arrow-left'},
                             "sep2": "----",
+                            "setCap": {name: "Set \""+node.title +"\" as Captiol", icon: 'fa-arrow-right-arrow-left'},
+                            "sep3": "----",
                             "delete": {name: "Delete \""+node.title +"\"", icon: 'delete'},
                         }
                         break;
@@ -3870,12 +4731,22 @@
                         var m = "clicked: "+key
                         switch (node.type) {
                             case "ETHNICITIES_PARENT":
-                                $("#addEthnicityTrigger").click()
-                                break;  
+                                switch (key) {
+                                    case "add":
+                                        $("#addEthnicityTrigger").click()
+                                        break;
+                                    case "file":
+                                        $("#bulkImportEthnicities").trigger("click")
+                                        break;
+                                }
+                                break;
                             case "CONTINENTS_PARENT":
                                 switch (key) {
                                     case "add":
                                         $("#addContinentTrigger").click()
+                                        break;
+                                    case "file":
+                                        $("#bulkImportContinents").trigger("click")
                                         break;
                                 }
                                 break;  
@@ -3888,6 +4759,9 @@
                                 switch (key) {
                                     case "add":
                                         addNation(node.data.id)
+                                        break;
+                                    case "file":
+                                        addNationsFromFile(node.data.id);
                                         break;
                                     case "delete":
                                         if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s nations, states and cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
@@ -3908,6 +4782,9 @@
                                         addState(node.parent.data.id,node.data.id)
                                         //$("#addStateTrigger").click()
                                         break;
+                                    case "addStatesFromFile":
+                                        $("#bulkImportStates").trigger("click", [node.parent.data.id, node.data.id])
+                                        break;
                                     case "addSecondNation":
                                         addSecondNation(node.id)
                                         break;
@@ -3925,8 +4802,14 @@
                                 }
                                 break;
                             case "STATES_PARENT":
-                                addState(node.parent.parent.data.id,node.parent.data.id)
-                                break;
+                                switch (key) {
+                                    case "add":
+                                        addState(node.parent.parent.data.id,node.parent.data.id)
+                                        break;
+                                    case "file":
+                                        $("#bulkImportStates").trigger("click", [node.parent.parent.data.id, node.parent.data.id])
+                                        break;
+                                }
                             case "state":
                                 switch (key) {
                                     case "edit":
@@ -3935,6 +4818,9 @@
                                     case "add":
                                         //$("#addCityTrigger").click()
                                         addCity(node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id)
+                                        break;
+                                    case "file":
+                                        $("#bulkImportCities").trigger("click", [node.parent.parent.parent.data.id, node.parent.parent.data.id, node.data.id])
                                         break;
                                     case "delete":
                                         if (confirm("Are you sure you want to delete "+node.title+"?\n\nThis will delete all of "+node.title+"'s cities as well!\n\nThis action can not be undone and may have unintended consequences!")) {
@@ -3958,6 +4844,12 @@
                                         break;
                                     case "move":
                                         moveCity(node)
+                                        break;
+                                    case "setCap":
+                                        //console.log(node.data.id, node.title)
+                                        node.parent.parent.parent.data.capid = node.data.id
+                                        //console.log(node.parent.parent.parent.data)
+                                        resetCaptiol(node.parent.parent.parent)   
                                         break;
                                 }
                                 break;
@@ -4178,6 +5070,7 @@
             $('#editNationCapitolState').val("0")
         }
         $("#editNationUSA").val(node.data.this_is_the_usa)
+        $("#editNationHardcoded").val(node.data.use_hardcoded_ml_player_origins)
         rightDivContent("#editNation")
     }
 
@@ -4414,6 +5307,11 @@
         rightDivContent("#addNation")
     }
 
+    function addNationsFromFile(continent) {
+        $("#bulkImportNations").trigger("click", continent)
+        $("#bulkNationContinent").val(continent).trigger("change")
+    }
+
     function addState(continent,nation) {
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var con = tree.findFirst("CONTINENTS")
@@ -4465,7 +5363,7 @@
     $("#newStateNation").on("change",function() {
         n = findNation($("#newStateContinent option:selected").text(), $("#newStateNation option:selected" ).text())
         $("#newStateTimeZone").val(n.data.time_zone)
-    })
+    })  
 
     function addSecondNation(nation) {
         console.log(nation)
@@ -4486,7 +5384,6 @@
     }
 
     function findNation(continent, nation) {
-        console.log(continent, nation)
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var con = findContinent(continent)
         var arr = con.findAll(nation) 
@@ -4596,6 +5493,18 @@
             return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
         }))
         $("#newCityState").trigger("change")
+    })
+
+    $(".newCityAltCalc").on("change",function() {
+        ipcRenderer.send('get-elevation',[$("#newCityLatitude").val(),$("#newCityLongitude").val(),"#newCityAltitude"])
+    })
+
+    $(".editCityAltCalc").on("change", function() {
+        ipcRenderer.send('get-elevation',[$("#editCityLatitude").val(),$("#editCityLongitude").val(),"#editCityAltitude"])
+    })
+
+    $(".firstwCityAltCalc").on("change", function() {
+        ipcRenderer.send('get-elevation',[$("#firstCityLatitude").val(),$("#firstCityLongitude").val(),"#firstCityAltitude"])
     })
 
     $(".toKorean").on("keyup",function() {
@@ -4714,6 +5623,7 @@
         ethnicity_obj.hispanic = $("#firstEthnicityHispanic").val()
         ethnicities.push(ethnicity_obj)
         ethnicities_arr.children = ethnicities
+        ethnicities_by_id[1] = $("#firstEthnicityName").val()
         max_ethnicity_id++
         ethnicity_count++
 
@@ -4754,6 +5664,7 @@
         nation_obj.time_zone = $("#firstNationTimeZone").val()
         nation_obj.observes_dst = $("#firstNationDST").val()
         nation_obj.this_is_the_usa = $("#firstNationUSA").val()
+        nation_obj.use_hardcoded_ml_player_origins = $("#firstNationHardcoded").val()
         nation_obj.children = []
         nations.push(nation_obj)
         nations_by_id[1] = $("#firstNationName").val()
@@ -4943,6 +5854,7 @@
         nation_obj.time_zone = $("#newNationTimeZone").val()
         nation_obj.observes_dst = $("#newNationDST").val()
         nation_obj.this_is_the_usa = $("#newNationUSA").val()
+        nation_obj.use_hardcoded_ml_player_origins = $("#newNationHardcoded").val()
         var states_obj = {}
         states_obj.title = "States"
         states_obj.folder = true
@@ -5083,6 +5995,10 @@
         city_obj.observes_dst = $("#newCityDST").val()
         city_obj.state = $("#newCityState").val()
         city_obj.nation = $("#newCityNation").val()
+        city_bn_obj.id = $("#newCityId").val()
+        city_bn_obj.title = $("#newCityName").val()
+        city_bn_obj.state = $("#newCityState").val()
+        city_bn_obj.nation = $("#newCityNation").val()
         if (parseInt($("#newCityId").val()) > max_city_id) { max_city_id = parseInt($("#newCityId").val()) }
         $("#max_city_id").text(max_city_id)
         $("#city_count").text(city_count)
@@ -5098,6 +6014,7 @@
         cities_by_nation[$("#newCityNation").val()].push(city_bn_obj)
         if ($("#newCityCapitol").val() == 1) {
             nation.data.capid = $("#newCityId").val()
+            resetCaptiol(nation)
         }
     })
 
@@ -5205,6 +6122,7 @@
         nodeToEdit.title_korean = $("#editCityNameK").val()
         if ($("#editCityCapitol").val() == "1") {
             nodeToEdit.parent.parent.parent.data.capid = $("#editCityId").val()
+            resetCaptiol(nodeToEdit.parent.parent.parent)
         }
         scrollToEditedNode("CONTINENTS")
         var tree = $.ui.fancytree.getTree("#xmlOutput")
@@ -5212,6 +6130,27 @@
         nodeToEdit.setFocus()
         nodeToEdit.setActive()
     })
+
+    function resetCaptiol (nation) {
+        nation.visit(function(n){
+            if (n.type == "city") {
+                if (n.data.id == nation.data.capid) {
+                    n.icon = './images/star-solid.svg'
+                } else {
+                    n.icon = './images/city-solid.svg'
+                }
+                n.renderTitle()
+            }
+        });
+        // if the nation is the "active" node, update the capitol display span
+        var city = cities_by_nation[nation.data.id].find( function( city ){
+            return city.id === nation.data.capid;
+        } );
+        if (city != null) {
+            $("#capDisplaySpan").text(city.title+", "+states_by_id[city.state])
+            //cap = city.title+",&nbsp;"+states_by_id[city.state]
+        }
+    }
 
     $("#moveNationForm").on("submit", function(e) {
         e.preventDefault()
@@ -5411,5 +6350,70 @@
         $("#infoPanel").html("")
         rightDivContent("#infoPanel")
     }
+
+    function getAltitudeEstimate(x) {
+        let valuesArray = [0, 500, 1000, 1500, 2000, 2500, 3000]
+        let closestValue = valuesArray[0]; // Initialize with the first value in the array
+        let minDifference = Math.abs(x - valuesArray[0]); // Initialize with the difference between x and the first value
+
+        for (let i = 1; i < valuesArray.length; i++) {
+            const difference = Math.abs(x - valuesArray[i]);
+            
+            if (difference < minDifference) {
+            minDifference = difference;
+            closestValue = valuesArray[i];
+            }
+        }
+
+        switch (closestValue) {
+            case 0:
+                return 0;
+                break;
+            case 500:
+                return 1;
+                break;
+            case 1000:
+                return 2;
+                break;
+            case 1500:
+                return 3;
+                break;
+            case 2000:
+                return 4;
+                break;
+            case 2500:
+                return 5;
+                break;
+            case 3000:
+                return 6;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+
+    function getElevationDataSync(lat, lon) {
+        const url = "https://api.open-elevation.com/api/v1/lookup?locations="+lat+","+lon
+
+        const request = new XMLHttpRequest();
+        request.open('GET', url, false); // Passing `false` for synchronous
+
+        request.send();
+
+        if (request.status === 200) {
+            const data = JSON.parse(request.responseText);
+            if (data.results && data.results.length > 0) {
+                return data.results[0].elevation;
+            } else {
+                console.log("no elevation data available")
+                return 0
+            }
+        } else {
+            console.log(`Request failed with status ${request.status}`)
+            return 0
+        }
+    }
+    
     </script>
 </html>

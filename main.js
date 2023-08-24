@@ -3,7 +3,10 @@ const xml2js = require("xml2js");
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
+const https = require('https')
 const increment = require('add-filename-increment');
+const xlsx = require('xlsx')
+const { translate } = require('bing-translate-api');
 
 const tempDir = os.tmpdir()
 
@@ -22,6 +25,47 @@ ipcMain.on('menu-reset', (event,arg) => {
     Menu.getApplicationMenu().getMenuItemById('addStateMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addCityMenu').enabled = false
     Menu.getApplicationMenu().getMenuItemById('addRegionMenu').enabled = false */
+})
+
+ipcMain.on('get-elevation', (event, arg) => {
+    let url = "https://api.open-elevation.com/api/v1/lookup?locations="+arg[0]+","+arg[1]
+    https.get(url,(res) => {
+        let body = ""
+        res.on("data", (chunk) => {
+            body += chunk
+        })
+        res.on("end", () => {
+            try {
+                let json = JSON.parse(body)
+                json.target = arg[2]
+                event.sender.send('elevation-retrieved', JSON.stringify(json))
+            } catch (error) {
+                console.error(error.message)
+            }
+        })  
+    }).on("error", (error) => {
+        console.error(error.message)
+    })
+})
+
+ipcMain.on('get-elevation-sync', (event, arg) => {
+    let url = "https://api.open-elevation.com/api/v1/lookup?locations="+arg[0]+","+arg[1]
+    https.get(url,(res) => {
+        let body = ""
+        res.on("data", (chunk) => {
+            body += chunk
+        })
+        res.on("end", () => {
+            try {
+                let json = JSON.parse(body)
+                event.returnValue = json.elevation
+            } catch (error) {
+                event.returnValue = 0
+            }
+        })  
+    }).on("error", (error) => {
+        event.returnValue = 0
+    })
 })
 
 ipcMain.on('debug-load', (event, arg) => {
@@ -116,7 +160,316 @@ ipcMain.on('save_xml', (event, data) => {
     })
 })
 
-  const template = [
+ipcMain.on("check-for-debug", (event, data) => { 
+    if (!app.isPackaged) {
+        mainWindow.webContents.openDevTools()
+        event.sender.send('load-debug', null)
+    } else {
+        event.sender.send('open-warning', null)
+    }
+})
+
+function compareHeaders(type, sheet, headerRow) {
+    let expectedHeaders = null;
+    switch (type) {
+        case "city":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Population","3":"TimeZone","4":"Capitol","5":"DST","6":"Latitude","7":"Longitude","8":"Altitude"}'
+            break;
+        case "state":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Population","3":"TimeZone","4":"DST","5":"Latitude","6":"Longitude"}'
+            break;
+        case "nation":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Demonym","3":"Population","4":"Gender","5":"BBQuality","6":"DST","7":"IsUSA","8":"HardcodedOrigins","9":"TimeZone"}'
+            break;
+        case "continent":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Demonym","3":"Population"}'
+            break;
+        case "ethnicity":
+            expectedHeaders = '{"0":"Name","1":"African","2":"Asian","3":"EastIndian","4":"Caucasian","5":"Hispanic"}'
+            break;
+        case "region":
+            expectedHeaders = '{"0":"Name","1":"Nations","2":"States","3":"Cities"}'
+            break;
+        default:
+            return false;
+    }
+    const headers = {};
+    const range = xlsx.utils.decode_range(sheet['!ref']);
+    let C;
+    /* start in the first row */
+    for (C = range.s.c; C <= range.e.c; ++C) {
+        /* walk every column in the range */
+        const cell = sheet[xlsx.utils.encode_cell({ c: C, r: headerRow })];
+        /* find the cell in the first row */
+        let hdr = C; // <-- replace with your desired default
+        if (cell && cell.t) hdr = xlsx.utils.format_cell(cell);
+        headers[C] = hdr;
+    }
+    if (JSON.stringify(headers) == expectedHeaders) { return true } else { return false }
+}
+
+ipcMain.on("bulk-import-cities", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let headerRow = 6
+            let dataOut = {}
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (compareHeaders("city", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.continent = data[0]
+                        dataOut.nation = data[1]
+                        dataOut.state = data[2]
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+                    }
+                    
+                } 
+            } catch (err) {
+                console.log(err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+            }
+        } else {
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+        }
+    })
+})
+
+ipcMain.on("bulk-import-states", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let dataOut = {}
+            let headerRow = 5
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (compareHeaders("state", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.continent = data[0]
+                        dataOut.nation = data[1]
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+                    }
+                } 
+            } catch (err) {
+                console.log(err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+            }
+        } else {
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+        }
+    })
+})
+
+ipcMain.on("bulk-import-nations", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let dataOut = {}
+            let headerRow = 6
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (compareHeaders("nation", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.continent = data[0]
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+                    }
+                } 
+            } catch (err) {
+                console.log(err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+            }
+        } else {
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+        }
+    })
+})
+
+ipcMain.on("bulk-import-continents", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let dataOut = {}
+            let headerRow = 0
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (compareHeaders("continent", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
+                    }
+                } 
+            } catch (err) {
+                console.log(err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
+            }
+        } else {
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
+        }
+    })
+})
+
+ipcMain.on("bulk-import-ethnicities", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let dataOut = {}
+            let headerRow = 3
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (compareHeaders("ethnicity", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
+                    }
+                } 
+            } catch (err) {
+                console.log(err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
+            }
+        } else {
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
+        }
+    })
+})
+
+ipcMain.on("bulk-import-regions", (event, data) => {
+    const options = {
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Excel or CSV files', extensions: ['xlsx', 'csv'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+            let dataOut = {}
+            let headerRow = 3
+            try {
+                if (isExcelFile(result.filePaths[0])) {
+                    let workbook = xlsx.readFile(result.filePaths[0])
+                    let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (compareHeaders("region", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow, raw: true, cellDates: false});
+                        event.sender.send('bulk-region-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-region-import', JSON.stringify(dataOut))
+                    }  
+                } 
+            } catch (err) {
+                console.log(err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-region-import', JSON.stringify(dataOut))
+            }
+        } else {
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-region-import', JSON.stringify(dataOut))
+        }
+    })
+})
+
+function isExcelFile(filePath) {
+    try {
+      const workbook = xlsx.readFile(filePath);
+      return true; // If the file can be read by xlsx, it's likely an Excel file
+    } catch (error) {
+      return false;
+    }
+}
+
+function openTemplate(filepath) {
+    let xlsx = path.join(filepath);
+    let xlsxtmp = path.join(app.getPath('temp', path.basename(xlsx)))
+    let tmpFile = path.join(xlsxtmp+"\\"+path.basename(xlsx))
+    let ws = fs.createWriteStream(tmpFile)
+    fs.createReadStream(filepath).pipe(ws)
+    ws.on('finish', () => {
+        shell.openPath(tmpFile);
+    })
+}
+
+const template = [
     ...(isMac ? [{
         label: app.name,
         submenu: [
@@ -168,13 +521,6 @@ ipcMain.on('save_xml', (event, data) => {
         label: 'Action',
         submenu: [
           {
-              id: 'addEthnicityMenu',
-              click: () => mainWindow.webContents.send('add-ethnicity','click'),
-              accelerator: isMac ? 'Cmd+Shift+E' : 'Control+Shift+E',
-              label: 'Add Ethnicity',
-              enabled: true
-          },
-          {
               id: 'addContinentMenu',
               click: () => mainWindow.webContents.send('add-continent','click'),
               accelerator: isMac ? 'Cmd+Shift+C' : 'Control+Shift+C',
@@ -202,14 +548,108 @@ ipcMain.on('save_xml', (event, data) => {
               label: 'Add City',
               enabled: true
           },
+          { type: 'separator' },
+          {
+            id: 'addEthnicityMenu',
+            click: () => mainWindow.webContents.send('add-ethnicity','click'),
+            accelerator: isMac ? 'Cmd+Shift+E' : 'Control+Shift+E',
+            label: 'Add Ethnicity',
+            enabled: true
+            },
           {
               id: 'addRegionMenu',
               click: () => mainWindow.webContents.send('add-region','click'),
               accelerator: isMac ? 'Cmd+Shift+G' : 'Control+Shift+G',
               label: 'Add Region',
               enabled: true
-          }
-        ]
+        },
+        { type: 'separator' },
+        {
+            label: 'Import From File',
+            submenu: [
+                {
+                    id: 'bulkContinentMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-continents','click'),
+                    label: 'Import Continents',
+                    enabled: true
+                },
+                {
+                    id: 'bulkNationMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-nations','click'),
+                    label: 'Import Nations',
+                    enabled: true
+                },
+                {
+                    id: 'bulkStateMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-states','click'),
+                    label: 'Import States',
+                    enabled: true
+                },
+                {
+                    id: 'bulkCityMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-cities','click'),
+                    label: 'Import Cities',
+                    enabled: true
+                },
+                { type: 'separator' },
+                {
+                    id: 'bulkEthnicityMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-ethnicities','click'),
+                    label: 'Import Ethnicities',
+                    enabled: true
+                },
+                {
+                    id: 'bulkRegionMenu',
+                    click: () => mainWindow.webContents.send('bulk-add-regions','click'),
+                    label: 'Import Regions',
+                    enabled: true
+                }
+            ]
+        },
+        { type: 'separator' },
+        {
+            label: 'Open Template',
+            submenu: [     
+                {
+                    id: 'continentTemplate',
+                    click: () => openTemplate(path.join(__dirname,'/files/continents_template.csv')),
+                    label: 'Continents',
+                    enabled: true
+                },
+                {
+                    id: 'nationTemplate',
+                    click: () => openTemplate(path.join(__dirname+"\\files\\nations_template.csv")),
+                    label: 'Nations',
+                    enabled: true
+                },
+                {
+                    id: 'stateTemplate',
+                    click: () => openTemplate(path.join(__dirname+"\\files\\states_template.csv")),
+                    label: 'States',
+                    enabled: true
+                },
+                {
+                    id: 'cityTemplate',
+                    click: () => openTemplate(path.join(__dirname+"\\files\\cities_template.csv")),
+                    label: 'Cities',
+                    enabled: true
+                },
+                { type: 'separator' },
+                {
+                    id: 'ethnicityTemplate',
+                    click: () => openTemplate(path.join(__dirname+"\\files\\ethnicities_template.csv")),
+                    label: 'Ethnicities',
+                    enabled: true
+                },
+                {
+                    id: 'regionTemplate',
+                    click: () => openTemplate(path.join(__dirname+"\\files\\regions_template.csv")),
+                    label: 'Regions',
+                    enabled: true
+                },
+            ]
+        },
+    ]
     },
     {
         label: 'View',
@@ -264,7 +704,7 @@ ipcMain.on('save_xml', (event, data) => {
         } */
         ]
     }
-    ]
+]
     
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
@@ -287,8 +727,6 @@ app.whenReady().then(() => {
       shell.openExternal(url);
       return { action: 'deny' };
     });
-
-    mainWindow.webContents.openDevTools()
 
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()

@@ -1,0 +1,6 @@
+//,,,,,,
+"// TimeZone should be main GMT offset for the state.  Illinois, for example, would simply be -6.",,,,,,
+// DST must be a numerical value.  Set to 1 for Yes and 0 for No.,,,,,,
+"// Latitude and Longitude must be in decimal format.  Chicago, for example would have a Latitude of 41.881832 and a Longitude of -87.623177.",,,,,,
+//,,,,,,
+Name,Abbreviation,Population,TimeZone,DST,Latitude,Longitude

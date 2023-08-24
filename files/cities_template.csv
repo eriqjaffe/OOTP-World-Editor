@@ -1,0 +1,7 @@
+//,,,,,,,,
+"// TimeZone should be the GMT offset.  Chicago, for example, would simply be -6",,,,,,,,
+// Captiol and DST must be numerical values.  Set to 1 for Yes and 0 for No,,,,,,,,
+"// Latitude and Longitude must be in decimal format.  Chicago, for example would have a Latitude of 41.881832 and a Longitude of -87.623177.",,,,,,,,
+// Altitude must be expressed in meters.   Setting the altitude to a value less than zero will propmt the app to attempt to calculate the altitude from the Latitude and Longitude,,,,,,,,
+//,,,,,,,,
+Name,Abbreviation,Population,TimeZone,Capitol,DST,Latitude,Longitude,Altitude
