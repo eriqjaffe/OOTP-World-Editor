@@ -2519,6 +2519,10 @@
 
     ipcRenderer.on('bulk-city-import', (event, data) => {
         let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
         if (json.responseData.length < 1) {
             alert("There don't appear to be any cities in that file")
             return false;
@@ -2666,7 +2670,12 @@
     })
 
     ipcRenderer.on('bulk-state-import', (event, data) => {
+        console.log(JSON.parse(data))
         let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
         if (json.responseData.length < 1) {
             alert("There don't appear to be any states in that file")
             return false;
@@ -2773,6 +2782,10 @@
 
     ipcRenderer.on('bulk-nation-import', (event, data) => {
         let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
         if (json.responseData.length < 1) {
             alert("There don't appear to be any nations in that file")
             return false;
@@ -2962,18 +2975,24 @@
     })
 
     ipcRenderer.on('bulk-continent-import', (event, data) => {
-        if (JSON.parse(data).length < 1) {
-            alert("There don't appear to be any continents in that file")
+        let json = JSON.parse(data)
+        console.log(json)
+        if (json.result != "success") {
+            alert(json.errorMessage)
             return false;
         }
-        $("#importContinentsHeader").html("Importing "+JSON.parse(data).length+" Continents From File")
+        if (json.responseData.length < 1) {
+            alert("There don't appear to be any nations in that file")
+            return false;
+        }
+        $("#importContinentsHeader").html("Importing "+json.responseData.length+" Continents From File")
         $.magnificPopup.open({
             items: {
                 src: '#bulkContinentImport',
                 type: 'inline'
             }
         });
-        bulkImportData = data
+        bulkImportData = JSON.stringify(json.responseData)
     })
     
     $("#bulkImportEthnicities").on("click", function(e) {
@@ -3034,18 +3053,23 @@
     })
 
     ipcRenderer.on('bulk-ethnicity-import', (event, data) => {
-        if (JSON.parse(data).length < 1) {
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
             alert("There don't appear to be any ethnicities in that file")
             return false;
         }
-        $("#importEthnicitiesHeader").html("Importing "+JSON.parse(data).length+" Ethnicities From File")
+        $("#importEthnicitiesHeader").html("Importing "+json.responseData.length+" Ethnicities From File")
         $.magnificPopup.open({
             items: {
                 src: '#bulkEthnicityImport',
                 type: 'inline'
             }
         });
-        bulkImportData = data
+        bulkImportData = JSON.stringify(json.responseData)
     })
 
     $("#bulkImportRegions").on("click", function(e) {
@@ -3145,18 +3169,23 @@
     })
 
     ipcRenderer.on('bulk-region-import', (event, data) => {
-        if (JSON.parse(data).length < 1) {
+        let json = JSON.parse(data)
+        if (json.result != "success") {
+            alert(json.errorMessage)
+            return false;
+        }
+        if (json.responseData.length < 1) {
             alert("There don't appear to be any regions in that file")
             return false;
         }
-        $("#importRegionsHeader").html("Importing "+JSON.parse(data).length+" Regions From File")
+        $("#importRegionsHeader").html("Importing "+json.responseData.length+" Regions From File")
         $.magnificPopup.open({
             items: {
                 src: '#bulkRegionImport',
                 type: 'inline'
             }
         });
-        bulkImportData = data
+        bulkImportData = JSON.stringify(json.responseData)
     })
 
     ipcRenderer.on('version-info', (event, data) => {

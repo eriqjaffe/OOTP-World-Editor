@@ -169,6 +169,45 @@ ipcMain.on("check-for-debug", (event, data) => {
     }
 })
 
+function compareHeaders(type, sheet, headerRow) {
+    let expectedHeaders = null;
+    switch (type) {
+        case "city":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Population","3":"TimeZone","4":"Capitol","5":"DST","6":"Latitude","7":"Longitude","8":"Altitude"}'
+            break;
+        case "state":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Population","3":"TimeZone","4":"DST","5":"Latitude","6":"Longitude"}'
+            break;
+        case "nation":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Demonym","3":"Population","4":"Gender","5":"BBQuality","6":"DST","7":"IsUSA","8":"HardcodedOrigins","9":"TimeZone"}'
+            break;
+        case "continent":
+            expectedHeaders = '{"0":"Name","1":"Abbreviation","2":"Demonym","3":"Population"}'
+            break;
+        case "ethnicity":
+            expectedHeaders = '{"0":"Name","1":"African","2":"Asian","3":"EastIndian","4":"Caucasian","5":"Hispanic"}'
+            break;
+        case "region":
+            expectedHeaders = '{"0":"Name","1":"Nations","2":"States","3":"Cities"}'
+            break;
+        default:
+            return false;
+    }
+    const headers = {};
+    const range = xlsx.utils.decode_range(sheet['!ref']);
+    let C;
+    /* start in the first row */
+    for (C = range.s.c; C <= range.e.c; ++C) {
+        /* walk every column in the range */
+        const cell = sheet[xlsx.utils.encode_cell({ c: C, r: headerRow })];
+        /* find the cell in the first row */
+        let hdr = C; // <-- replace with your desired default
+        if (cell && cell.t) hdr = xlsx.utils.format_cell(cell);
+        headers[C] = hdr;
+    }
+    if (JSON.stringify(headers) == expectedHeaders) { return true } else { return false }
+}
+
 ipcMain.on("bulk-import-cities", (event, data) => {
     const options = {
 		properties: ['openFile'],
@@ -178,25 +217,36 @@ ipcMain.on("bulk-import-cities", (event, data) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            let responseData = null
+            let headerRow = 6
+            let dataOut = {}
             try {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 6});
-                    let dataOut = {}
-                    dataOut.continent = data[0]
-                    dataOut.nation = data[1]
-                    dataOut.state = data[2]
-                    dataOut.responseData = responseData
-                    event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+                    if (compareHeaders("city", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.continent = data[0]
+                        dataOut.nation = data[1]
+                        dataOut.state = data[2]
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-city-import', JSON.stringify(dataOut))
+                    }
+                    
                 } 
             } catch (err) {
                 console.log(err)
-                event.sender.send('bulk-city-import', err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-city-import', JSON.stringify(dataOut))
             }
         } else {
-            event.sender.send('bulk-city-import', 'cancelled')
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-city-import', JSON.stringify(dataOut))
         }
     })
 })
@@ -210,24 +260,34 @@ ipcMain.on("bulk-import-states", (event, data) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            let responseData = null
+            let dataOut = {}
+            let headerRow = 5
             try {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 5});
-                    let dataOut = {}
-                    dataOut.continent = data[0]
-                    dataOut.nation = data[1]
-                    dataOut.responseData = responseData
-                    event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+                    if (compareHeaders("state", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.continent = data[0]
+                        dataOut.nation = data[1]
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-state-import', JSON.stringify(dataOut))
+                    }
                 } 
             } catch (err) {
                 console.log(err)
-                event.sender.send('bulk-state-import', err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-state-import', JSON.stringify(dataOut))
             }
         } else {
-            event.sender.send('bulk-state-import', 'cancelled')
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-state-import', JSON.stringify(dataOut))
         }
     })
 })
@@ -241,23 +301,33 @@ ipcMain.on("bulk-import-nations", (event, data) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            let responseData = null
+            let dataOut = {}
+            let headerRow = 6
             try {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 6});
-                    let dataOut = {}
-                    dataOut.continent = data
-                    dataOut.responseData = responseData
-                    event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+                    if (compareHeaders("nation", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.continent = data[0]
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
+                    }
                 } 
             } catch (err) {
                 console.log(err)
-                event.sender.send('bulk-nation-import', err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
             }
         } else {
-            event.sender.send('bulk-nation-import', 'cancelled')
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-nation-import', JSON.stringify(dataOut))
         }
     })
 })
@@ -271,20 +341,32 @@ ipcMain.on("bulk-import-continents", (event, data) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            let responseData = null
+            let dataOut = {}
+            let headerRow = 0
             try {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0});
-                    event.sender.send('bulk-continent-import', JSON.stringify(responseData))
+                    if (compareHeaders("continent", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
+                    }
                 } 
             } catch (err) {
                 console.log(err)
-                event.sender.send('bulk-continent-import', err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
             }
         } else {
-            event.sender.send('bulk-continent-import', 'cancelled')
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-continent-import', JSON.stringify(dataOut))
         }
     })
 })
@@ -298,20 +380,32 @@ ipcMain.on("bulk-import-ethnicities", (event, data) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            let responseData = null
+            let dataOut = {}
+            let headerRow = 3
             try {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 3});
-                    event.sender.send('bulk-ethnicity-import', JSON.stringify(responseData))
+                    if (compareHeaders("ethnicity", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow});
+                        event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
+                    }
                 } 
             } catch (err) {
                 console.log(err)
-                event.sender.send('bulk-ethnicity-import', err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
             }
         } else {
-            event.sender.send('bulk-ethnicity-import', 'cancelled')
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-ethnicity-import', JSON.stringify(dataOut))
         }
     })
 })
@@ -325,20 +419,32 @@ ipcMain.on("bulk-import-regions", (event, data) => {
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
-            let responseData = null
+            let dataOut = {}
+            let headerRow = 3
             try {
                 if (isExcelFile(result.filePaths[0])) {
                     let workbook = xlsx.readFile(result.filePaths[0])
                     let first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: 3, raw: true, cellDates: false});
-                    event.sender.send('bulk-region-import', JSON.stringify(responseData))
+                    if (compareHeaders("region", first_sheet, headerRow)) {
+                        dataOut.result = "success"
+                        dataOut.responseData = xlsx.utils.sheet_to_json(first_sheet, {header: 0, range: headerRow, raw: true, cellDates: false});
+                        event.sender.send('bulk-region-import', JSON.stringify(dataOut))
+                    } else {
+                        dataOut.result = "error"
+                        dataOut.errorMessage = "This does not appear to be the proper CSV file."
+                        event.sender.send('bulk-region-import', JSON.stringify(dataOut))
+                    }  
                 } 
             } catch (err) {
                 console.log(err)
-                event.sender.send('bulk-region-import', err)
+                dataOut.result = "error"
+                dataOut.errorMessage = err
+                event.sender.send('bulk-region-import', JSON.stringify(dataOut))
             }
         } else {
-            event.sender.send('bulk-region-import', 'cancelled')
+            dataOut.result = "error"
+            dataOut.errorMessage = "User Cancelled"
+            event.sender.send('bulk-region-import', JSON.stringify(dataOut))
         }
     })
 })
@@ -350,7 +456,7 @@ function isExcelFile(filePath) {
     } catch (error) {
       return false;
     }
-  }
+}
 
 const template = [
     ...(isMac ? [{
