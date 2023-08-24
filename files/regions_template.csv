@@ -1,4 +1,4 @@
 //			
 "// Nations, States, and Cities must be a list of IDs separated by lower case ""x"" - for example, 3x5x7x9x11 and so on.  IDs that do not exist will be skipped on import."			
 //			
-Name	Nations	States	Cities
+Name,Nations,States,Cities
