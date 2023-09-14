@@ -1524,8 +1524,10 @@
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import Region">
             <br><br>
+            <div id="regionImportProgressParent" style="width: 100%; display: inline-block;">
             <span id="regionImportProgressLabel">&nbsp;</span><br>
             <div id="regionImportProgress"></div>
+            </div>
         </div>
         </form>
     </div>
@@ -1536,8 +1538,10 @@
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import Ethnicities">
             <br><br>
+            <div id="ethnicityImportProgressParent" style="width: 100%; display: inline-block;">
             <span id="ethnicityImportProgressLabel">&nbsp;</span><br>
             <div id="ethnicityImportProgress"></div>
+            </div>
         </div>
         </form>
     </div>
@@ -1548,8 +1552,10 @@
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import Continents">
             <br><br>
+            <div id="continentImportProgressParent" style="width: 100%; display: inline-block;">
             <span id="continentImportProgressLabel">&nbsp;</span><br>
             <div id="continentImportProgress"></div>
+            </div>
         </div>
         </form>
     </div>
@@ -1568,8 +1574,10 @@
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import Nations">
             <br><br>
+            <div id="nationImportProgressParent" style="width: 100%; display: inline-block;">
             <span id="nationImportProgressLabel">&nbsp;</span><br>
             <div id="nationImportProgress"></div>
+            </div>
         </div>
         </form>
     </div>
@@ -1592,8 +1600,10 @@
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import States">
             <br><br>
+            <div id="stateImportProgressParent" style="width: 100%; display: inline-block;">
             <span id="stateImportProgressLabel">&nbsp;</span><br>
             <div id="stateImportProgress"></div>
+            </div>
         </div>
         </form>
     </div>
@@ -1620,8 +1630,10 @@
         <div style="text-align:center;">
             <input type="submit" class="submit" value="Import Cities">
             <br><br>
+            <div id="cityImportProgressParent" style="width: 100%; display: inline-block;">
             <span id="cityImportProgressLabel"></span><br>
             <div id="cityImportProgress"></div>
+            </div>
         </div>
         </form>
     </div>
@@ -2546,6 +2558,14 @@
         }
 
         $("#bulkCityContinent").trigger("change", [json.nation, json.state])
+
+        $("#cityImportProgressParent").css("display","none")
+        $("#cityImportProgressLabel").text("")
+        $('#cityImportProgress').LineProgressbar({
+            duration: 0,
+            percentage: 0
+        });
+
         $.magnificPopup.open({
             items: {
                 src: '#bulkCityImport',
@@ -2592,6 +2612,8 @@
         let count = 1
         let cityNameArr = []
         let newCap = -1
+
+        $("#cityImportProgressParent").css("display","inline-block")
 
         for (const city of json) {
 
@@ -2698,6 +2720,14 @@
             $("#bulkStateContinent").val(json.continent)
         }
         $("#bulkStateContinent").trigger("change", json.nation)
+
+        $("#stateImportProgressParent").css("display","none")
+        $("#stateImportProgressLabel").text("")
+        $('#stateImportProgress').LineProgressbar({
+            duration: 0,
+            percentage: 0
+        });
+
         $.magnificPopup.open({
             items: {
                 src: '#bulkStateImport',
@@ -2729,6 +2759,9 @@
         let states = nation.findFirst("States")
         let count = 1
         let stateNameArr = []
+
+        $("#stateImportProgressParent").css("display","inline-block")
+
         for (const state of json) {
 
             stateNameArr.push(state.Name)
@@ -2805,6 +2838,14 @@
         });
         sortDropdown("#bulkNationContinent")
         $("#bulkNationContinent").val((json.continent > 0) ? json.continent : 1)
+
+        $("#nationImportProgressParent").css("display","none")
+        $("#nationImportProgressLabel").text("")
+        $('#nationImportProgress').LineProgressbar({
+            duration: 0,
+            percentage: 0
+        });
+
         $.magnificPopup.open({
             items: {
                 src: '#bulkNationImport',
@@ -2821,6 +2862,8 @@
         let count = 1
         let nationNameArr = []
         var newUSAName = null;
+
+        $("#nationImportProgressParent").css("display","inline-block")
 
         for (const nation of json) {
             nationNameArr.push(nation.Name)
@@ -2931,6 +2974,8 @@
 
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("CONTINENT")
+
+        $("#continentImportProgressParent").css("display","inline-block")
         
         for (const continent of json) {
             continentNameArr.push(continent.Name)
@@ -2992,6 +3037,14 @@
             return false;
         }
         $("#importContinentsHeader").html("Importing "+json.responseData.length+" Continents From File")
+
+        $("#continentImportProgressParent").css("display","none")
+        $("#continentImportProgressLabel").text("")
+        $('#continentImportProgress').LineProgressbar({
+            duration: 0,
+            percentage: 0
+        });
+
         $.magnificPopup.open({
             items: {
                 src: '#bulkContinentImport',
@@ -3015,6 +3068,8 @@
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("ETHNICITIES")
         
+        $("#ethnicityImportProgressParent").css("display","inline-block")
+
         for (const ethnicity of json) {
             ethnicityNameArr.push(ethnicity.Name)
              $("#ethnicityImportProgressLabel").text("Importing "+ethnicity.Name+"...")
@@ -3069,6 +3124,15 @@
             return false;
         }
         $("#importEthnicitiesHeader").html("Importing "+json.responseData.length+" Ethnicities From File")
+
+        $("#ethnicityImportProgressParent").css("display","none")
+        $("#ethnicityImportProgressLabel").text("")
+        $('#ethnicityImportProgress').LineProgressbar({
+            duration: 0,
+            percentage: 0
+        });
+
+
         $.magnificPopup.open({
             items: {
                 src: '#bulkEthnicityImport',
@@ -3091,6 +3155,8 @@
 
         var tree = $.ui.fancytree.getTree("#xmlOutput")
         var world = tree.findFirst("REGIONS")
+
+        $("#regionImportProgressParent").css("display","inline-block")
         
         for (const region of json) {
             regionNameArr.push(region.Name)
@@ -3185,6 +3251,15 @@
             return false;
         }
         $("#importRegionsHeader").html("Importing "+json.responseData.length+" Regions From File")
+
+        $("#regionImportProgressParent").css("display","none")
+        $("#regionImportProgressLabel").text("")
+        $('#regionImportProgress').LineProgressbar({
+            duration: 0,
+            percentage: 0
+        });
+
+
         $.magnificPopup.open({
             items: {
                 src: '#bulkRegionImport',
