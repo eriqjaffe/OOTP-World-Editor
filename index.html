@@ -2311,7 +2311,7 @@
             $("#overlay").css("display","none")
             return false           
         } else if (usaCount > 1) {
-            alert("There are no nations defined as The USA.  More than one nation is defined as The USA.  While this is not necessarily game-breaking, OOTP expects only one nation to have this flag set.")
+            alert("More than one nation is defined as The USA.  While this is not necessarily game-breaking, OOTP expects only one nation to have this flag set.")
             $("#overlay").css("display","none")
             return false
         }
@@ -2383,8 +2383,12 @@
                     .writeAttribute("dem", n.data.dem)
                     .writeAttribute("dem_korean", n.data.dem_korean)
                     .writeAttribute("time_zone", n.data.time_zone)
-                    .writeAttribute("this_is_the_usa", n.data.this_is_the_usa)
-                    .writeAttribute("use_hardcoded_ml_player_origins", n.data.use_hardcoded_ml_player_origins)
+                    if (parseInt(n.data.this_is_the_usa) == 1) {
+                        xw.writeAttribute("this_is_the_usa", 1)
+                    }
+                    if (parseInt(n.data.use_hardcoded_ml_player_origins) == 1) {
+                        xw.writeAttribute("use_hardcoded_ml_player_origins", 1)
+                    }
                     // second nations & nation ethnicities
                     for (child of n.children) {
                         if (child.type == "second_nations") {
@@ -2427,24 +2431,24 @@
                         .writeAttribute("observes_dst", s.data.observes_dst)
                         .writeAttribute("lat",s.data.lat)
                         .writeAttribute("long", s.data.long)
-                        if (s.children != undefined) {
                             xw.startElement("CITIES")
-                            for (ci of s.children) {
-                                xw.startElement("CITY")
-                                .writeAttribute("id", ci.data.id)
-                                .writeAttribute("name", ci.title)
-                                .writeAttribute("name_korean", ci.data.name_korean)
-                                .writeAttribute("pop", ci.data.pop)
-                                .writeAttribute("time_zone", ci.data.time_zone)
-                                .writeAttribute("observes_dst", ci.data.observes_dst)
-                                .writeAttribute("lat", ci.data.lat)
-                                .writeAttribute("long", ci.data.long)
-                                .writeAttribute("abbr", ci.data.abbr)
-                                .writeAttribute("abbr_korean", ci.data.abbr_korean)
-                                .endElement()
-                            } 
-                            xw.endElement()                  
-                        }
+                            if (s.children != undefined) {
+                                for (ci of s.children) {
+                                    xw.startElement("CITY")
+                                    .writeAttribute("id", ci.data.id)
+                                    .writeAttribute("name", ci.title)
+                                    .writeAttribute("name_korean", ci.data.name_korean)
+                                    .writeAttribute("pop", ci.data.pop)
+                                    .writeAttribute("time_zone", ci.data.time_zone)
+                                    .writeAttribute("observes_dst", ci.data.observes_dst)
+                                    .writeAttribute("lat", ci.data.lat)
+                                    .writeAttribute("long", ci.data.long)
+                                    .writeAttribute("abbr", ci.data.abbr)
+                                    .writeAttribute("abbr_korean", ci.data.abbr_korean)
+                                    .endElement()
+                                }            
+                            }
+                            xw.endElement()
                         xw.endElement()
                     }
                     xw.endElement()
@@ -3984,7 +3988,6 @@
                         })
                         break;
                     case "city":
-                        console.log(node)
                         var lat = (node.data.lat == undefined || node.data.lat == "0") ? "00.00000" : node.data.lat
                         var lon = (node.data.long == undefined || node.data.long == "0") ? "00.00000" : node.data.long
                         var alt = (node.data.altitude == undefined) ? "0" : node.data.altitude
