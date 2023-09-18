@@ -185,7 +185,7 @@
   dependencies:
     "@types/node" "*"
 
-"@xmldom/xmldom@^0.8.8":
+"@xmldom/xmldom@^0.8.10", "@xmldom/xmldom@^0.8.8":
   version "0.8.10"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.10.tgz#a1337ca426aa61cef9fe15b5b28e340a72f6fa99"
   integrity sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==
@@ -1571,6 +1571,10 @@ xlsx@^0.18.5:
     wmf "~1.0.1"
     word "~0.3.0"
 
+"xlsx@https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz":
+  version "0.20.0"
+  resolved "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz#ca1826e53a4fe32f8789ae6c584457e7bf10841e"
+
 xml-writer@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/xml-writer/-/xml-writer-1.7.0.tgz#b76f1d591c16a2634ebdb703c7bdbd0fd6819065"
@@ -1593,11 +1597,6 @@ xmlbuilder@~11.0.0:
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
   integrity sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
-
-xmldom@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.6.0.tgz#43a96ecb8beece991cef382c08397d82d4d0c46f"
-  integrity sha512-iAcin401y58LckRZ0TkI4k0VSM1Qg0KGSc3i8rU+xrxe19A/BN1zHyVSJY7uoutVlaTSzYyk/v5AmkewAP7jtg==
 
 xpath@^0.0.32:
   version "0.0.32"
