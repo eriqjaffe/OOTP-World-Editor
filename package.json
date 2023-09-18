@@ -21,7 +21,7 @@
     "xpath": "^0.0.32"
   },
   "devDependencies": {
-    "electron": "^25.2.0",
+    "electron": "^25.8.1",
     "electron-builder": "^24.6.3"
   },
   "build": {
