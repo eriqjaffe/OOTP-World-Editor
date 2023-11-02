@@ -3324,262 +3324,267 @@
             $("#max_region_id").text(max_region_id)
 
             // start parsing the new data
-            var json = JSON.parse(result)
-            var tree_json = [];
+            try {
+                var json = JSON.parse(result)
+                var tree_json = [];
 
-            var ethnicities_arr = {}
-            var ethnicities = []
-            ethnicities_arr.title = "ETHNICITIES";
-            ethnicities_arr.folder = true
-            ethnicities_arr.type = "ETHNICITIES_PARENT"
-            ethnicities_arr.icon = './images/people-group-solid.svg'
-            for (ethnicity of json.WORLD.ETHNICITIES[0].ETHNICITY) {
-                ethnicities_by_id[ethnicity.$.id] = ethnicity.$.name
-                ethnicity_count++;
-                var ethnicity_obj = {}
-                ethnicity_obj.type = 'ethnicity'
-                ethnicity_obj.folder = false
-                ethnicity_obj.icon = './images/user-group-solid.svg'
-                ethnicity_obj.title = ethnicity.$.name
-                ethnicity_obj.name_korean = ethnicity.$.name_korean
-                ethnicity_obj.id = ethnicity.$.id
-                ethnicity_obj.african = ethnicity.$.african
-                ethnicity_obj.asian = ethnicity.$.asian
-                ethnicity_obj.east_indian = ethnicity.$.east_indian
-                ethnicity_obj.caucasian = ethnicity.$.caucasian
-                ethnicity_obj.hispanic = ethnicity.$.hispanic
-                ethnicities.push(ethnicity_obj)
-                if (parseInt(ethnicity.$.id) > max_ethnicity_id) { max_ethnicity_id = parseInt(ethnicity.$.id) }
-            }
-            ethnicities_arr.children = ethnicities
-            tree_json.push(ethnicities_arr)
-            
-            var continent_arr = {};
-            continent_arr.title = "CONTINENTS";
-            continent_arr.folder = true;
-            continent_arr.icon = './images/globe-solid.svg'
-            continent_arr.type = "CONTINENTS_PARENT"
-            var continents = []
-            for (continent of json.WORLD.CONTINENTS[0].CONTINENT) {
-                continents_by_id[continent.$.id] = continent.$.name
-                continent_count++;
-                var continent_obj = {}
-                continent_obj.type = 'continent'
-                continent_obj.folder = true
-                continent_obj.icon = './images/earth-americas-solid.svg'
-                continent_obj.id = continent.$.id
-                continent_obj.title = continent.$.name
-                continent_obj.title_korean = (continent.$.name_korean != undefined) ? continent.$.name_korean : ""
-                continent_obj.pop = (continent.$.population != undefined) ? continent.$.population : continent.$.pop
-                continent_obj.etid = (continent.$.etid != undefined) ? continent.$.etid : ""
-                continent_obj.abbr = continent.$.abbr
-                continent_obj.dem = continent.$.dem
-                continent_obj.abbr_korean = (continent.$.abbr_korean != undefined) ? continent.$.abbr_korean : ""
-                continent_obj.dem_korean = (continent.$.dem_korean != undefined) ? continent.$.dem_korean : ""
-                if (parseInt(continent.$.id) > max_continent_id) { max_continent_id = parseInt(continent.$.id) }
-                var nation_arr = []     
-                for (nation of continent.NATIONS[0].NATION) {
-                    console.log(nation.$.name)
-                    const usa = (nation.$.hasOwnProperty('this_is_the_usa')) ? nation.$.this_is_the_usa : nation.$.this_is_modern_usa
-                    nations_by_id[nation.$.id] = nation.$.name
-                    nation_count++;
-                    var nation_obj = {}
-                    nation_obj.type = 'nation'
-                    nation_obj.folder = true
-                    nation_obj.icon = (usa != undefined) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
-                    nation_obj.id = nation.$.id
-                    nation_obj.title = nation.$.name
-                    nation_obj.title_korean = (nation.$.name_korean != undefined) ? nation.$.name_korean : ""
-                    nation_obj.short_korean = (nation.$.short_korean != undefined) ? nation.$.short_korean : ""
-                    nation_obj.pop = nation.$.pop
-                    nation_obj.etid = (nation.$.etid != undefined) ? nation.$.etid : ""
-                    /* nation_obj.lid = nation.$.lid = (nation.$.lid != undefined) ? nation.$.lid : "" */
-                    nation_obj.capid = (nation.$.capid != undefined) ? nation.$.capid : ""
-                    nation_obj.gender = nation.$.gender
-                    nation_obj.bbqual = nation.$.bbqual
-                    nation_obj.abbr = nation.$.abbr
-                    nation_obj.abbr_korean = (nation.$.abbr_korean != undefined) ? nation.$.abbr_korean : ""
-                    nation_obj.dem = nation.$.dem
-                    nation_obj.dem_korean = (nation.$.dem_korean != undefined) ? nation.$.dem_korean : ""
-                    nation_obj.time_zone = parseFloat(nation.$.time_zone).toFixed(2).toString()
-                    nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
-                    nation_obj.this_is_the_usa = (usa != undefined) ? "1" : "0"
-                    nation_obj.use_hardcoded_ml_player_origins = (nation.$.use_hardcoded_ml_player_origins != undefined) ? nation.$.use_hardcoded_ml_player_origins : "0"
-                    if (nation_obj.this_is_the_usa == 1) { usa_defined.push(nation_obj.id) }
-                    if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
-                    var second_nations_obj = {}
-                    second_nations_obj.title = "Second Nations"
-                    second_nations_obj.folder = false
-                    second_nations_obj.icon = './images/circle-plus-solid.svg'
-                    second_nations_obj.type = 'second_nations'
-                    var second_nations_arr = []
-                    if (nation.SECOND_NATIONS != undefined && nation.SECOND_NATIONS[0].SECOND_NATIONS != undefined) {
-                        for (sn of nation.SECOND_NATIONS[0].SECOND_NATIONS) {
-                            var sn_obj = {}
-                            sn_obj.id = sn.$.id
-                            sn_obj.pct = sn.$.pct
-                            sn_obj.use_name = sn.$.use_name
-                            second_nations_arr.push(sn_obj)
-                        }
-                        second_nations_obj.subdata = (second_nations_arr)
-                    }
-                    var nation_eth_obj = {}
-                    nation_eth_obj.title = "Ethnicities"
-                    nation_eth_obj.folder = false
-                    nation_eth_obj.icon = './images/user-group-solid.svg'
-                    nation_eth_obj.type = 'nation_ethnicity'
-                    var nation_eth_arr = []
-                    if (nation.ETHN_PCTS != undefined) {
-                        for (n_eth of nation.ETHN_PCTS[0].ETHN_PCT) {
-                            var eth_obj = {}
-                            eth_obj.name = ethnicities_by_id[n_eth.$.etid]
-                            eth_obj.etid = n_eth.$.etid
-                            eth_obj.pct = n_eth.$.pct
-                            nation_eth_arr.push(eth_obj)
-                        }
-                        nation_eth_obj.subdata = (nation_eth_arr)
-                    }
-                    var states_obj = {}
-                    states_obj.title = "States"
-                    states_obj.folder = true
-                    states_obj.icon = './images/landmark-dome-solid.svg'
-                    states_obj.type = "STATES_PARENT"
-                    var state_arr = []
-                    var cities_bn_arr = []
-                    for (state of nation.STATES[0].STATE) {
-                        states_by_id[state.$.id] = state.$.name
-                        state_count++;
-                        var state_obj = {}
-                        state_obj.type = 'state'
-                        state_obj.folder = true
-                        state_obj.icon = './images/landmark-flag-solid.svg'
-                        state_obj.id = state.$.id
-                        state_obj.title = state.$.name
-                        state_obj.title_korean = (state.$.name_korean != undefined) ? state.$.name_korean : ""
-                        state_obj.pop = state.$.pop
-                        state_obj.abbr = state.$.abbr
-                        state_obj.abbr_korean = (state.$.abbr_korean != undefined) ? state.$.abbr_korean : ""
-                        state_obj.time_zone = (state.$.time_zone != undefined) ? parseFloat(state.$.time_zone).toFixed(2).toString() : parseFloat(nation.$.time_zone).toFixed(2).toString()
-                        state_obj.observes_dst = (state.$.observes_dst != undefined) ? state.$.observes_dst : "0"
-                        state_obj.lat = (state.$.lat != undefined) ? state.$.lat : "0"
-                        state_obj.long = (state.$.long != undefined) ? state.$.long : "0"
-                        if (parseInt(state.$.id) > max_state_id) { max_state_id = parseInt(state.$.id) }
-                        var city_arr = []
-                        if (state.CITIES[0].CITY != undefined) {
-                            for (city of state.CITIES[0].CITY) {
-                                var obj = {}
-                                obj.name = city.$.name
-                                obj.state = state.$.id
-                                obj.nation = nation.$.id
-                                obj.continent = continent.$.id
-                                cities_by_id[city.$.id] = obj
-                                city_count++;
-                                var city_obj = {}
-                                var city_bn_obj = {}
-                                city_obj.type = 'city'
-                                city_obj.folder = false
-                                if (nation.$.capid == city.$.id) {
-                                    city_obj.icon = './images/star-solid.svg'
-                                } else {
-                                    city_obj.icon = './images/city-solid.svg'
-                                }
-                                city_obj.id = city.$.id
-                                city_obj.title = city.$.name
-                                city_obj.title_korean = (city.$.name_korean != undefined) ? city.$.name_korean : ""
-                                city_obj.pop = city.$.pop
-                                city_obj.lat = (city.$.lat != undefined) ? city.$.lat : "0"
-                                city_obj.long = (city.$.long != undefined) ? city.$.long : "0"
-                                city_obj.abbr = city.$.abbr
-                                city_obj.altitude = (city.$.altitude != undefined) ? city.$.altitude : "0"
-                                city_obj.abbr_korean = (city.$.abbr_korean != undefined) ? city.$.abbr_korean : ""
-                                city_obj.time_zone = (city.$.time_zone != undefined) ? parseFloat(city.$.time_zone).toFixed(2).toString() : parseFloat(nation.$.time_zone).toFixed(2).toString()
-                                city_obj.observes_dst = (city.$.observes_dst != undefined) ? city.$.observes_dst : "0"
-                                city_obj.state = state.$.id
-                                city_obj.nation = nation.$.id
-                                city_arr.push(city_obj)
-                                if (parseInt(city.$.id) > max_city_id) { max_city_id = parseInt(city.$.id) }
-                                city_bn_obj.id = city.$.id
-                                city_bn_obj.title = city.$.name
-                                city_bn_obj.state = state.$.id
-                                city_bn_obj.nation = nation.$.id
-                                cities_bn_arr.push(city_bn_obj)
+                var ethnicities_arr = {}
+                var ethnicities = []
+                ethnicities_arr.title = "ETHNICITIES";
+                ethnicities_arr.folder = true
+                ethnicities_arr.type = "ETHNICITIES_PARENT"
+                ethnicities_arr.icon = './images/people-group-solid.svg'
+                for (ethnicity of json.WORLD.ETHNICITIES[0].ETHNICITY) {
+                    ethnicities_by_id[ethnicity.$.id] = ethnicity.$.name
+                    ethnicity_count++;
+                    var ethnicity_obj = {}
+                    ethnicity_obj.type = 'ethnicity'
+                    ethnicity_obj.folder = false
+                    ethnicity_obj.icon = './images/user-group-solid.svg'
+                    ethnicity_obj.title = ethnicity.$.name
+                    ethnicity_obj.name_korean = ethnicity.$.name_korean
+                    ethnicity_obj.id = ethnicity.$.id
+                    ethnicity_obj.african = ethnicity.$.african
+                    ethnicity_obj.asian = ethnicity.$.asian
+                    ethnicity_obj.east_indian = ethnicity.$.east_indian
+                    ethnicity_obj.caucasian = ethnicity.$.caucasian
+                    ethnicity_obj.hispanic = ethnicity.$.hispanic
+                    ethnicities.push(ethnicity_obj)
+                    if (parseInt(ethnicity.$.id) > max_ethnicity_id) { max_ethnicity_id = parseInt(ethnicity.$.id) }
+                }
+                ethnicities_arr.children = ethnicities
+                tree_json.push(ethnicities_arr)
+                
+                var continent_arr = {};
+                continent_arr.title = "CONTINENTS";
+                continent_arr.folder = true;
+                continent_arr.icon = './images/globe-solid.svg'
+                continent_arr.type = "CONTINENTS_PARENT"
+                var continents = []
+                for (continent of json.WORLD.CONTINENTS[0].CONTINENT) {
+                    continents_by_id[continent.$.id] = continent.$.name
+                    continent_count++;
+                    var continent_obj = {}
+                    continent_obj.type = 'continent'
+                    continent_obj.folder = true
+                    continent_obj.icon = './images/earth-americas-solid.svg'
+                    continent_obj.id = continent.$.id
+                    continent_obj.title = continent.$.name
+                    continent_obj.title_korean = (continent.$.name_korean != undefined) ? continent.$.name_korean : ""
+                    continent_obj.pop = (continent.$.population != undefined) ? continent.$.population : continent.$.pop
+                    continent_obj.etid = (continent.$.etid != undefined) ? continent.$.etid : ""
+                    continent_obj.abbr = continent.$.abbr
+                    continent_obj.dem = continent.$.dem
+                    continent_obj.abbr_korean = (continent.$.abbr_korean != undefined) ? continent.$.abbr_korean : ""
+                    continent_obj.dem_korean = (continent.$.dem_korean != undefined) ? continent.$.dem_korean : ""
+                    if (parseInt(continent.$.id) > max_continent_id) { max_continent_id = parseInt(continent.$.id) }
+                    var nation_arr = []     
+                    for (nation of continent.NATIONS[0].NATION) {
+                        console.log(nation.$.name)
+                        const usa = (nation.$.hasOwnProperty('this_is_the_usa')) ? nation.$.this_is_the_usa : nation.$.this_is_modern_usa
+                        nations_by_id[nation.$.id] = nation.$.name
+                        nation_count++;
+                        var nation_obj = {}
+                        nation_obj.type = 'nation'
+                        nation_obj.folder = true
+                        nation_obj.icon = (usa != undefined) ? './images/flag-usa-solid.svg' : './images/flag-solid.svg'
+                        nation_obj.id = nation.$.id
+                        nation_obj.title = nation.$.name
+                        nation_obj.title_korean = (nation.$.name_korean != undefined) ? nation.$.name_korean : ""
+                        nation_obj.short_korean = (nation.$.short_korean != undefined) ? nation.$.short_korean : ""
+                        nation_obj.pop = nation.$.pop
+                        nation_obj.etid = (nation.$.etid != undefined) ? nation.$.etid : ""
+                        /* nation_obj.lid = nation.$.lid = (nation.$.lid != undefined) ? nation.$.lid : "" */
+                        nation_obj.capid = (nation.$.capid != undefined) ? nation.$.capid : ""
+                        nation_obj.gender = nation.$.gender
+                        nation_obj.bbqual = nation.$.bbqual
+                        nation_obj.abbr = nation.$.abbr
+                        nation_obj.abbr_korean = (nation.$.abbr_korean != undefined) ? nation.$.abbr_korean : ""
+                        nation_obj.dem = nation.$.dem
+                        nation_obj.dem_korean = (nation.$.dem_korean != undefined) ? nation.$.dem_korean : ""
+                        nation_obj.time_zone = parseFloat(nation.$.time_zone).toFixed(2).toString()
+                        nation_obj.observes_dst = (nation.$.observes_dst != undefined) ? nation.$.observes_dst : ""
+                        nation_obj.this_is_the_usa = (usa != undefined) ? "1" : "0"
+                        nation_obj.use_hardcoded_ml_player_origins = (nation.$.use_hardcoded_ml_player_origins != undefined) ? nation.$.use_hardcoded_ml_player_origins : "0"
+                        if (nation_obj.this_is_the_usa == 1) { usa_defined.push(nation_obj.id) }
+                        if (parseInt(nation.$.id) > max_nation_id) { max_nation_id = parseInt(nation.$.id) }
+                        var second_nations_obj = {}
+                        second_nations_obj.title = "Second Nations"
+                        second_nations_obj.folder = false
+                        second_nations_obj.icon = './images/circle-plus-solid.svg'
+                        second_nations_obj.type = 'second_nations'
+                        var second_nations_arr = []
+                        if (nation.SECOND_NATIONS != undefined && nation.SECOND_NATIONS[0].SECOND_NATIONS != undefined) {
+                            for (sn of nation.SECOND_NATIONS[0].SECOND_NATIONS) {
+                                var sn_obj = {}
+                                sn_obj.id = sn.$.id
+                                sn_obj.pct = sn.$.pct
+                                sn_obj.use_name = sn.$.use_name
+                                second_nations_arr.push(sn_obj)
                             }
+                            second_nations_obj.subdata = (second_nations_arr)
                         }
-                        state_obj.children = city_arr
-                        state_arr.push(state_obj)
-                        cities_by_state[state.$.id] = city_arr
-                    }
-                    states_obj.children = (state_arr)
-                    nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
-                    nation_arr.push(nation_obj)
-                    states_by_nation[nation.$.id] = state_arr
-                    cities_by_nation[nation.$.id] = cities_bn_arr
-                }
-                nations_by_continent[continent.$.id] = nation_arr
-                continent_obj.children = nation_arr
-                continents.push(continent_obj)
-            }
-            continent_arr.children = continents
-            tree_json.push(continent_arr)
-
-            var regions_arr = {}
-            regions_arr.title = "REGIONS"
-            regions_arr.folder = true
-            regions_arr.icon = './images/map-solid.svg'
-            regions_arr.type = "REGIONS_PARENT"
-            var regions = []
-            
-            if (json.WORLD.REGIONS[0].REGION != undefined) {
-                for (region of json.WORLD.REGIONS[0].REGION) {
-                    regions_by_id[region.$.id] = region.$.name
-                    region_count++;
-                    var region_obj = {}
-                    region_obj.type = 'region'
-                    region_obj.folder = true
-                    region_obj.icon = "./images/map-location-dot-solid.svg"
-                    region_obj.id = region.$.id
-                    region_obj.title = region.$.name
-                    region_obj.sort_order = region.$.sort_order
-                    region_obj.name_korean = region.$.name_korean
-                    var city_arr = []
-                    var state_arr = []
-                    var nation_arr = []
-                    try {
-                        for (city of REGION_CITIES[0].REGION_CITY) {
-                            var city_obj ={}
-                            city_obj.title = cities_by_id[city.$.id].name
-                            city_obj.id = city.$.id
-                            city_arr.push(city_obj)
+                        var nation_eth_obj = {}
+                        nation_eth_obj.title = "Ethnicities"
+                        nation_eth_obj.folder = false
+                        nation_eth_obj.icon = './images/user-group-solid.svg'
+                        nation_eth_obj.type = 'nation_ethnicity'
+                        var nation_eth_arr = []
+                        if (nation.ETHN_PCTS != undefined) {
+                            for (n_eth of nation.ETHN_PCTS[0].ETHN_PCT) {
+                                var eth_obj = {}
+                                eth_obj.name = ethnicities_by_id[n_eth.$.etid]
+                                eth_obj.etid = n_eth.$.etid
+                                eth_obj.pct = n_eth.$.pct
+                                nation_eth_arr.push(eth_obj)
+                            }
+                            nation_eth_obj.subdata = (nation_eth_arr)
                         }
-                    } catch (err) {}
-                    try {
-                        for (state of region.REGION_STATES[0].REGION_STATE) {
+                        var states_obj = {}
+                        states_obj.title = "States"
+                        states_obj.folder = true
+                        states_obj.icon = './images/landmark-dome-solid.svg'
+                        states_obj.type = "STATES_PARENT"
+                        var state_arr = []
+                        var cities_bn_arr = []
+                        for (state of nation.STATES[0].STATE) {
+                            states_by_id[state.$.id] = state.$.name
+                            state_count++;
                             var state_obj = {}
-                            state_obj.title = states_by_id[state.$.id]
+                            state_obj.type = 'state'
+                            state_obj.folder = true
+                            state_obj.icon = './images/landmark-flag-solid.svg'
                             state_obj.id = state.$.id
+                            state_obj.title = state.$.name
+                            state_obj.title_korean = (state.$.name_korean != undefined) ? state.$.name_korean : ""
+                            state_obj.pop = state.$.pop
+                            state_obj.abbr = state.$.abbr
+                            state_obj.abbr_korean = (state.$.abbr_korean != undefined) ? state.$.abbr_korean : ""
+                            state_obj.time_zone = (state.$.time_zone != undefined) ? parseFloat(state.$.time_zone).toFixed(2).toString() : parseFloat(nation.$.time_zone).toFixed(2).toString()
+                            state_obj.observes_dst = (state.$.observes_dst != undefined) ? state.$.observes_dst : "0"
+                            state_obj.lat = (state.$.lat != undefined) ? state.$.lat : "0"
+                            state_obj.long = (state.$.long != undefined) ? state.$.long : "0"
+                            if (parseInt(state.$.id) > max_state_id) { max_state_id = parseInt(state.$.id) }
+                            var city_arr = []
+                            if (state.CITIES[0].CITY != undefined) {
+                                for (city of state.CITIES[0].CITY) {
+                                    var obj = {}
+                                    obj.name = city.$.name
+                                    obj.state = state.$.id
+                                    obj.nation = nation.$.id
+                                    obj.continent = continent.$.id
+                                    cities_by_id[city.$.id] = obj
+                                    city_count++;
+                                    var city_obj = {}
+                                    var city_bn_obj = {}
+                                    city_obj.type = 'city'
+                                    city_obj.folder = false
+                                    if (nation.$.capid == city.$.id) {
+                                        city_obj.icon = './images/star-solid.svg'
+                                    } else {
+                                        city_obj.icon = './images/city-solid.svg'
+                                    }
+                                    city_obj.id = city.$.id
+                                    city_obj.title = city.$.name
+                                    city_obj.title_korean = (city.$.name_korean != undefined) ? city.$.name_korean : ""
+                                    city_obj.pop = city.$.pop
+                                    city_obj.lat = (city.$.lat != undefined) ? city.$.lat : "0"
+                                    city_obj.long = (city.$.long != undefined) ? city.$.long : "0"
+                                    city_obj.abbr = city.$.abbr
+                                    city_obj.altitude = (city.$.altitude != undefined) ? city.$.altitude : "0"
+                                    city_obj.abbr_korean = (city.$.abbr_korean != undefined) ? city.$.abbr_korean : ""
+                                    city_obj.time_zone = (city.$.time_zone != undefined) ? parseFloat(city.$.time_zone).toFixed(2).toString() : parseFloat(nation.$.time_zone).toFixed(2).toString()
+                                    city_obj.observes_dst = (city.$.observes_dst != undefined) ? city.$.observes_dst : "0"
+                                    city_obj.state = state.$.id
+                                    city_obj.nation = nation.$.id
+                                    city_arr.push(city_obj)
+                                    if (parseInt(city.$.id) > max_city_id) { max_city_id = parseInt(city.$.id) }
+                                    city_bn_obj.id = city.$.id
+                                    city_bn_obj.title = city.$.name
+                                    city_bn_obj.state = state.$.id
+                                    city_bn_obj.nation = nation.$.id
+                                    cities_bn_arr.push(city_bn_obj)
+                                }
+                            }
+                            state_obj.children = city_arr
                             state_arr.push(state_obj)
+                            cities_by_state[state.$.id] = city_arr
                         }
-                    } catch (err) {}
-                    try {
-                        for (nation of region.REGION_NATIONS[0].REGION_NATION) {
-                            var nation_obj = {}
-                            nation_obj.title = nations_by_id[nation.$.id]
-                            nation_obj.id = nation.$.id
-                            nation_arr.push(nation_obj)
-                        }
-                    } catch (err) {}
-                    region_obj.nations = nation_arr
-                    region_obj.states = state_arr
-                    region_obj.cities = city_arr
-                    regions.push(region_obj)
-                    if (parseInt(region.$.id) > max_region_id) { max_region_id = parseInt(region.$.id) }
-                    if (parseInt(region.$.sort_order) > max_region_sort_order) { max_region_sort_order = parseInt(region.$.sort_order) }
+                        states_obj.children = (state_arr)
+                        nation_obj.children = [second_nations_obj, nation_eth_obj, states_obj]
+                        nation_arr.push(nation_obj)
+                        states_by_nation[nation.$.id] = state_arr
+                        cities_by_nation[nation.$.id] = cities_bn_arr
+                    }
+                    nations_by_continent[continent.$.id] = nation_arr
+                    continent_obj.children = nation_arr
+                    continents.push(continent_obj)
                 }
-            }
-            regions_arr.children = regions
-            tree_json.push(regions_arr)
+                continent_arr.children = continents
+                tree_json.push(continent_arr)
 
-            initTree(tree_json)
+                var regions_arr = {}
+                regions_arr.title = "REGIONS"
+                regions_arr.folder = true
+                regions_arr.icon = './images/map-solid.svg'
+                regions_arr.type = "REGIONS_PARENT"
+                var regions = []
+                
+                if (json.WORLD.REGIONS[0].REGION != undefined) {
+                    for (region of json.WORLD.REGIONS[0].REGION) {
+                        regions_by_id[region.$.id] = region.$.name
+                        region_count++;
+                        var region_obj = {}
+                        region_obj.type = 'region'
+                        region_obj.folder = true
+                        region_obj.icon = "./images/map-location-dot-solid.svg"
+                        region_obj.id = region.$.id
+                        region_obj.title = region.$.name
+                        region_obj.sort_order = region.$.sort_order
+                        region_obj.name_korean = region.$.name_korean
+                        var city_arr = []
+                        var state_arr = []
+                        var nation_arr = []
+                        try {
+                            for (city of REGION_CITIES[0].REGION_CITY) {
+                                var city_obj ={}
+                                city_obj.title = cities_by_id[city.$.id].name
+                                city_obj.id = city.$.id
+                                city_arr.push(city_obj)
+                            }
+                        } catch (err) {}
+                        try {
+                            for (state of region.REGION_STATES[0].REGION_STATE) {
+                                var state_obj = {}
+                                state_obj.title = states_by_id[state.$.id]
+                                state_obj.id = state.$.id
+                                state_arr.push(state_obj)
+                            }
+                        } catch (err) {}
+                        try {
+                            for (nation of region.REGION_NATIONS[0].REGION_NATION) {
+                                var nation_obj = {}
+                                nation_obj.title = nations_by_id[nation.$.id]
+                                nation_obj.id = nation.$.id
+                                nation_arr.push(nation_obj)
+                            }
+                        } catch (err) {}
+                        region_obj.nations = nation_arr
+                        region_obj.states = state_arr
+                        region_obj.cities = city_arr
+                        regions.push(region_obj)
+                        if (parseInt(region.$.id) > max_region_id) { max_region_id = parseInt(region.$.id) }
+                        if (parseInt(region.$.sort_order) > max_region_sort_order) { max_region_sort_order = parseInt(region.$.sort_order) }
+                    }
+                }
+                regions_arr.children = regions
+                tree_json.push(regions_arr)
+
+                initTree(tree_json)
+            } catch (err) {
+                $("#overlay").css("display","none")
+                alert(err)
+            }
         } else {
             $("#overlay").css("display","none")
             alert("cancelled!")
