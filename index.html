@@ -3380,7 +3380,6 @@
                     if (parseInt(continent.$.id) > max_continent_id) { max_continent_id = parseInt(continent.$.id) }
                     var nation_arr = []     
                     for (nation of continent.NATIONS[0].NATION) {
-                        console.log(nation.$.name)
                         const usa = (nation.$.hasOwnProperty('this_is_the_usa')) ? nation.$.this_is_the_usa : nation.$.this_is_modern_usa
                         nations_by_id[nation.$.id] = nation.$.name
                         nation_count++;
