@@ -1,7 +1,7 @@
 {
   "name": "OOTP-World-Editor",
   "productName": "OOTP World Editor",
-  "version": "0.1.2-beta",
+  "version": "0.1.3-beta",
   "description": "A world_default.xml editor for OOTP Baseball",
   "main": "main.js",
   "author": {
@@ -12,16 +12,16 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
     "add-filename-increment": "^1.0.0",
     "bing-translate-api": "^2.9.1",
-    "xlsx": "^0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz",
     "xml-writer": "^1.7.0",
     "xml2js": "^0.6.0",
-    "xmldom": "^0.6.0",
     "xpath": "^0.0.32"
   },
   "devDependencies": {
-    "electron": "^25.2.0",
+    "electron": "^25.8.1",
     "electron-builder": "^24.6.3"
   },
   "build": {
