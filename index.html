@@ -5480,7 +5480,7 @@
 
     $("#newStateNation").on("change",function() {
         n = findNation($("#newStateContinent option:selected").text(), $("#newStateNation option:selected" ).text())
-        $("#newStateTimeZone").val(n.data.time_zone)
+        $("#newStateTimeZone").val((n == undefined) ? "0.00" : n.data.time_zone)
     })  
 
     function addSecondNation(nation) {
